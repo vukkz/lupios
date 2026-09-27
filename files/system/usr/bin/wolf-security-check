@@ -146,6 +146,9 @@ fi
 level=$(cat /etc/wolf-os/security-level 2>/dev/null || echo wolf)
 case $level in balanced) level=wolf ;; paranoid) level=sheep ;; esac # names used by older versions
 opt_off "Security level" "$level (change: wolf level)"
+if [[ $image_ref == *:br-testing-* ]]; then
+    opt_off "Update channel" "testing: new changes arrive here first (wolf channel stable)"
+fi
 
 net_zone=""
 while IFS=: read -r _ type device; do

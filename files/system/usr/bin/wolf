@@ -600,6 +600,34 @@ cmd_update() {
     fi
 }
 
+# Update channels: stable = the `latest` tag (built from the main branch), testing = the
+# `br-testing-<Fedora version>` tag (built from the testing branch, where changes land first).
+cmd_channel() {
+    local ref image tag version current target
+    ref=$(rpm-ostree status --json | jq -r '.deployments[] | select(.booted) | ."container-image-reference" // empty')
+    ref=$(sed -E 's#^[^:]+:(docker://)?##' <<<"$ref") # drop "ostree-image-signed:docker://" etc.
+    image=${ref%:*} tag=${ref##*:}
+    version=$(. /etc/os-release && echo "$VERSION_ID")
+    current=stable
+    [[ $tag == br-testing-* ]] && current=testing
+    case ${1:-} in
+        "")
+            printf '%sUpdate channel:%s %s  %s(%s)%s\n\n' "$B" "$N" "$current" "$D" "$ref" "$N"
+            echo "  stable    what friends and your main PC should use"
+            echo "  testing   new changes arrive here first; use it in a VM to try them"
+            echo
+            echo "Switch with: wolf channel stable|testing"
+            return 0
+            ;;
+        stable) target="$image:latest" ;;
+        testing) target="$image:br-testing-$version" ;;
+        *) die "Usage: wolf channel [stable|testing]" ;;
+    esac
+    [[ $1 == "$current" ]] && { echo "Already on the $1 channel."; return 0; }
+    as_root rpm-ostree rebase "ostree-image-signed:docker://$target"
+    ok "Switched to the $1 channel ($target). Reboot to start it: systemctl reboot"
+}
+
 # Machine-readable state for the Wolf panel widget and Wolf Welcome (key=value lines)
 cmd_state() {
     local uuid zone="" name="" net=offline
@@ -627,6 +655,7 @@ ${B}Software${N}
   ${C}wolf remove${N} <name>               remove it again
   ${C}wolf search${N} <name>               look for apps and tools
   ${C}wolf update${N}                      update the system, apps and boxes
+  ${C}wolf channel${N} [stable|testing]    which updates you get (testing = new changes first)
 
 ${B}Security${N}
   ${C}wolf check${N}                       how locked-down this system is
@@ -667,6 +696,7 @@ case ${1:-help} in
     remove | uninstall) cmd_remove "${2:-}" ;;
     search) cmd_search "${2:-}" ;;
     update | upgrade) cmd_update ;;
+    channel) cmd_channel "${2:-}" ;;
     state) cmd_state ;;
     _classify) cmd_classify "$2" "$3" ;;
     help | -h | --help) usage ;;

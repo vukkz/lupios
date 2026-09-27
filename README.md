@@ -37,10 +37,10 @@ In the commands below, use `wolf-os-nvidia` instead of `wolf-os` if you have NVI
 
 ## Installation
 
-> [!WARNING]  
-> [This is an experimental feature](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable), try at your own discretion.
+**New install from a USB stick:** follow [docs/install.md](docs/install.md). The installer ISOs are
+built by the `build-iso` workflow (Actions tab → build-iso → Run workflow).
 
-To rebase an existing atomic Fedora installation to the latest build:
+**Already running Fedora Atomic** (Silverblue, Kinoite and similar)? Switch it to Wolf OS:
 
 - First rebase to the unsigned image, to get the proper signing keys and policies installed:
   ```
@@ -80,11 +80,21 @@ wolf game on            # before playing; wolf game off afterwards
 wolf level sheep        # maximum caution; or gaming / wolf (the default)
 ```
 
-Run `wolf help` to see every command. System updates: `ujust update`.
+Run `wolf help` to see every command.
 
-## ISO
+## Update channels
 
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+| Channel | Image tag | Built from | For |
+|---|---|---|---|
+| **stable** | `latest` | the `main` branch, plus a daily rebuild for Fedora security updates | everyone |
+| **testing** | `br-testing-44` | the `testing` branch | trying new changes in a VM first |
+
+Switch with `wolf channel stable` or `wolf channel testing`, then reboot.
+
+**How changes ship:**
+1. New work is pushed to the `testing` branch.
+2. Try it on a testing machine: `wolf update`, reboot, test.
+3. If it works, promote it: `git push origin testing:main`. Stable machines get it with their next update.
 
 ## Verification
 
