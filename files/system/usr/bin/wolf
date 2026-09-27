@@ -552,8 +552,14 @@ cmd_remove() { # <name>
         if [[ ${app,,} == "${q,,}" || ${name,,} == "${q,,}" ]]; then id=$app; break; fi
     done < <(flatpak list --app --columns=application,name 2>/dev/null)
     if [[ -n $id ]]; then
+        # A running app keeps going (tray icon and all) after uninstalling, so close it first
+        if flatpak ps --columns=application 2>/dev/null | grep -qxF "$id"; then
+            note "$id is running. Closing it first."
+            flatpak kill "$id" 2>/dev/null || true
+            sleep 1
+        fi
         flatpak uninstall --noninteractive "$id"
-        ok "Removed $id."
+        ok "Removed $id. Its settings are kept in ~/.var/app/$id (delete that folder to remove them too)."
         return
     fi
     if podman container exists "$TOOLS_BOX" && in_box pacman -Qq "$q" >/dev/null 2>&1; then
