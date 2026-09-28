@@ -67,15 +67,11 @@ settings, install, then turn it back on after step 5.
    administrator.
 4. **Wolf Welcome** opens and walks you through your security level, gaming and the Lab.
 
-## 6. Two commands to finish
+## 6. One restart to finish
 
-Open **Howl** (the terminal) and run:
-
-```bash
-wolf kargs on
-```
-
-That adds extra kernel hardening. Reboot, then run:
+About 5 minutes after you start Wolf OS, it adds extra kernel hardening by itself, and a
+**"Kernel hardening added"** message pops up. Restart once after that message. Then open **Howl**
+(the terminal) and run:
 
 ```bash
 wolf check

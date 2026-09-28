@@ -1,0 +1,14 @@
+[Unit]
+Description=Wolf OS: add the kernel hardening boot arguments
+Documentation=https://github.com/vukkz/wolf-os/blob/main/SECURITY.md
+# Only on an installed Wolf OS, and only until it has worked once or the user ran
+# `wolf kargs on/off` themselves (wolf creates this file in both cases)
+ConditionPathExists=/run/ostree-booted
+ConditionPathExists=!/var/lib/wolf-os/kargs-decided
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wolf _kargs-auto
+# rpm-ostree does one job at a time; if an update is running, try again later
+Restart=on-failure
+RestartSec=10min

@@ -5,6 +5,7 @@ set -euo pipefail
 LEVEL_FILE=/etc/wolf-os/security-level # persistent
 LEVELS=/usr/share/wolf-os/levels
 KARGS_FILE=/usr/share/wolf-os/kargs
+KARGS_DECIDED=/var/lib/wolf-os/kargs-decided # kargs were set up once; /var is shared by every boot entry
 GAME_STATE=/run/wolf-os/game-mode # /run is cleared at reboot, like Game Mode's firewall changes
 USER_FLAGS=${XDG_CONFIG_HOME:-$HOME/.config}/wolf-os
 LAB_IMAGE=ghcr.io/vukkz/wolf-os-lab:latest
@@ -102,13 +103,13 @@ cmd_net() {
 }
 
 # Tell everyone logged in to a desktop (used by the NetworkManager dispatcher, which runs as root)
-notify_desktop_users() { # <title> <body>
+notify_desktop_users() { # <title> <body> [icon]
     local session uid user type
     while read -r session uid user _; do
         type=$(loginctl show-session "$session" -p Type --value 2>/dev/null) || continue
         [[ $type == wayland || $type == x11 ]] || continue
         runuser -u "$user" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-            notify-send -a "Wolf OS" -i network-wireless "$1" "$2" 2>/dev/null || true
+            notify-send -a "Wolf OS" -i "${3:-network-wireless}" "$1" "$2" 2>/dev/null || true
     done < <(loginctl list-sessions --no-legend 2>/dev/null)
 }
 
@@ -377,35 +378,68 @@ cmd_usbguard() {
     esac
 }
 
-cmd_kargs() {
-    local args=() current arg action
+kargs_decided() { as_root mkdir -p "${KARGS_DECIDED%/*}" && as_root touch "$KARGS_DECIDED"; }
+
+# Fills kargs_args with the rpm-ostree options that turn the hardening on or off for the next boot
+# (no subshell, so a failing rpm-ostree stops us instead of looking like "nothing to change")
+kargs_changes() { # <on|off>
+    local current arg
     current=" $(rpm-ostree kargs) " # what the next boot will use
+    kargs_args=()
+    while read -r arg; do
+        [[ -z $arg ]] && continue
+        if [[ $1 == on && $current != *" $arg "* ]]; then
+            kargs_args+=("--append-if-missing=$arg")
+        elif [[ $1 == off && $current == *" $arg "* ]]; then
+            kargs_args+=("--delete-if-present=$arg")
+        fi
+    done <"$KARGS_FILE"
+}
+
+cmd_kargs() {
+    local arg
     case ${1:-} in
         "")
-            local missing=0 cmdline
+            local now=on next=on cmdline
             cmdline=" $(</proc/cmdline) "
-            while read -r arg; do [[ -z $arg || $cmdline == *" $arg "* ]] || missing=1; done <"$KARGS_FILE"
-            if ((missing)); then echo "Kernel hardening boot arguments: OFF"; else echo "Kernel hardening boot arguments: ON"; fi
+            while read -r arg; do [[ -z $arg || $cmdline == *" $arg "* ]] || now=off; done <"$KARGS_FILE"
+            kargs_changes on
+            ((${#kargs_args[@]} == 0)) || next=off
+            if [[ $now == "$next" ]]; then
+                echo "Kernel hardening boot arguments: ${now^^}"
+            else
+                echo "Kernel hardening boot arguments: ${now^^}, ${next^^} after the next restart"
+            fi
             echo "${D}$(tr '\n' ' ' <"$KARGS_FILE")${N}"
             echo "${D}Changing them creates a new boot entry and needs a reboot.${N}"
             return 0
             ;;
-        on) action=--append-if-missing ;;
-        off) action=--delete-if-present ;;
+        on | off) kargs_changes "$1" ;;
         *) on_off_usage kargs ;;
     esac
-    while read -r arg; do
-        [[ -z $arg ]] && continue
-        if [[ $1 == on && $current != *" $arg "* ]] || [[ $1 == off && $current == *" $arg "* ]]; then
-            args+=("$action=$arg")
-        fi
-    done <"$KARGS_FILE"
-    if ((${#args[@]} == 0)); then
+    if ((${#kargs_args[@]} == 0)); then
+        kargs_decided
         echo "Already $1. If you haven't rebooted since, reboot now."
         return 0
     fi
-    as_root rpm-ostree kargs "${args[@]}"
+    as_root rpm-ostree kargs "${kargs_args[@]}"
+    kargs_decided # the user chose: the automatic setup below won't change it again
     ok "Kernel hardening boot arguments turned $1. Reboot to apply."
+}
+
+# Run as root by wolf-kargs.timer a few minutes after startup, so new installs get the hardening
+# without anyone having to remember `wolf kargs on`. It only ever runs until it has worked once,
+# and never after the user picked on or off themselves, so `wolf kargs off` stays off.
+cmd_kargs_auto() {
+    [[ -e $KARGS_DECIDED ]] && return 0
+    kargs_changes on
+    if ((${#kargs_args[@]})); then
+        # fails while an update is running (rpm-ostree does one job at a time); the service retries
+        rpm-ostree kargs "${kargs_args[@]}"
+        notify_desktop_users "Kernel hardening added" \
+            "Extra protection for the kernel turns on the next time you restart. (Undo: wolf kargs off)" security-high
+    fi
+    kargs_decided
 }
 
 # ---------------------------------------------------------------------------------------
@@ -667,7 +701,7 @@ ${B}Security${N}
   ${C}wolf check${N}                       how locked-down this system is
   ${C}wolf level${N} [gaming|wolf|sheep]   security level (stays until you change it)
   ${C}wolf net${N} [home|public]           trust level of the network you're on
-  ${C}wolf kargs${N} [on|off]              kernel hardening boot arguments (needs a reboot)
+  ${C}wolf kargs${N} [on|off]              kernel hardening boot arguments (on by itself after install)
   ${C}wolf usbguard${N} [on|off]           block USB devices plugged in later
 
 ${B}Gaming${N}
@@ -705,6 +739,7 @@ case ${1:-help} in
     channel) cmd_channel "${2:-}" ;;
     state) cmd_state ;;
     _classify) cmd_classify "$2" "$3" ;;
+    _kargs-auto) cmd_kargs_auto ;;
     help | -h | --help) usage ;;
     *) usage; exit 1 ;;
 esac

@@ -38,7 +38,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 
 ## Hard-won facts (verified; don't re-learn them)
 - rpm-ostree ignores the BlueBuild `kargs` module (bootc-only), hence `wolf kargs on`, which runs
-  `rpm-ostree kargs`. Security levels must **never** change kargs: that creates a new deployment and
+  `rpm-ostree kargs`. `wolf-kargs.timer` (enabled by the `systemd` module) runs it once by itself, 5 min
+  after boot, until `/var/lib/wolf-os/kargs-decided` exists; `wolf kargs on/off` creates that file
+  too, so the user's choice always wins. Security levels must **never** change kargs: that creates a new deployment and
   pushes the previous OS version out of the rollback slot.
 - Fedora KDE: `XDG_CONFIG_DIRS=/etc/xdg:/usr/share/kde-settings/kde-profile/default/xdg`, so our defaults
   go in `/etc/xdg`. The app-menu icon is `start-here` (look.sh swaps it and deletes the sized PNGs).

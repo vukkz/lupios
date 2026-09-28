@@ -101,8 +101,17 @@ done </usr/share/wolf-os/kargs
 if ((${#missing[@]} == 0)); then
     pass "Kernel boot args" "hardened"
 else
-    fail "Kernel boot args" "missing: ${missing[*]}"
-    hint "wolf kargs on (then reboot)"
+    # added already (by hand, or automatically after install) but not booted into yet?
+    next_boot=" $(rpm-ostree kargs 2>/dev/null) "
+    pending=1
+    for arg in "${missing[@]}"; do [[ $next_boot == *" $arg "* ]] || pending=0; done
+    if ((pending)); then
+        fail "Kernel boot args" "added, active after the next restart"
+        hint "restart to turn them on"
+    else
+        fail "Kernel boot args" "missing: ${missing[*]}"
+        hint "wolf kargs on (then reboot)"
+    fi
 fi
 
 # --- Hacking tools stay in the lab -----------------------------------------------

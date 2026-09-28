@@ -64,8 +64,7 @@ The `latest` tag will automatically point to the latest build. That build will s
 ## After installing
 
 ```bash
-wolf kargs on           # once: kernel hardening boot arguments, then reboot
-wolf check              # see what's protected
+wolf check              # see what's protected (restart once after the "Kernel hardening added" message)
 wolf lab                # enter the Wolf Lab (first time downloads a few GB)
 wolf setup gaming       # optional: Steam, Heroic, Lutris, ProtonUp-Qt, MangoHud, gamescope
 ```

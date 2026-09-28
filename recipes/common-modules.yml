@@ -50,6 +50,11 @@ modules:
       - fix-permissions.sh
       - compat.sh
 
+  - type: systemd
+    system:
+      enabled:
+        - wolf-kargs.timer # adds the kernel hardening boot arguments once, after install
+
   # Rebuild the boot image so it contains the Wolf OS boot screen and the module
   # blacklist. Keep this near the end so it includes everything above.
   - type: initramfs

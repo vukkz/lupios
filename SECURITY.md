@@ -52,7 +52,7 @@ To change one: put the same key in `/etc/sysctl.d/99-local.conf`, then run `sudo
 - `rp_filter` stays at systemd's "loose" mode, because strict mode breaks many VPNs.
 - `io_uring` stays enabled, because some apps and games need it.
 
-## Kernel boot arguments: `wolf kargs on` (*run once*)
+## Kernel boot arguments: added automatically, once
 
 `slab_nomerge init_on_alloc=1 page_alloc.shuffle=1 randomize_kstack_offset=on vsyscall=none`
 (the list is in `files/system/usr/share/wolf-os/kargs`)
@@ -62,8 +62,13 @@ amount of performance and memory.
 - `vsyscall=none` breaks only ancient (pre-2012) Linux programs. Windows games through Proton aren't affected.
 - `init_on_free=1` was left out on purpose because of its bigger performance cost.
 
-They're a `wolf` command rather than built into the image, because updates
-through `rpm-ostree` don't apply kernel arguments from the image. Undo with `wolf kargs off`.
+Updates through `rpm-ostree` don't apply kernel arguments from the image, so Wolf OS adds them
+itself: `wolf-kargs.timer` runs `wolf _kargs-auto` 5 minutes after startup, shows a notification,
+and the arguments are active from the next restart on. It runs only until it has worked once.
+- Adding them creates a new boot entry. The first time, the previous entry becomes the same version
+  without the extra arguments, so the rollback slot holds no older version until the next update.
+- **Undo with `wolf kargs off`.** That choice is remembered (`/var/lib/wolf-os/kargs-decided`), and
+  Wolf OS never adds them back by itself. `wolf kargs on` turns them on again.
 
 ## Blocked kernel modules: `files/system/usr/lib/modprobe.d/wolf-blacklist.conf`
 
