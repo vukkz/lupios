@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Started at login by /etc/xdg/autostart/opensnitch_ui.desktop. Opens OpenSnitch's pop-up app
+# (the one that asks "allow this app to connect?") only while the outgoing guard is on.
+set -euo pipefail
+
+systemctl is-enabled --quiet opensnitch.service || exit 0
+exec opensnitch-ui

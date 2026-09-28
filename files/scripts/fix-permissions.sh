@@ -3,4 +3,4 @@
 set -euo pipefail
 
 chmod 0755 /usr/bin/wolf /usr/bin/wolf-security-check /usr/libexec/wolf-os-look \
-    /usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust
+    /usr/libexec/wolf-outgoing-ui /usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust

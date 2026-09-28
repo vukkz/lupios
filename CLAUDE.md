@@ -55,6 +55,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - ISO: `jasonn3/build-container-installer@v1.5.0`, installer product name = image name, Secure Boot key
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.
 - Flatpak apps keep running after `flatpak uninstall`; `wolf remove` closes them with `flatpak kill`.
+- OpenSnitch (`wolf outgoing`) isn't in Fedora's repos: `files/scripts/opensnitch.sh` installs the GitHub
+  release, pinned with SHA-256 (bump both to update; Dependabot can't). Its RPM enables the daemon, so the
+  script disables it. The pop-up app autostarts via our `/etc/xdg/autostart/opensnitch_ui.desktop` →
+  `wolf-outgoing-ui`, which exits unless the daemon is enabled. Daemon default: allow when no UI is connected.
 - QML and anything Plasma can't be tested on Windows: test in the VM. VirtualBox there runs in
   Hyper-V (NEM) mode: slow, and once hung at `boot.mount` after an update (a reboot fixed it).
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
@@ -66,5 +70,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   waiting for the owner's second SSD for dual-boot.
 - Before going public: check the name ("Wolfi" and others exist), ISO hosting, a website, Fedora 45 rebase
   (around Oct–Nov 2026), and a boot test in CI.
-- Ideas: Wolf Center in Rust (owner is learning Rust in C:\dev\kernel), opt-in per-app firewall, strict
-  lab mode, podman signature policy for the lab image, Howl colour scheme.
+- Ideas: Wolf Center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
+  policy for the lab image, Howl colour scheme.
+- Untested in the VM: `wolf outgoing` (OpenSnitch eBPF under our sysctls, the pre-approved rule, the
+  autostart unit name `app-opensnitch_ui@autostart.service`).

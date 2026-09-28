@@ -92,6 +92,32 @@ When it's on, only the USB devices plugged in when you turned it on are allowed.
 A malicious USB stick pretending to be a keyboard gets blocked. It's off by default
 because it's easy to lock yourself out of a new keyboard.
 
+## Outgoing guard (*opt-in, on in sheep*): `wolf outgoing on`
+
+The firewall above stops strangers connecting **to** you. The outgoing guard covers the
+other direction: [OpenSnitch](https://github.com/evilsocket/opensnitch) asks the first time
+each app connects somewhere ("Discord wants to connect to discord.com: allow or deny?") and
+remembers your answer. It catches things you didn't expect to go online: telemetry, a script
+or game mod phoning home, a malicious package calling out.
+
+- **Installed from OpenSnitch's official release**, pinned to a version and checked against
+  its published SHA-256 checksums at build time (`files/scripts/opensnitch.sh`). It isn't in
+  Fedora's repos.
+- **Wolf OS's own services are pre-approved** (DNS, network setup, time, system, app and firmware
+  updates, container downloads) in `/etc/opensnitchd/rules/000-wolf-os-system.json`, so the
+  first minutes aren't a wall of questions. A deny rule of your own still wins.
+- **Off by default**, because the questions take getting used to, and a friend who clicks
+  Allow on everything gains nothing. The sheep level turns it on, and off again when you leave
+  sheep, unless you had turned it on yourself.
+
+**What it can't do:**
+- **When the pop-up app isn't running, connections are allowed** (OpenSnitch's default), so a
+  crashed or closed pop-up never cuts off the internet. Malware running as you could close it
+  on purpose.
+- **Malware inside an app you already allowed** (your browser, say) can use that app's permission.
+- **Traffic that can't be tied to an app** passes, for example raw packets from `nmap` scans
+  in `wolf lab root`.
+
 ## Network trust: `wolf net`
 
 Every Wi-Fi or wired network has a trust level. The first time you connect to one,
@@ -137,6 +163,7 @@ The files are in `files/system/usr/share/wolf-os/levels/`.
 | Magic SysRq keyboard shortcuts | Sync only | Sync only | Off |
 | TCP timestamps, which reveal uptime | On | On | Off |
 | USBGuard | Your choice | Your choice | On |
+| Outgoing guard: apps ask before they connect (OpenSnitch) | Your choice | Your choice | On |
 
 Switching levels is instant and needs no reboot. **Levels never change kernel boot
 arguments.** On Wolf OS that creates a new boot entry, which takes a minute, needs a
@@ -151,6 +178,8 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 - Wi-Fi login pages (hotels, airports, trains) don't load, because DNS only goes to
   Quad9. Switch to `wolf level wolf`, log in, then switch back.
 - A few apps that use io_uring can fail.
+- Every app asks once before it goes online, so expect questions in the first minutes and
+  after installing something new.
 - Split-lock mitigation only exists on CPUs that detect split locks (mostly Intel).
   On other CPUs, that setting does nothing.
 

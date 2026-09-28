@@ -28,7 +28,7 @@ PlasmoidItem {
     readonly property var levelInfo: ({
         gaming: "Steam Remote Play/LAN ports stay open at home, no split-lock slowdown.",
         wolf: "The default: everything in Wolf OS's security baseline.",
-        sheep: "Maximum caution: encrypted DNS, invisible to pings, USBGuard on."
+        sheep: "Maximum caution: encrypted DNS, invisible to pings, USBGuard on, apps ask before connecting."
     })
 
     Plasmoid.icon: "wolf-os-logo"
@@ -165,7 +165,7 @@ PlasmoidItem {
             Layout.fillWidth: true
             PlasmaComponents3.Label {
                 Layout.fillWidth: true
-                text: "Sheep blocks Wi-Fi login pages (hotels, airports) and new USB devices. Switch to it?"
+                text: "Sheep blocks Wi-Fi login pages (hotels, airports) and new USB devices, and apps ask before connecting. Switch to it?"
                 wrapMode: Text.WordWrap
                 color: Kirigami.Theme.neutralTextColor
             }

@@ -45,6 +45,7 @@ modules:
     scripts:
       - branding.sh
       - firewall.sh
+      - opensnitch.sh # per-app firewall for `wolf outgoing`, off by default
       - look.sh
       - debrand.sh
       - fix-permissions.sh

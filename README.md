@@ -77,6 +77,7 @@ wolf update             # system, apps and boxes; reboot afterwards if it says s
 wolf net public         # on a network you don't trust (new Wi-Fi networks start as public)
 wolf game on            # before playing; wolf game off afterwards
 wolf level sheep        # maximum caution; or gaming / wolf (the default)
+wolf outgoing on        # apps ask before they connect to the internet (on in sheep)
 ```
 
 Run `wolf help` to see every command.

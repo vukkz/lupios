@@ -182,6 +182,12 @@ else
     opt_off "USBGuard" "off (optional: wolf usbguard on)"
 fi
 
+if systemctl is-active --quiet opensnitch.service; then
+    opt_on "Outgoing guard" "on, apps ask before they connect"
+else
+    opt_off "Outgoing guard" "off (optional: wolf outgoing on)"
+fi
+
 # --- Score -----------------------------------------------------------------------
 if ((passed == total)); then
     colour=$G

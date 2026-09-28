@@ -32,7 +32,7 @@ Welcome.Page {
             model: [
                 ["gaming", "Gaming", "input-gaming", "For playing a lot: Steam Remote Play and LAN transfers always work at home, and a SteamOS fix for stutter in some games."],
                 ["wolf", "Wolf (recommended)", "wolf-os-logo", "The everyday default. Every protection in Wolf OS, nothing that gets in your way."],
-                ["sheep", "Sheep", "security-high", "Maximum caution for travel and public places: encrypted DNS, invisible to pings, new USB devices blocked. Wi-Fi login pages (hotels, airports) won't load."]
+                ["sheep", "Sheep", "security-high", "Maximum caution for travel and public places: encrypted DNS, invisible to pings, new USB devices blocked, apps ask before connecting. Wi-Fi login pages (hotels, airports) won't load."]
             ]
             delegate: QQC2.Button {
                 required property var modelData
