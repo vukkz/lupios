@@ -456,7 +456,7 @@ cmd_kargs_auto() {
 # Outgoing guard: wolf outgoing (OpenSnitch, a per-app firewall for outgoing connections)
 # ---------------------------------------------------------------------------------------
 
-OUTGOING_UI_UNIT=app-opensnitch_ui@autostart.service # made from /etc/xdg/autostart/opensnitch_ui.desktop
+OUTGOING_UI_UNIT="app-opensnitch_ui@autostart.service" # made from /etc/xdg/autostart/opensnitch_ui.desktop
 
 # Open the pop-up app now instead of at the next login. From the widget we run as root, so
 # start it in each desktop user's own session. If a user switched off OpenSnitch's autostart,
