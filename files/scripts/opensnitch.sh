@@ -19,10 +19,15 @@ for rpm in "${!SHA256[@]}"; do
     echo "${SHA256[$rpm]}  $dir/$rpm" | sha256sum -c -
 done
 
-# The UI only "recommends" grpcio and protobuf, but it can't talk to the daemon without them
-dnf -y install "$dir"/*.rpm python3-grpcio python3-protobuf
+# The pop-up app. It only "recommends" grpcio and protobuf, but can't talk to the daemon without them.
+dnf -y install "$dir/opensnitch-ui-$VERSION-1.noarch.rpm" python3-grpcio python3-protobuf
+
+# The daemon, without its install scripts: they only enable and start the service. Starting can't
+# work during a build, and dnf5 then fails the whole install. Wolf OS ships it off anyway:
+# `wolf outgoing on` (or the sheep level) turns it on, and /etc/xdg/autostart opens the pop-up only then.
+dnf -y install --setopt=tsflags=noscripts "$dir/opensnitch-$VERSION-1.x86_64.rpm"
 rm -rf "${dir:?}"
 
-# The package turns the daemon on for everyone. Wolf OS ships it off: `wolf outgoing on`
-# (or the sheep level) turns it on, and /etc/xdg/autostart starts the pop-up app only then.
+# Make sure it stays off, even if a future package turns it on another way
 systemctl disable opensnitch.service
+rpm -q opensnitch opensnitch-ui python3-grpcio python3-protobuf

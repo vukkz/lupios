@@ -56,9 +56,11 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.
 - Flatpak apps keep running after `flatpak uninstall`; `wolf remove` closes them with `flatpak kill`.
 - OpenSnitch (`wolf outgoing`) isn't in Fedora's repos: `files/scripts/opensnitch.sh` installs the GitHub
-  release, pinned with SHA-256 (bump both to update; Dependabot can't). Its RPM enables the daemon, so the
-  script disables it. The pop-up app autostarts via our `/etc/xdg/autostart/opensnitch_ui.desktop` →
-  `wolf-outgoing-ui`, which exits unless the daemon is enabled. Daemon default: allow when no UI is connected.
+  release, pinned with SHA-256 (bump both to update; Dependabot can't). The daemon RPM's %post runs
+  `systemctl start`, which fails in a container build, and dnf5 then fails the whole transaction even though
+  it calls the error "non-critical": so the daemon RPM is installed with `tsflags=noscripts`. The pop-up
+  app autostarts via our `/etc/xdg/autostart/opensnitch_ui.desktop` → `wolf-outgoing-ui`, which exits
+  unless the daemon is enabled. Daemon default: allow when no UI is connected.
 - QML and anything Plasma can't be tested on Windows: test in the VM. VirtualBox there runs in
   Hyper-V (NEM) mode: slow, and once hung at `boot.mount` after an update (a reboot fixed it).
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
