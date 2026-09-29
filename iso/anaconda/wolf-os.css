@@ -1,0 +1,36 @@
+/* Wolf OS look for the installer (Anaconda), in place of Fedora's.
+ * wolf-os-look.tmpl copies this over every stylesheet in /usr/share/anaconda/pixmaps
+ * and our PNGs over Fedora's, at the paths below. Same layout as Fedora's fedora.css. */
+
+@define-color wolf_night #0B1220;
+
+/* The sidebar: a background, then a logo on top */
+.logo-sidebar {
+    background-image: url('/usr/share/anaconda/pixmaps/sidebar-bg.png');
+    background-color: @wolf_night;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 100%;
+}
+
+.logo {
+    background-image: url('/usr/share/anaconda/pixmaps/sidebar-logo.png');
+    background-position: 50% 20px;
+    background-repeat: no-repeat;
+    background-color: transparent;
+}
+
+.product-logo {
+    background-image: none;
+    background-color: transparent;
+}
+
+/* The bar at the top of each page */
+AnacondaSpokeWindow #nav-box {
+    background-color: @wolf_night;
+    background-image: url('/usr/share/anaconda/pixmaps/topbar-bg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: top left;
+    color: white;
+}

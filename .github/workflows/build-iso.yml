@@ -32,6 +32,21 @@ jobs:
           sudo docker image prune --all --force
           df -h /
 
+      # The installer runs on Fedora's packages, which brand it as Fedora. Our look for it lives in
+      # iso/anaconda: render its artwork here, then wolf-os-look.tmpl swaps it in during the build.
+      - uses: actions/checkout@v7
+        if: env.WANTED == 'true'
+      - name: Render the installer artwork
+        if: env.WANTED == 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends librsvg2-bin fonts-dejavu-core
+          mkdir -p iso/anaconda/build
+          for svg in iso/anaconda/*.svg; do
+            rsvg-convert "$svg" -o "iso/anaconda/build/$(basename "${svg%.svg}").png"
+          done
+          ls -l iso/anaconda/build
+
       - name: Build ISO
         if: env.WANTED == 'true'
         id: build
@@ -48,6 +63,7 @@ jobs:
           # password once, on a blue "MOK management" screen after the first reboot.
           secure_boot_key_url: https://github.com/ublue-os/akmods/raw/main/certs/public_key.der
           enrollment_password: universalblue
+          additional_templates: /github/workspace/iso/anaconda/wolf-os-look.tmpl # the repo, inside the builder
 
       - name: Upload ISO
         if: env.WANTED == 'true'

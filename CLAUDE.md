@@ -24,8 +24,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `files/system/usr/bin/wolf`: the control tool (bash; sections: net, game, setup, level, usbguard, kargs,
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
 - `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run).
-- `art/generate.mjs`: all artwork (SVGs, fastfetch logo, `art/preview.html`). The `check` workflow fails if
-  its output isn't committed, so run `node art/generate.mjs` after editing it.
+  `iso/anaconda/`: the installer's Wolf OS look (stylesheet, Lorax template, generated SVGs).
+- `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, `art/preview.html`). The `check`
+  workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
 
 ## Conventions
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:
@@ -54,6 +55,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - BlueBuild tags: default branch → `latest`, `44`, date. Other branches → `br-<branch>-44`.
 - ISO: `jasonn3/build-container-installer@v1.5.0`, installer product name = image name, Secure Boot key
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.
+  The installer itself runs on Fedora's packages, so `fedora-logos` brands its sidebar as Fedora. Fix:
+  `iso/anaconda/wolf-os-look.tmpl`, passed as `additional_templates` (absolute path: the builder mounts
+  the repo at `/github/workspace`), overwrites `/usr/share/anaconda/pixmaps/{sidebar-logo,sidebar-bg,
+  topbar-bg}.png` and every `*.css` there. So build-iso.yml must check out the repo and render the PNGs first.
 - Flatpak apps keep running after `flatpak uninstall`; `wolf remove` closes them with `flatpak kill`.
 - OpenSnitch (`wolf outgoing`) isn't in Fedora's repos: `files/scripts/opensnitch.sh` installs the GitHub
   release, pinned with SHA-256 (bump both to update; Dependabot can't). The daemon RPM's %post runs
@@ -75,4 +80,5 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - Ideas: Wolf Center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
   policy for the lab image, Howl colour scheme.
 - Untested in the VM: `wolf outgoing` (OpenSnitch eBPF under our sysctls, the pre-approved rule, the
-  autostart unit name `app-opensnitch_ui@autostart.service`).
+  autostart unit name `app-opensnitch_ui@autostart.service`), and the installer's Wolf OS look (needs an
+  ISO rebuild). The ISO's boot menu and boot splash may still show Fedora art: check when testing.

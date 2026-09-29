@@ -174,8 +174,67 @@ function terminalLogo() {
 }
 writeFileSync("files/system/usr/share/wolf-os/fastfetch-logo.txt", terminalLogo());
 
+// ---- Installer (Anaconda) sidebar and top bar: iso/anaconda/ -----------------------------
+// The installer runs on Fedora's own packages, which brand it as Fedora. build-iso.yml turns
+// these into PNGs and iso/anaconda/wolf-os-look.tmpl puts them in place of Fedora's.
+const ISO = "iso/anaconda";
+mkdirSync(ISO, { recursive: true });
+
+// Top of the sidebar (about 190 px wide): the head above the name. letter-spacing also pads
+// after the last letter, so the text is nudged right by half of it to look centred.
+writeFileSync(
+  `${ISO}/sidebar-logo.svg`,
+  svg(
+    170,
+    138,
+    `<g transform="translate(35,0) scale(0.39)">\n  ${wolfHead()}\n  </g>
+  <text x="88.5" y="130" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="20" font-weight="300" letter-spacing="7" fill="${C.text}">WOLF OS</text>`,
+  ),
+);
+
+// Behind it: the Night wallpaper's sky and mountains, tall and narrow. The stylesheet scales it
+// to cover the sidebar and pins the bottom, so the mountains always show.
+function sidebarBg() {
+  const W = 400, H = 1200, rand = rng(707);
+  const stars = Array.from({ length: 90 }, () => {
+    const x = Math.round(rand() * W), y = Math.round(260 + rand() * 620); // none behind the logo
+    const r = (rand() < 0.1 ? 2.2 : 1 + rand() * 0.9).toFixed(1);
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.text}" opacity="${(0.2 + rand() * 0.5).toFixed(2)}"/>`;
+  }).join("");
+  const layers = [
+    { baseY: 1030, amp: 190, peaks: 2, fill: "#12243A", snow: 0.25 },
+    { baseY: 1110, amp: 140, peaks: 3, fill: "#0E1C2E", snow: 0.16 },
+    { baseY: 1190, amp: 100, peaks: 4, fill: "#0A1523", snow: 0.1 },
+  ].map((l) => {
+    const top = ridge(rand, { ...l, W });
+    const line = top.map((p) => p.join(",")).join(" ");
+    return `${poly([...top, [W, H], [0, H]], l.fill)}<polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="2" opacity="${l.snow}"/>`;
+  }).join("\n  ");
+  return svg(W, H, `<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050912"/><stop offset="0.7" stop-color="#0C1A2C"/><stop offset="1" stop-color="#10233A"/>
+    </linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="${C.accent}" stop-opacity="0.22"/><stop offset="1" stop-color="${C.accent}" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#sky)"/>
+  <circle cx="${W / 2}" cy="130" r="220" fill="url(#glow)"/>
+  ${stars}
+  ${layers}`);
+}
+writeFileSync(`${ISO}/sidebar-bg.svg`, sidebarBg());
+
+// The bar at the top of each installer page (Keyboard, Installation Destination, ...)
+writeFileSync(
+  `${ISO}/topbar-bg.svg`,
+  svg(1600, 80, `<defs>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${C.night}"/><stop offset="1" stop-color="#12243A"/></linearGradient>
+  </defs>
+  <rect width="1600" height="80" fill="url(#bar)"/>
+  <rect y="77" width="1600" height="3" fill="${C.accent}" opacity="0.7"/>`),
+);
+
 // ---- Preview page: open art/preview.html in a browser to check everything at once -------
-const uri = (f) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${OUT}/${f}`)).toString("base64")}`;
+const uri = (f, dir = OUT) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${dir}/${f}`)).toString("base64")}`;
 const logo = uri("wolf-os-logo.svg");
 writeFileSync(
   "art/preview.html",
@@ -186,6 +245,11 @@ body{margin:0;background:#1a1d21;color:#ddd;font:14px sans-serif}
 .panel{background:#171e29;padding:6px 10px;display:flex;gap:12px;align-items:center}
 img.wp{width:760px;display:block}
 .ply{background:linear-gradient(#0e1726,#070b14);width:760px;height:428px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.inst{display:flex;width:760px;height:475px;background:#f5f4f2;color:#2e3436}
+.inst .side{width:120px;background:#0B1220 url(${uri("sidebar-bg.svg", ISO)}) 50% 100%/cover no-repeat}
+.inst .side div{height:100%;background:url(${uri("sidebar-logo.svg", ISO)}) 50% 20px/106px no-repeat}
+.inst .main{flex:1;padding:14px 20px}.inst .top{text-align:right;font-size:11px}
+.inst .bar{height:34px;margin:12px -20px;background:url(${uri("topbar-bg.svg", ISO)}) 0 0/cover;color:#fff;padding:9px 20px;box-sizing:border-box;font-size:12px}
 </style></head><body>
 <div class="row"><img src="${logo}" width="256"><img src="${logo}" width="64"><img src="${logo}" width="32">
 <div class="panel"><img src="${logo}" width="24"><span>dark panel, 24px</span></div></div>
@@ -193,6 +257,10 @@ img.wp{width:760px;display:block}
 <div class="row"><div class="ply"><img src="${uri("wolf-os-emblem.svg")}" height="200">
 <div style="margin-top:60px;opacity:.6">boot screen: the password box goes here</div></div></div>
 <div class="row"><img class="wp" src="${uri("wallpaper-night.svg")}"><img class="wp" src="${uri("wallpaper-emblem.svg")}"></div>
+<div class="row"><div class="inst"><div class="side"><div></div></div><div class="main"><div class="top">WOLF-OS 44 INSTALLATION</div>
+<h3>WELCOME TO WOLF-OS 44.</h3><div class="bar">INSTALLATION DESTINATION (the bar at the top of each page)</div>
+What language would you like to use during the installation process?</div></div>
+<span>installer, at 60% size (build-iso.yml)</span></div>
 </body></html>
 `,
 );

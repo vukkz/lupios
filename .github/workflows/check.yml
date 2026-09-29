@@ -21,7 +21,7 @@ jobs:
       - name: Artwork is up to date with art/generate.mjs
         run: |
           node art/generate.mjs
-          git diff --exit-code -- files/system/usr/share/wolf-os/art files/system/usr/share/wolf-os/fastfetch-logo.txt art/preview.html
+          git diff --exit-code -- files/system/usr/share/wolf-os/art files/system/usr/share/wolf-os/fastfetch-logo.txt art/preview.html iso/anaconda
 
       - name: No Windows line endings
         run: |
