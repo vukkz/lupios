@@ -19,7 +19,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 
 ## Map
 - `recipes/`: `recipe.yml` (wolf-os, kinoite-main:44) and `recipe-nvidia.yml` (kinoite-nvidia:44) share
-  `common-modules.yml`: files → dnf → default-flatpaks → script → initramfs → signing.
+  `common-modules.yml`: files → dnf → script → systemd → initramfs → signing.
 - `files/system/`: copied to `/` verbatim. `files/scripts/`: run once at build time.
 - `files/system/usr/bin/wolf`: the control tool (bash; sections: net, game, setup, level, usbguard, kargs,
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
@@ -64,6 +64,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   The check workflow now runs `env -i ... wolf help`. Inside functions only users reach, `$HOME` is fine.
 - The installer (build-container-installer, Kinoite 44 profile) has no user or root spoke: KDE creates the
   first user, an administrator, on first boot.
+- Don't use BlueBuild's `default-flatpaks` (v2): it runs on every boot, re-installs apps the user removed,
+  and notifies at every login (`notify` defaults to true). Firefox and Flatseal come from
+  `wolf-default-apps.timer` → `wolf _default-apps` instead: once, until `/var/lib/wolf-os/default-apps-done`.
 - Flatpak apps keep running after `flatpak uninstall`; `wolf remove` closes them with `flatpak kill`.
 - OpenSnitch (`wolf outgoing`) isn't in Fedora's repos: `files/scripts/opensnitch.sh` installs the GitHub
   release, pinned with SHA-256 (bump both to update; Dependabot can't). The daemon RPM's %post runs

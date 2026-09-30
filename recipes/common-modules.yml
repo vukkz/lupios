@@ -16,9 +16,9 @@ modules:
       packages:
         - micro
         - starship
-        - distrobox # runs the Wolf Lab container (ujust lab)
+        - distrobox # runs the Wolf Lab container (wolf lab) and the tools box (wolf install)
         - jq # used by wolf-security-check
-        - usbguard # off by default, turned on with ujust toggle-usbguard
+        - usbguard # off by default, turned on with wolf usbguard on (or the sheep level)
         - gamemode # host daemon that Steam's gamemoderun talks to
         - fastfetch # system info with the wolf logo
         - librsvg2-tools # rsvg-convert, turns the SVG artwork into PNGs in look.sh
@@ -31,15 +31,9 @@ modules:
         - firefox
         - firefox-langpacks
 
-  - type: default-flatpaks
-    configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - com.github.tchx84.Flatseal # see and change what each app is allowed to access
-      - scope: user # Also add Flathub user repo, but no user packages
+  # Firefox and Flatseal (Flatpaks) are installed once on the first start by wolf-default-apps.timer,
+  # not by BlueBuild's default-flatpaks: that one re-installs them on every boot (so removing one
+  # never sticks) and notifies at every login.
 
   - type: script
     scripts:
@@ -55,6 +49,7 @@ modules:
     system:
       enabled:
         - wolf-kargs.timer # adds the kernel hardening boot arguments once, after install
+        - wolf-default-apps.timer # installs Firefox and Flatseal once, on the first start
 
   # Rebuild the boot image so it contains the Wolf OS boot screen and the module
   # blacklist. Keep this near the end so it includes everything above.

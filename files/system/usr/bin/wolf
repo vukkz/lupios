@@ -588,6 +588,29 @@ cmd_lab() {
 
 in_box() { distrobox enter "$TOOLS_BOX" -- "$@" | tr -d '\r'; }
 
+# The apps every install starts with: a browser, and Flatseal to see and change what each app may access
+DEFAULT_APPS=(org.mozilla.firefox com.github.tchx84.Flatseal)
+DEFAULT_APPS_DONE=/var/lib/wolf-os/default-apps-done
+
+# Run as root by wolf-default-apps.timer on the first start, and only until it has worked once:
+# after that, an app the user removes stays removed. Systems that already have them just get marked done.
+cmd_default_apps() {
+    [[ -e $DEFAULT_APPS_DONE ]] && return 0
+    local missing=() app
+    for app in "${DEFAULT_APPS[@]}"; do
+        flatpak info --system "$app" >/dev/null 2>&1 || missing+=("$app")
+    done
+    if ((${#missing[@]})); then
+        # fails without internet; the service tries again in 10 minutes
+        flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        flatpak install --system --noninteractive flathub "${missing[@]}"
+        notify_desktop_users "Your apps are ready" \
+            "Firefox (web browser) and Flatseal (what each app may access) are installed." system-software-install
+    fi
+    as_root mkdir -p "${DEFAULT_APPS_DONE%/*}"
+    as_root touch "$DEFAULT_APPS_DONE"
+}
+
 tools_box_ready() {
     podman container exists "$TOOLS_BOX" && return 0
     echo "Creating the Wolf tools box (Arch Linux). First time only, takes a minute or two..."
@@ -827,6 +850,7 @@ case ${1:-help} in
     state) cmd_state ;;
     _classify) cmd_classify "$2" "$3" ;;
     _kargs-auto) cmd_kargs_auto ;;
+    _default-apps) cmd_default_apps ;;
     help | -h | --help) usage ;;
     *) usage; exit 1 ;;
 esac

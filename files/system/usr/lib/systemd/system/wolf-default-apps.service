@@ -1,0 +1,14 @@
+[Unit]
+Description=Wolf OS: install the default apps (Firefox, Flatseal) once
+Documentation=https://github.com/vukkz/wolf-os
+Wants=network-online.target
+After=network-online.target
+# Only until it has worked once (wolf creates this file): an app the user removes stays removed
+ConditionPathExists=!/var/lib/wolf-os/default-apps-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wolf _default-apps
+# No internet yet, or Flathub is down: try again later
+Restart=on-failure
+RestartSec=10min
