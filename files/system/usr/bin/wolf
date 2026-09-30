@@ -557,6 +557,7 @@ lab_enter() { # [root]
         echo "Creating $name from $LAB_IMAGE (the first time downloads a few GB)..."
         mkdir -p "$lab_home"
         distrobox create "${root[@]}" --yes --pull --name "$name" --image "$LAB_IMAGE" --home "$lab_home"
+        box_first_start "$name" "${root[@]}" || exit 1
         if distrobox enter "${root[@]}" "$name" -- distrobox-export --app "$app" >/dev/null 2>&1; then
             ok "Added $app to your app menu."
         else
@@ -588,6 +589,17 @@ cmd_lab() {
 
 in_box() { distrobox enter "$TOOLS_BOX" -- "$@" | tr -d '\r'; }
 
+# A box's first start sets it up inside (users, devices, packages), which takes minutes in a slow VM.
+# Show it and ask not to interrupt: a half-finished setup leaves a box that can't be entered
+# ("crun: ptsname: Inappropriate ioctl for device") until it's stopped and started again.
+box_first_start() { # <name> [--root]
+    echo "Setting up $1 inside. First time only, it can take a few minutes: please don't interrupt it."
+    if ! distrobox enter "${@:2}" "$1" -- true; then
+        note "The setup didn't finish. Stop the box and try again: ${2:+sudo }podman stop $1"
+        return 1
+    fi
+}
+
 # The apps every install starts with: a browser, and Flatseal to see and change what each app may access
 DEFAULT_APPS=(org.mozilla.firefox com.github.tchx84.Flatseal)
 DEFAULT_APPS_DONE=/var/lib/wolf-os/default-apps-done
@@ -613,9 +625,9 @@ cmd_default_apps() {
 
 tools_box_ready() {
     podman container exists "$TOOLS_BOX" && return 0
-    echo "Creating the Wolf tools box (Arch Linux). First time only, takes a minute or two..."
+    echo "Creating the Wolf tools box (Arch Linux). First time only..."
     distrobox create --yes --name "$TOOLS_BOX" --image "$TOOLS_IMAGE" >/dev/null
-    in_box true >/dev/null # first entry sets the box up
+    box_first_start "$TOOLS_BOX"
 }
 
 tool_commands() { in_box pacman -Qlq "$1" | grep -E '^/usr/bin/[^/]+$' || true; }

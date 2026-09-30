@@ -77,6 +77,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - QML and anything Plasma can't be tested on Windows: test in the VM. VirtualBox there runs in
   Hyper-V (NEM) mode: slow, and once hung at `boot.mount` after an update (a reboot fixed it).
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
+- A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
+  a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
+  Never hide that first start behind `>/dev/null`: `box_first_start` in `wolf` shows it.
 
 ## Open items
 - Owner hasn't reported `flatpak remotes` output or remaining "Fedora" branding yet.

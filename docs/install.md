@@ -83,4 +83,6 @@ You should see ✔ on everything, and a full score if Secure Boot is on.
 
 - **An update broke something:** restart and pick the **second entry** in the boot menu. That's the
   previous version.
+- **`wolf lab` says `crun: ptsname: Inappropriate ioctl for device`:** the lab's first setup was
+  interrupted. Run `podman stop wolf-lab`, then `wolf lab` again and let it finish.
 - **Anything else:** open an issue at https://github.com/vukkz/wolf-os/issues with a photo of the screen.
