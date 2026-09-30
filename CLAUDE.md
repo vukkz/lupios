@@ -95,7 +95,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - Before going public: check the name ("Wolfi" and others exist), ISO hosting, a website, Fedora 45 rebase
   (around Oct–Nov 2026), and a boot test in CI.
 - Ideas: Wolf Center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
-  policy for the lab image, Howl colour scheme.
+  policy for the lab image.
+- The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
+  customise their own terminal). Wolf OS only adds defaults to it: fastfetch and the prompt.
 - Untested in the VM: `wolf outgoing` (OpenSnitch eBPF under our sysctls, the pre-approved rule, the
   autostart unit name `app-opensnitch_ui@autostart.service`). The installer's sidebar shows the Wolf OS
   look (verified in the VM on 2026-09-30); its boot menu and boot splash weren't checked yet.

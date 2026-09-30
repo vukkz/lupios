@@ -7,7 +7,7 @@ import org.kde.plasma.welcome as Welcome
 
 Welcome.Page {
     heading: "What makes Wolf OS different"
-    description: "Everything below is already on. You control it all from the wolf icon next to the clock, or with the wolf command in Howl (type: wolf help)."
+    description: "Everything below is already on. You control it all from the wolf icon next to the clock, or with the wolf command in the terminal, Konsole (type: wolf help)."
 
     ColumnLayout {
         anchors.centerIn: parent

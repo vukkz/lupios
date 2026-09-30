@@ -584,7 +584,7 @@ cmd_lab() {
 # ---------------------------------------------------------------------------------------
 # Software: wolf install / remove / search / update
 # Apps come from Flathub (sandboxed); command-line tools go into an Arch Linux box, and
-# their commands are linked into ~/.local/bin so they work in Howl like normal commands.
+# their commands are linked into ~/.local/bin so they work in the terminal like normal commands.
 # ---------------------------------------------------------------------------------------
 
 in_box() { distrobox enter "$TOOLS_BOX" -- "$@" | tr -d '\r'; }
@@ -652,7 +652,7 @@ install_tool() { # <Arch package name>
         in_box distrobox-export --app "$pkg" >/dev/null 2>&1 || true
     fi
     ok "Installed $pkg (from Arch Linux, in the Wolf tools box)."
-    if ((${#names[@]})); then echo "  Commands you can now run in Howl: ${names[*]}"; fi
+    if ((${#names[@]})); then echo "  Commands you can now run in the terminal: ${names[*]}"; fi
 }
 
 cmd_install() { # <name>

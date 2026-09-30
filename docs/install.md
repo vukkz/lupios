@@ -70,8 +70,8 @@ settings, install, then turn it back on after step 5.
 ## 6. One restart to finish
 
 About 5 minutes after you start Wolf OS, it adds extra kernel hardening by itself, and a
-**"Kernel hardening added"** message pops up. Restart once after that message. Then open **Howl**
-(the terminal) and run:
+**"Kernel hardening added"** message pops up. Restart once after that message. Then open the
+terminal (**Konsole**) and run:
 
 ```bash
 wolf check

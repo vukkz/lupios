@@ -8,7 +8,7 @@ Built on Fedora Atomic 44 (KDE Plasma) with [BlueBuild](https://blue-build.org).
 - **Wolf Lab:** Kali's top hacking tools in a container (`wolf lab`), not on your host system.
 - **Networks that know who to trust:** new Wi-Fi networks are treated as public (invisible to other devices, random MAC address), and your home network as trusted. `wolf net` switches between them.
 - **Gaming and security in one OS:** `wolf setup gaming` installs Steam, Heroic, Lutris and ProtonUp-Qt. `wolf game on` opens Remote Play ports, fixes stutter in some games and pauses updates while you play. `wolf level wolf|sheep` changes a whole bundle of protections at once.
-- **One command for everything:** `wolf` (with tab completion). `wolf install discord` or `wolf install htop` picks the right way to install anything, and `wolf update` updates it all. The terminal is called **Howl**.
+- **One command for everything:** `wolf` (with tab completion). `wolf install discord` or `wolf install htop` picks the right way to install anything, and `wolf update` updates it all.
 - **The wolf next to the clock:** click it to switch security level, network trust and Game Mode, and to see your security score.
 - **Wolf Welcome:** a first-login tour that sets up your security level, gaming and the Lab.
 
