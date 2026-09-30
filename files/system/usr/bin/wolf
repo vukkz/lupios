@@ -171,9 +171,14 @@ game_zone() {
     echo "$zone"
 }
 
+# The split-lock slowdown makes a few games stutter; SteamOS turns it off. The setting only
+# exists on CPUs that detect split locks (mostly Intel), so do nothing elsewhere.
+SPLIT_LOCK=/proc/sys/kernel/split_lock_mitigate
+splitlock_set() { [[ -e $SPLIT_LOCK ]] && as_root sysctl -q -w "kernel.split_lock_mitigate=$1"; }
+
 game_on() {
     [[ -e $GAME_STATE ]] && { echo "Game Mode is already on. Turn it off with: wolf game off"; return 0; }
-    local zone opened="" paused=() previous=""
+    local zone opened="" paused=() previous="" splitlock=""
     zone=$(game_zone)
     if [[ $zone == wolf-public ]]; then
         note "Public network: Steam Remote Play and LAN ports stay closed."
@@ -191,6 +196,10 @@ game_on() {
         fi
     done
     ok "Paused automatic updates"
+    if [[ -e $SPLIT_LOCK ]]; then
+        splitlock=$(<"$SPLIT_LOCK")
+        splitlock_set 0 && ok "Split-lock slowdown off (fixes stutter in a few games)"
+    fi
     previous=$(power_profile get 2>/dev/null) || true
     if power_profile set performance >/dev/null 2>&1; then
         ok "Power profile: performance"
@@ -198,19 +207,20 @@ game_on() {
         note "This PC has no performance power profile (normal in virtual machines)"
     fi
     as_root mkdir -p "${GAME_STATE%/*}"
-    printf 'ZONE=%q\nTIMERS=%q\nPROFILE=%q\n' "$opened" "${paused[*]}" "$previous" | as_root tee "$GAME_STATE" >/dev/null
+    printf 'ZONE=%q\nTIMERS=%q\nPROFILE=%q\nSPLITLOCK=%q\n' "$opened" "${paused[*]}" "$previous" "$splitlock" |
+        as_root tee "$GAME_STATE" >/dev/null
     echo "${B}Game Mode is ON.${N} Turn it off with: wolf game off"
 }
 
 game_off() {
     [[ -e $GAME_STATE ]] || { echo "Game Mode is already off."; return 0; }
-    local ZONE="" TIMERS="" PROFILE=""
+    local ZONE="" TIMERS="" PROFILE="" SPLITLOCK=""
     # shellcheck disable=SC1090
     source "$GAME_STATE"
     if [[ -n $ZONE ]]; then
         local args=()
         for s in "${STEAM_SERVICES[@]}"; do
-            # keep ports the gaming security level opened permanently
+            # keep ports that are open for good (by hand, or by the old gaming level)
             as_root firewall-cmd --permanent --zone="$ZONE" --query-service="$s" >/dev/null 2>&1 || args+=("--remove-service=$s")
         done
         ((${#args[@]} == 0)) || as_root firewall-cmd --zone="$ZONE" "${args[@]}" >/dev/null
@@ -218,6 +228,7 @@ game_off() {
     fi
     for t in $TIMERS; do as_root systemctl start "$t"; done
     ok "Automatic updates resumed"
+    if [[ -n $SPLITLOCK ]]; then splitlock_set "$SPLITLOCK" && ok "Split-lock slowdown back on"; fi
     [[ -n $PROFILE ]] && power_profile set "$PROFILE" >/dev/null 2>&1 || true
     as_root rm -f "$GAME_STATE"
     echo "${B}Game Mode is OFF.${N}"
@@ -227,8 +238,9 @@ cmd_game() {
     case ${1:-} in
         "")
             if [[ -e $GAME_STATE ]]; then echo "Game Mode is ON. Turn it off with: wolf game off"; else echo "Game Mode is OFF. Turn it on with: wolf game on"; fi
-            echo "${D}Game Mode opens Steam Remote Play/LAN ports (home networks only), pauses automatic updates"
-            echo "and switches to the performance power profile. Everything resets at reboot.${N}"
+            echo "${D}While you play: Steam Remote Play/LAN ports open (home networks only), the split-lock slowdown"
+            echo "off (fixes stutter in a few games), automatic updates paused, performance power profile."
+            echo "Everything goes back when you turn it off or restart.${N}"
             ;;
         on) game_on ;;
         off) game_off ;;
@@ -257,7 +269,7 @@ ${B}Done.${N} You'll find them in the app menu:
 
 Tips:
   - Per game in Steam (Properties > Launch Options):  MANGOHUD=1 gamemoderun %command%
-  - Before playing:  wolf game on   (Remote Play/LAN ports, pauses updates, performance mode)
+  - Before playing:  wolf game on   (Remote Play/LAN ports, stutter fix, updates paused, performance)
   - Check a game works on Linux first: https://www.protondb.com
 EOF
 }
@@ -266,10 +278,11 @@ EOF
 # Security levels: wolf level (persistent)
 # ---------------------------------------------------------------------------------------
 
-# Older Wolf OS versions called the levels balanced and paranoid
+# Older Wolf OS versions called the levels balanced and paranoid, and had a gaming level
+# that became part of Game Mode (its settings were the wolf level's plus open Steam ports)
 level_name() {
     case $1 in
-        balanced) echo wolf ;;
+        balanced | gaming) echo wolf ;;
         paranoid) echo sheep ;;
         *) echo "$1" ;;
     esac
@@ -299,30 +312,32 @@ level_dns() { # on | off
 
 describe_levels() {
     cat <<EOF
-  ${C}gaming${N}   the wolf level, plus: Steam Remote Play/LAN ports stay open on home networks,
-           and no split-lock slowdown (fixes stutter in a few games)
   ${C}wolf${N}     the default: confident, with everything in SECURITY.md
   ${C}sheep${N}    maximum caution: the wolf level, plus encrypted DNS (Quad9), no replies to pings,
            io_uring and SysRq off, no TCP timestamps, USBGuard and the outgoing guard on
            ${Y}Breaks Wi-Fi login pages (hotels, airports) and apps that need io_uring.${N}
 
 Switching is instant and needs no reboot. Your rollback (the previous OS version) is never touched.
+Playing games? That's Game Mode, on any level: wolf game on
 EOF
 }
 
 cmd_level() { # [level] [--yes]
-    local current new yes=${2:-}
+    local current new saved yes=${2:-}
     current=$(current_level)
-    new=$(level_name "${1:-}")
-    if [[ -z $new ]]; then
+    saved=$(cat "$LEVEL_FILE" 2>/dev/null || echo wolf) # may still be an old name
+    if [[ -z ${1:-} ]]; then
         printf '%sSecurity level:%s %s\n\n' "$B" "$N" "$current"
         describe_levels
         echo
-        echo "Change it with: wolf level gaming|wolf|sheep"
+        echo "Change it with: wolf level wolf|sheep"
         return 0
     fi
-    [[ $new == gaming || $new == wolf || $new == sheep ]] || die "Usage: wolf level [gaming|wolf|sheep]"
-    [[ $new == "$current" ]] && { echo "Already on the $new level."; return 0; }
+    [[ $1 == gaming ]] && die "The gaming level is now part of Game Mode, which works on any level: wolf game on"
+    new=$(level_name "$1")
+    [[ $new == wolf || $new == sheep ]] || die "Usage: wolf level [wolf|sheep]"
+    # an old name (e.g. gaming) is re-applied under the new one, which also cleans up after it
+    [[ $new == "$current" && $saved == "$new" ]] && { echo "Already on the $new level."; return 0; }
     if [[ $new == sheep && $yes != --yes && $yes != -y ]]; then
         echo "${Y}Sheep level (maximum caution):${N}"
         echo "  - Wi-Fi networks with a login page (hotels, airports, trains) won't load it."
@@ -337,8 +352,10 @@ cmd_level() { # [level] [--yes]
     as_root systemctl restart systemd-sysctl
     ok "Kernel settings for the $new level applied"
 
-    if [[ $new == gaming ]]; then level_steam_ports add && ok "Steam ports open on home networks"; fi
-    if [[ $current == gaming ]]; then level_steam_ports remove && ok "Steam ports closed"; fi
+    # Restarting systemd-sysctl re-applied the level's split-lock setting; keep Game Mode's while it's on
+    if [[ -e $GAME_STATE ]]; then splitlock_set 0 || true; fi
+    # The old gaming level opened the Steam ports for good; now Game Mode opens them while you play
+    if [[ $saved == gaming ]]; then level_steam_ports remove && ok "Steam ports closed (Game Mode opens them while you play)"; fi
 
     # Levels never change kernel boot arguments: that would create a new boot entry, take a
     # minute, need a reboot, and push the previous OS version out of the rollback slot.
@@ -767,7 +784,7 @@ ${B}Software${N}
 
 ${B}Security${N}
   ${C}wolf check${N}                       how locked-down this system is
-  ${C}wolf level${N} [gaming|wolf|sheep]   security level (stays until you change it)
+  ${C}wolf level${N} [wolf|sheep]          security level: how careful (stays until you change it)
   ${C}wolf net${N} [home|public]           trust level of the network you're on
   ${C}wolf kargs${N} [on|off]              kernel hardening boot arguments (on by itself after install)
   ${C}wolf usbguard${N} [on|off]           block USB devices plugged in later
@@ -775,7 +792,7 @@ ${B}Security${N}
 
 ${B}Gaming${N}
   ${C}wolf setup gaming${N}                install Steam, Heroic, Lutris, ProtonUp-Qt, MangoHud
-  ${C}wolf game${N} [on|off]               Game Mode (temporary, resets at reboot)
+  ${C}wolf game${N} [on|off]               Game Mode while you play (off again at restart)
 
 ${B}Hacking lab${N}
   ${C}wolf lab${N} [root]                  enter the Wolf Lab (Kali tools in a container)

@@ -12,7 +12,7 @@ Welcome.Page {
     property string status: ""
 
     heading: "Pick your security level"
-    description: "You can change this any time from the wolf icon next to the clock, or with: wolf level"
+    description: "How careful Wolf OS should be. You can change this any time from the wolf icon next to the clock, or with: wolf level. Playing games works on both: that's Game Mode."
 
     function refresh() {
         Welcome.Controller.runCommand("/usr/bin/wolf state", (code, output) => {
@@ -30,7 +30,6 @@ Welcome.Page {
 
         Repeater {
             model: [
-                ["gaming", "Gaming", "input-gaming", "For playing a lot: Steam Remote Play and LAN transfers always work at home, and a SteamOS fix for stutter in some games."],
                 ["wolf", "Wolf (recommended)", "wolf-os-logo", "The everyday default. Every protection in Wolf OS, nothing that gets in your way."],
                 ["sheep", "Sheep", "security-high", "Maximum caution for travel and public places: encrypted DNS, invisible to pings, new USB devices blocked, apps ask before connecting. Wi-Fi login pages (hotels, airports) won't load."]
             ]

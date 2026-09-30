@@ -5,7 +5,7 @@ _wolf() {
         words="install remove search update channel check level net kargs usbguard outgoing setup game lab fastfetch prompt help"
     elif ((COMP_CWORD == 2)); then
         case ${COMP_WORDS[1]} in
-            level) words="gaming wolf sheep" ;;
+            level) words="wolf sheep" ;;
             net) words="home public" ;;
             kargs | usbguard | outgoing | game | fastfetch | prompt) words="on off" ;;
             setup) words="gaming" ;;

@@ -144,26 +144,33 @@ don't control. Use `wolf net home` on networks you trust.
 A temporary mode for playing. **Everything it changes resets at reboot or with `wolf game off`.**
 - Opens Steam Remote Play and Steam LAN game transfer (firewalld services `steam-streaming`,
   `steam-lan-transfer`), but **only on home networks**. On public networks they stay closed.
+- Turns off the split-lock slowdown (`kernel.split_lock_mitigate`), as SteamOS always does: it
+  fixes stutter in a few games. That setting only exists on CPUs that detect split locks (mostly
+  Intel); elsewhere this step does nothing.
 - Pauses automatic updates, so they don't take bandwidth or CPU mid-game.
 - Switches to the *performance* power profile.
+
+It works on any security level. Older versions also had a *gaming* level; it became part of Game
+Mode, because a permanent switch and a temporary one, both about gaming, were confusing. Pausing
+updates must never be permanent, so it can't be a level.
 
 ## Security levels: `wolf level`
 
 One switch that moves a bundle of settings together. It stays until you change it.
 The files are in `files/system/usr/share/wolf-os/levels/`.
 
-| | gaming | wolf (default) | sheep (maximum caution) |
-|---|---|---|---|
-| Everything above in this file | ✔ | ✔ | ✔ |
-| Steam Remote Play/LAN ports on home networks | Always open | Only in Game Mode | Only in Game Mode |
-| Split-lock slowdown (`kernel.split_lock_mitigate`) | Off, as on SteamOS: fixes stutter in a few games | On | On |
-| Encrypted DNS: every lookup goes to Quad9 over TLS, ignoring the network's DNS | | | ✔ |
-| Reply to pings | Yes | Yes | No |
-| io_uring, a kernel I/O interface with many past exploits | On | On | Off |
-| Magic SysRq keyboard shortcuts | Sync only | Sync only | Off |
-| TCP timestamps, which reveal uptime | On | On | Off |
-| USBGuard | Your choice | Your choice | On |
-| Outgoing guard: apps ask before they connect (OpenSnitch) | Your choice | Your choice | On |
+| | wolf (default) | sheep (maximum caution) |
+|---|---|---|
+| Everything above in this file | ✔ | ✔ |
+| Steam Remote Play/LAN ports on home networks | Only in Game Mode | Only in Game Mode |
+| Split-lock slowdown (`kernel.split_lock_mitigate`) | On (off during Game Mode) | On (off during Game Mode) |
+| Encrypted DNS: every lookup goes to Quad9 over TLS, ignoring the network's DNS | | ✔ |
+| Reply to pings | Yes | No |
+| io_uring, a kernel I/O interface with many past exploits | On | Off |
+| Magic SysRq keyboard shortcuts | Sync only | Off |
+| TCP timestamps, which reveal uptime | On | Off |
+| USBGuard | Your choice | On |
+| Outgoing guard: apps ask before they connect (OpenSnitch) | Your choice | On |
 
 Switching levels is instant and needs no reboot. **Levels never change kernel boot
 arguments.** On Wolf OS that creates a new boot entry, which takes a minute, needs a
@@ -180,8 +187,6 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 - A few apps that use io_uring can fail.
 - Every app asks once before it goes online, so expect questions in the first minutes and
   after installing something new.
-- Split-lock mitigation only exists on CPUs that detect split locks (mostly Intel).
-  On other CPUs, that setting does nothing.
 
 ## The wolf panel widget and Wolf Welcome
 

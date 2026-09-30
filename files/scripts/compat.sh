@@ -6,3 +6,5 @@ set -euo pipefail
 # made by `wolf level` on older versions still point at the old folder names.
 ln -sfn wolf /usr/share/wolf-os/levels/balanced
 ln -sfn sheep /usr/share/wolf-os/levels/paranoid
+# The gaming level became part of Game Mode; systems left on it get the wolf level's settings
+ln -sfn wolf /usr/share/wolf-os/levels/gaming

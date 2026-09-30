@@ -26,7 +26,6 @@ PlasmoidItem {
     property bool confirmSheep: false
 
     readonly property var levelInfo: ({
-        gaming: "Steam Remote Play/LAN ports stay open at home, no split-lock slowdown.",
         wolf: "The default: everything in Wolf OS's security baseline.",
         sheep: "Maximum caution: encrypted DNS, invisible to pings, USBGuard on, apps ask before connecting."
     })
@@ -135,7 +134,7 @@ PlasmoidItem {
         RowLayout {
             Layout.fillWidth: true
             Repeater {
-                model: [["gaming", "Gaming"], ["wolf", "Wolf"], ["sheep", "Sheep"]]
+                model: [["wolf", "Wolf"], ["sheep", "Sheep"]]
                 delegate: PlasmaComponents3.Button {
                     required property var modelData
                     Layout.fillWidth: true
@@ -224,7 +223,7 @@ PlasmoidItem {
                 }
                 PlasmaComponents3.Label {
                     Layout.fillWidth: true
-                    text: "Remote Play ports, updates paused, performance power"
+                    text: "While you play: Remote Play ports, stutter fix, updates paused, performance. Off again at restart."
                     wrapMode: Text.WordWrap
                     opacity: 0.7
                     font: Kirigami.Theme.smallFont

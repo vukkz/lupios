@@ -34,7 +34,8 @@ Welcome.Page {
         }
         QQC2.Label {
             Layout.alignment: Qt.AlignHCenter
-            text: "Before playing, turn on Game Mode from the wolf icon (or: wolf game on)."
+            text: "Before playing, turn on Game Mode from the wolf icon (or: wolf game on).\nIt opens Remote Play ports, fixes stutter in some games and pauses updates, until you restart."
+            horizontalAlignment: Text.AlignHCenter
             opacity: 0.7
         }
     }
