@@ -77,7 +77,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 
 ## Open items
 - Owner hasn't reported `flatpak remotes` output or remaining "Fedora" branding yet.
-- Test the ISO in a fresh VM (with Secure Boot) before any friend installs it.
+- Fresh install from our ISO with Secure Boot verified in the VM on 2026-09-30 (installer look, first-boot
+  user, MOK, `wolf channel testing`, automatic kargs, `wolf check`). Rebuild the ISOs from `main` after
+  promoting, so they carry the Wolf installer look and the new image.
 - Real hardware (NVIDIA RTX 3050, gaming, Secure Boot, Wi-Fi trust, dispatcher notification) is untested:
   waiting for the owner's second SSD for dual-boot.
 - Before going public: check the name ("Wolfi" and others exist), ISO hosting, a website, Fedora 45 rebase
