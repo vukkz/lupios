@@ -131,9 +131,17 @@ is `files/system/usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust`.
 | | Home (zone `wolf`) | Public (zone `wolf-public`) |
 |---|---|---|
 | Incoming connections | Blocked, except device discovery (mDNS) | **All silently dropped**, including pings. Scanners see nothing |
-| Announce this PC's name on the network (mDNS/LLMNR) | Yes | No |
+| Announce this PC's name and services (mDNS/avahi, LLMNR, NetBIOS, SSDP) | Yes | **No: the firewall drops them on the way out**, whichever app sends them |
 | Send your hostname to the router (DHCP) | Yes | No |
 | Wi-Fi MAC address | Stable for this network | **New random one every time you connect** |
+
+Staying quiet takes two parts. NetworkManager's `mdns`/`llmnr` settings only cover
+systemd-resolved, but `avahi-daemon` announces `<hostname>.local` on its own, and browsers
+and music apps do their own discovery too. So on public networks a firewall *policy*
+(`files/system/usr/lib/firewalld/policies/wolf-public-quiet.xml`) drops everything this PC
+sends on the discovery ports: mDNS 5353, LLMNR 5355, NetBIOS 137–138 and SSDP 1900. Zones only
+filter incoming traffic; policies can filter what leaves. Avahi may log "Operation not
+permitted" warnings on public networks: that's the firewall doing its job.
 
 **Can break on public networks:** casting to a TV, network printers and KDE Connect,
 because they rely on devices finding each other. That's the point on a network you
