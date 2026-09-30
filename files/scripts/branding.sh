@@ -4,7 +4,6 @@
 set -euo pipefail
 
 file=$(readlink -f /usr/lib/os-release) # Fedora symlinks this to a per-edition file
-version=$(sed -n 's/^VERSION_ID=//p' "$file" | tr -d '"')
 
 set_field() {
     local key=$1 value=$2
@@ -16,7 +15,9 @@ set_field() {
 }
 
 set_field NAME "Wolf OS"
-set_field PRETTY_NAME "Wolf OS ${version}"
+# No number in the name: Wolf OS updates continuously, and 44 is the Fedora version underneath.
+# It stays in VERSION_ID, which tools read (wolf channel builds the image tag from it).
+set_field PRETTY_NAME "Wolf OS"
 set_field HOME_URL "https://github.com/vukkz/wolf-os"
 set_field BUG_REPORT_URL "https://github.com/vukkz/wolf-os/issues"
 set_field DEFAULT_HOSTNAME "wolf-os"

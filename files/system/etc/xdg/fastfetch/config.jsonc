@@ -14,7 +14,7 @@
   "modules": [
     "title",
     "separator",
-    "os",
+    { "type": "os", "format": "{pretty-name} {arch}" },
     "host",
     "kernel",
     "uptime",
@@ -27,7 +27,9 @@
     "cpu",
     "gpu",
     "memory",
-    "disk",
+    // "/" is a tiny read-only layer on image-based systems (always "100% full"); /var is on the
+    // real disk, with your home folder, apps and updates
+    { "type": "disk", "key": "Disk", "folders": "/var" },
     "break",
     "colors"
   ]
