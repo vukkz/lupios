@@ -59,6 +59,11 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `iso/anaconda/wolf-os-look.tmpl`, passed as `additional_templates` (absolute path: the builder mounts
   the repo at `/github/workspace`), overwrites `/usr/share/anaconda/pixmaps/{sidebar-logo,sidebar-bg,
   topbar-bg}.png` and every `*.css` there. So build-iso.yml must check out the repo and render the PNGs first.
+- systemd services (`wolf-kargs.service`) and NetworkManager's dispatcher (`wolf _classify`) run `wolf`
+  without `$HOME`/`$USER`; with `set -u`, a bare `$HOME` at the top level killed both silently for 3 days.
+  The check workflow now runs `env -i ... wolf help`. Inside functions only users reach, `$HOME` is fine.
+- The installer (build-container-installer, Kinoite 44 profile) has no user or root spoke: KDE creates the
+  first user, an administrator, on first boot.
 - Flatpak apps keep running after `flatpak uninstall`; `wolf remove` closes them with `flatpak kill`.
 - OpenSnitch (`wolf outgoing`) isn't in Fedora's repos: `files/scripts/opensnitch.sh` installs the GitHub
   release, pinned with SHA-256 (bump both to update; Dependabot can't). The daemon RPM's %post runs
@@ -80,5 +85,5 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - Ideas: Wolf Center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
   policy for the lab image, Howl colour scheme.
 - Untested in the VM: `wolf outgoing` (OpenSnitch eBPF under our sysctls, the pre-approved rule, the
-  autostart unit name `app-opensnitch_ui@autostart.service`), and the installer's Wolf OS look (needs an
-  ISO rebuild). The ISO's boot menu and boot splash may still show Fedora art: check when testing.
+  autostart unit name `app-opensnitch_ui@autostart.service`). The installer's sidebar shows the Wolf OS
+  look (verified in the VM on 2026-09-30); its boot menu and boot splash weren't checked yet.

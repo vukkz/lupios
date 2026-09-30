@@ -51,7 +51,7 @@ settings, install, then turn it back on after step 5.
    - Leave storage on **Automatic**.
    - Tick **Encrypt my data** and choose a passphrase. You'll type it at every boot, and there's
      no way to recover it if you forget it.
-3. If the installer asks you to create a user, do it now and tick **Make this user administrator**.
+3. The installer doesn't ask for a user name or password. You create your user on the first start.
 4. Click **Begin Installation**, wait, then **Reboot** and take the USB stick out.
 
 ## 5. First boot
@@ -63,8 +63,8 @@ settings, install, then turn it back on after step 5.
 
    If you miss the timer, run `ujust enroll-secure-boot-key` later and reboot.
 2. Type your disk passphrase.
-3. If you didn't create a user in the installer, KDE asks you to create one now. Make it an
-   administrator.
+3. KDE asks you to create your user. This first user is the administrator: it can install
+   software and change system settings.
 4. **Wolf Welcome** opens and walks you through your security level, gaming and the Lab.
 
 ## 6. One restart to finish

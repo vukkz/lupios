@@ -18,6 +18,12 @@ jobs:
       - name: Shell scripts pass shellcheck
         run: shellcheck -S warning files/scripts/*.sh files/system/usr/bin/* files/system/usr/libexec/* files/system/etc/profile.d/*.sh files/system/usr/lib/NetworkManager/dispatcher.d/*
 
+      # systemd services (wolf-kargs) and NetworkManager's dispatcher (network trust) start wolf
+      # with almost no environment: no $HOME, no $USER. With `set -u`, anything at the top of the
+      # script that needs them would stop it before it does anything.
+      - name: wolf starts without $HOME, like systemd and NetworkManager run it
+        run: env -i PATH=/usr/bin:/bin bash files/system/usr/bin/wolf help >/dev/null
+
       - name: Artwork is up to date with art/generate.mjs
         run: |
           node art/generate.mjs

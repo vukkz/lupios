@@ -7,7 +7,9 @@ LEVELS=/usr/share/wolf-os/levels
 KARGS_FILE=/usr/share/wolf-os/kargs
 KARGS_DECIDED=/var/lib/wolf-os/kargs-decided # kargs were set up once; /var is shared by every boot entry
 GAME_STATE=/run/wolf-os/game-mode # /run is cleared at reboot, like Game Mode's firewall changes
-USER_FLAGS=${XDG_CONFIG_HOME:-$HOME/.config}/wolf-os
+# systemd services and NetworkManager's dispatcher run wolf without $HOME, and `set -u` stops at an
+# unset variable. Only the terminal toggles use this, and they always run as a user.
+USER_FLAGS=${XDG_CONFIG_HOME:-${HOME:-/root}/.config}/wolf-os
 LAB_IMAGE=ghcr.io/vukkz/wolf-os-lab:latest
 TOOLS_BOX=wolf-tools # Arch Linux box that `wolf install` puts command-line tools in
 TOOLS_IMAGE=docker.io/library/archlinux:latest
