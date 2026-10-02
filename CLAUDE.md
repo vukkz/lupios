@@ -79,8 +79,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
 - avahi-daemon ignores NetworkManager's per-connection `mdns`/`llmnr` and announces `<hostname>.local` on
   every network. Public networks stay quiet through the firewalld policy `wolf-public-quiet` (ingress
-  `HOST`, egress `wolf-public`), which drops outgoing discovery ports. Drops in OUTPUT return EPERM to the
-  sender, so avahi logs warnings there.
+  `HOST`, egress `wolf-public`), which drops outgoing discovery ports. Verified in the VM on 2026-10-02:
+  `echo hi > /dev/udp/224.0.0.251/5353` gets EPERM on public, 5354 and home go through. avahi only logs
+  failed sends at debug level, so its journal shows nothing either way.
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `wolf` shows it.
