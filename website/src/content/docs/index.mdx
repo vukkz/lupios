@@ -1,0 +1,78 @@
+---
+title: A Linux desktop that guards itself
+description: A hardened, rollback-safe everyday Linux desktop with an isolated hacking lab.
+template: splash
+editUrl: false
+hero:
+  title: A Linux desktop<br />that guards itself
+  tagline: LupiOS is hardened, can't be bricked by an update, and is made for every day. Browse, game and code on it. Kali's hacking tools live in a lab of their own.
+  image:
+    file: ../../assets/lupios-logo.svg
+    alt: The LupiOS wolf
+  actions:
+    - text: Download
+      link: download/
+      icon: right-arrow
+    - text: How to install
+      link: install/
+      variant: minimal
+    - text: Source on GitHub
+      link: https://github.com/vukkz/lupios
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import Downloads from "../../components/Downloads.astro";
+
+## Why LupiOS
+
+<CardGrid>
+  <Card title="Secure by default, without the pain" icon="padlock">
+    The firewall blocks incoming connections, the kernel is hardened, and updates are signed.
+    Every setting and its trade-off is written down in [Security](security/).
+  </Card>
+  <Card title="Updates that can't brick you" icon="approve-check-circle">
+    The whole system updates at once, in the background. If something breaks, pick the previous
+    version in the boot menu.
+  </Card>
+  <Card title="Networks that know who to trust" icon="random">
+    New Wi-Fi networks start as public: your PC goes invisible and quiet, with a random MAC
+    address. At home, it's trusted. One click switches.
+  </Card>
+  <Card title="Lupi Lab" icon="puzzle">
+    Kali's top hacking tools, one command away (`lupi lab`), in a container instead of on your
+    system.
+  </Card>
+  <Card title="Gaming and security in one OS" icon="rocket">
+    `lupi setup gaming` installs Steam, Heroic and Lutris. Game Mode opens Remote Play, fixes
+    stutter in some games and pauses updates while you play.
+  </Card>
+  <Card title="One command for everything" icon="seti:shell">
+    Install apps, change your security level, switch networks: `lupi`, or the wolf next to the
+    clock. See [the lupi command](lupi/).
+  </Card>
+</CardGrid>
+
+## One command
+
+```bash
+lupi install discord    # apps from Flathub, command-line tools from Arch Linux
+lupi update             # system, apps and boxes, all at once
+lupi net public         # in a café: invisible to everyone else on the network
+lupi game on            # before playing
+lupi level sheep        # maximum caution, for when it matters
+lupi check              # how locked-down is this PC?
+```
+
+## Get it
+
+<Downloads />
+
+## Built on solid ground
+
+LupiOS is built on [Fedora Atomic](https://fedoraproject.org/atomic-desktops/) with the KDE Plasma
+desktop, through [Universal Blue](https://universal-blue.org) and [BlueBuild](https://blue-build.org).
+Fedora's security team patches the base. LupiOS adds the hardening, the network trust, the lab and
+the `lupi` command on top, and every image is signed. It's free and open source. Read why in the
+[FAQ](faq/).

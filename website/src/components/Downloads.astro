@@ -1,0 +1,43 @@
+---
+// The two installer ISOs side by side, with download buttons once they're hosted (src/downloads.ts).
+import { Icon } from "@astrojs/starlight/components";
+import { downloads, isos, fileUrl } from "../downloads";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const switchLink = Astro.url.pathname.includes("/download") ? "#already-on-fedora-atomic" : `${base}/download/#already-on-fedora-atomic`;
+---
+
+<div class="downloads not-content">
+  {
+    isos.map((iso) => (
+      <div class="iso">
+        <p class="iso-name">{iso.name}</p>
+        <p class="iso-for">{iso.for}</p>
+        {downloads.ready ? (
+          <>
+            <a class="iso-button" href={fileUrl(iso.file)}>
+              <Icon name="download" size="1.1em" />
+              Download {iso.file}
+            </a>
+            <p class="iso-meta">
+              {iso.size} · <a href={fileUrl(`${iso.file}-CHECKSUM`)}>checksum</a>
+            </p>
+          </>
+        ) : (
+          <>
+            <span class="iso-button iso-soon">Coming soon</span>
+            <p class="iso-meta">{iso.size} · {iso.file}</p>
+          </>
+        )}
+      </div>
+    ))
+  }
+</div>
+{
+  !downloads.ready && (
+    <p class="downloads-note">
+      The first public ISOs are being tested right now. Watch the{" "}
+      <a href="https://github.com/vukkz/lupios">GitHub repository</a> to hear when they're out, or{" "}
+      <a href={switchLink}>switch an existing Fedora Atomic install</a> to LupiOS today.
+    </p>
+  )
+}

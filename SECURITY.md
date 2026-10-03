@@ -12,7 +12,7 @@ Flatpak apps. Everything below is added on top.
 
 | Setting | Why | Trade-off |
 |---|---|---|
-| Images signed with cosign (`cosign.pub`) | Your system only accepts updates signed with the LupiOS key, so a hijacked registry can't push you a malicious OS | You must rebase with `ostree-image-signed:` once (see README) |
+| Images signed with cosign (`cosign.pub`) | Your system only accepts updates signed with the LupiOS key, so a hijacked registry can't push you a malicious OS | You must rebase with `ostree-image-signed:` once (see the [README](README.md#installation)) |
 | Automatic updates (Universal Blue default) | Security fixes arrive without you remembering | Updates apply on the next reboot |
 | Fedora version pinned (`image-version: 44`) | Big upgrades are a deliberate change, not a surprise | Moving to Fedora 45 is a manual edit of `recipe.yml` |
 

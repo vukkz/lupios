@@ -37,7 +37,7 @@ result with the `-CHECKSUM` file that came with the ISO:
 
 1. Plug the stick in and restart.
 2. As the PC starts, press the **boot menu key**, usually **F12, F11, F8 or Esc**. It depends on
-   the brand; search "<your PC or motherboard> boot menu key".
+   the brand: search for your PC or motherboard model and "boot menu key".
 3. Pick the USB stick. If it's listed twice, pick the one that says **UEFI**.
 
 **Secure Boot can stay on.** If the stick won't boot at all, turn Secure Boot off in the firmware

@@ -25,8 +25,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
 - `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run).
   `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs).
-- `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, `art/preview.html`). The `check`
-  workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
+- `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
+  `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
+- `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://vukkz.github.io/lupios.
+  `scripts/sync.mjs` copies `SECURITY.md` and `docs/install.md` in before every build (the copies are
+  git-ignored), so those two files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
+  Preview: `npm run dev` in `website/` → http://localhost:4321/lupios/.
 
 ## Conventions
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:

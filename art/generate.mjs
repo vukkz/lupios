@@ -233,6 +233,55 @@ writeFileSync(
   <rect y="77" width="1600" height="3" fill="${C.accent}" opacity="0.7"/>`),
 );
 
+// ---- Website (website/): logo, favicon and the mountains behind the home page's title -------
+// Two versions of the mountains, one per site theme. The front ridge has the page's own
+// background colour, so the picture melts into the page below it.
+const WEB = "website/src/assets";
+mkdirSync(WEB, { recursive: true });
+mkdirSync("website/public", { recursive: true });
+writeFileSync(`${WEB}/lupios-logo.svg`, svg(256, 256, wolfHead()));
+writeFileSync("website/public/favicon.svg", svg(256, 256, wolfHead()));
+
+function heroMountains({ sky, star, layers, snow }) {
+  const W = 2400, H = 900, rand = rng(1312), sr = rng(77); // separate, so both themes get the same mountains
+  const stars = star
+    ? Array.from({ length: 160 }, () => {
+        const x = Math.round(sr() * W), y = Math.round(sr() * H * 0.55);
+        const r = (sr() < 0.08 ? 2.2 : 0.9 + sr() * 0.9).toFixed(1);
+        return `<circle cx="${x}" cy="${y}" r="${r}" fill="${star}" opacity="${(0.2 + sr() * 0.55).toFixed(2)}"/>`;
+      }).join("")
+    : "";
+  const ridges = layers.map((l) => {
+    const top = ridge(rand, { ...l, W });
+    const line = top.map((p) => p.join(",")).join(" ");
+    return `${poly([...top, [W, H], [0, H]], l.fill)}<polyline points="${line}" fill="none" stroke="${snow}" stroke-width="2.5" opacity="${l.snow}"/>`;
+  }).join("\n  ");
+  return svg(W, H, `<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      ${sky.map((c, i) => `<stop offset="${i / (sky.length - 1)}" stop-color="${c}"/>`).join("")}
+    </linearGradient>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#sky)"/>
+  ${stars}
+  ${ridges}`, ` preserveAspectRatio="xMidYMax slice"`);
+}
+writeFileSync(`${WEB}/hero-night.svg`, heroMountains({
+  sky: [C.night, "#0C1A2C", "#10233A"], star: C.text, snow: C.ice,
+  layers: [
+    { baseY: 680, amp: 230, peaks: 4, fill: "#12243A", snow: 0.3 },
+    { baseY: 780, amp: 170, peaks: 6, fill: "#0E1C2E", snow: 0.18 },
+    { baseY: 870, amp: 100, peaks: 8, fill: C.night, snow: 0.12 },
+  ],
+}));
+writeFileSync(`${WEB}/hero-day.svg`, heroMountains({
+  sky: ["#F7FBFE", "#E3F4FC", "#CDEBF8"], star: null, snow: "#FFFFFF",
+  layers: [
+    { baseY: 680, amp: 230, peaks: 4, fill: "#B4DCF0", snow: 0.9 },
+    { baseY: 780, amp: 170, peaks: 6, fill: "#D5ECF8", snow: 0.9 },
+    { baseY: 870, amp: 100, peaks: 8, fill: "#F7FBFE", snow: 0.9 },
+  ],
+}));
+
 // ---- Preview page: open art/preview.html in a browser to check everything at once -------
 const uri = (f, dir = OUT) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${dir}/${f}`)).toString("base64")}`;
 const logo = uri("lupios-logo.svg");

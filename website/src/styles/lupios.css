@@ -1,0 +1,133 @@
+/* LupiOS colours for the site, from the OS palette in art/generate.mjs:
+   night #0B1220, trench #0A2F4F, abyss #0F4C7A, deep #1D7FC0, accent #33B5F0, ice #8BE0FF, frost #CFF3FF */
+
+:root {
+  --sl-font: "Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; /* KDE's font first */
+
+  --sl-color-accent-low: #0a2f4f;
+  --sl-color-accent: #33b5f0;
+  --sl-color-accent-high: #8be0ff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e6f1fb;
+  --sl-color-gray-2: #c3d3e4;
+  --sl-color-gray-3: #8397b0;
+  --sl-color-gray-4: #3d5069;
+  --sl-color-gray-5: #1d2b42;
+  --sl-color-gray-6: #111b2d;
+  --sl-color-black: #0b1220;
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: #cff3ff;
+  --sl-color-accent: #1d7fc0;
+  --sl-color-accent-high: #0f4c7a;
+  --sl-color-white: #0b1220;
+  --sl-color-gray-1: #13233a;
+  --sl-color-gray-2: #2a3b52;
+  --sl-color-gray-3: #4a5d77;
+  --sl-color-gray-4: #7a8ca3;
+  --sl-color-gray-5: #c5d5e4;
+  --sl-color-gray-6: #e8f1f9;
+  --sl-color-gray-7: #f0f7fc;
+  --sl-color-black: #f7fbfe;
+}
+
+/* ---- Home page: icy mountains behind the title (hero-night/day.svg from art/generate.mjs) ---- */
+[data-has-hero] body {
+  overflow-x: clip; /* the full-width picture mustn't add a sideways scrollbar */
+}
+[data-has-hero] .hero {
+  position: relative;
+  isolation: isolate;
+}
+[data-has-hero] .hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -6rem auto 0 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: url("../assets/hero-night.svg") center bottom / cover no-repeat;
+}
+:root[data-theme="light"][data-has-hero] .hero::before {
+  background-image: url("../assets/hero-day.svg");
+}
+[data-has-hero] .hero > img {
+  filter: drop-shadow(0 0 3rem color-mix(in srgb, var(--sl-color-accent) 35%, transparent));
+}
+
+/* ---- Cards: icy instead of Starlight's rotating rainbow, rounded like the download cards ---- */
+.card {
+  --sl-card-border: var(--sl-color-accent);
+  --sl-card-bg: var(--sl-color-accent-low);
+  border-radius: 0.75rem;
+  background-color: var(--sl-color-gray-6);
+}
+
+.sl-markdown-content kbd {
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--sl-color-gray-4);
+  border-bottom-width: 2px;
+  border-radius: 0.3em;
+  background: var(--sl-color-gray-6);
+  font-family: var(--sl-font);
+  font-size: 0.85em;
+}
+
+/* ---- Download cards (src/components/Downloads.astro) ---- */
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.iso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: var(--sl-color-gray-6);
+}
+.iso p {
+  margin: 0;
+}
+.iso-name {
+  font-size: var(--sl-text-xl);
+  font-weight: 600;
+  color: var(--sl-color-white);
+}
+.iso-for,
+.iso-meta {
+  color: var(--sl-color-gray-3);
+}
+.iso-meta {
+  font-size: var(--sl-text-sm);
+}
+.iso-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: var(--sl-color-accent);
+  color: var(--sl-color-black);
+  font-weight: 600;
+  text-decoration: none;
+}
+a.iso-button:hover {
+  background: var(--sl-color-accent-high);
+  color: var(--sl-color-black);
+}
+.iso-soon {
+  border: 1px dashed var(--sl-color-gray-4);
+  background: transparent;
+  color: var(--sl-color-gray-3);
+}
+.downloads-note {
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}

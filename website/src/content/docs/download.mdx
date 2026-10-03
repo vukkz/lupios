@@ -1,0 +1,59 @@
+---
+title: Download
+description: Get the LupiOS installer for your PC, check it, or switch an existing Fedora Atomic install.
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+import Downloads from "../../components/Downloads.astro";
+
+Both downloads are the same LupiOS. The only difference is the graphics driver: pick the NVIDIA one
+if your PC has an NVIDIA card. On Windows, Task Manager → Performance → GPU tells you which card you have.
+
+<Downloads />
+
+## What you need
+
+- **A USB stick of 8 GB or more.** Everything on it gets erased.
+- **A 64-bit PC with at least 8 GB of RAM**, and an SSD with **64 GB or more** for LupiOS.
+- **Internet during setup.** Some apps download on first boot.
+
+<LinkCard title="Next: install it" description="Step by step, about 30 minutes." href="../install/" />
+
+## Check the download
+
+Every ISO comes with a `-CHECKSUM` file. To make sure your download isn't damaged, run this in
+Windows PowerShell and compare the result with the number in that file:
+
+```powershell
+Get-FileHash .\lupios.iso -Algorithm SHA256
+```
+
+On Linux or a Mac: `sha256sum lupios.iso` (Mac: `shasum -a 256 lupios.iso`).
+
+## Already on Fedora Atomic?
+
+If you run Fedora Silverblue, Kinoite or another Fedora Atomic desktop, you can switch it to
+LupiOS without reinstalling. Use `lupios-nvidia` instead of `lupios` if you have an NVIDIA card.
+
+1. Switch to the unsigned image first. That installs LupiOS's signing key and policy:
+   ```bash
+   rpm-ostree rebase ostree-unverified-registry:ghcr.io/vukkz/lupios:latest
+   systemctl reboot
+   ```
+2. Then switch to the signed image. From now on, your PC only accepts updates signed with the
+   LupiOS key:
+   ```bash
+   rpm-ostree rebase ostree-image-signed:docker://ghcr.io/vukkz/lupios:latest
+   systemctl reboot
+   ```
+
+Your Fedora version stays the one LupiOS is built on, so you're never upgraded to the next one by surprise.
+
+## Check the signature yourself
+
+Every LupiOS image is signed with [cosign](https://github.com/sigstore/cosign). With
+[`cosign.pub`](https://github.com/vukkz/lupios/blob/main/cosign.pub) from the repository:
+
+```bash
+cosign verify --key cosign.pub ghcr.io/vukkz/lupios
+```

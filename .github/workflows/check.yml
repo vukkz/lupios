@@ -27,11 +27,11 @@ jobs:
       - name: Artwork is up to date with art/generate.mjs
         run: |
           node art/generate.mjs
-          git diff --exit-code -- files/system/usr/share/lupios/art files/system/usr/share/lupios/fastfetch-logo.txt art/preview.html iso/anaconda
+          git diff --exit-code -- files/system/usr/share/lupios/art files/system/usr/share/lupios/fastfetch-logo.txt art/preview.html iso/anaconda website/src/assets website/public/favicon.svg
 
       - name: No Windows line endings
         run: |
-          if grep -rlI $'\r' files lab recipes; then
+          if grep -rlI $'\r' files lab recipes website/src website/scripts; then
             echo "::error::The files above have CRLF line endings"
             exit 1
           fi

@@ -1,0 +1,51 @@
+name: website
+# Builds the website (website/) and publishes it on GitHub Pages: https://vukkz.github.io/lupios
+# It runs when the site, or a doc it copies (SECURITY.md, docs/install.md), changes. On `testing`
+# and in pull requests it only checks that the site builds: only `main` publishes.
+on:
+  push:
+    branches: [main, testing]
+    paths:
+      - "website/**"
+      - "SECURITY.md"
+      - "docs/install.md"
+      - ".github/workflows/website.yml"
+  pull_request:
+    paths:
+      - "website/**"
+      - "SECURITY.md"
+      - "docs/install.md"
+      - ".github/workflows/website.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency: # one publish at a time, and never cut one off halfway
+  group: website-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: withastro/action@v6 # installs, runs `npm run build`, packages dist/ for Pages
+        with:
+          path: website
+
+  publish:
+    name: Publish on GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

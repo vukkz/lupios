@@ -4,3 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "npm" # the website: Astro and Starlight, in one pull request a month
+    directory: "/website"
+    schedule:
+      interval: "monthly"
+    groups:
+      website:
+        patterns: ["*"]
