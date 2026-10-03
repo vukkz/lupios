@@ -1,6 +1,6 @@
-# Wolf OS defaults. These only apply until you change them in System Settings.
+# LupiOS defaults. These only apply until you change them in System Settings.
 [General]
-ColorScheme=WolfOS
+ColorScheme=LupiOS
 
 [Icons]
 Theme=breeze-dark

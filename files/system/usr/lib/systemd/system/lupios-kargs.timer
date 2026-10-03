@@ -1,0 +1,9 @@
+[Unit]
+Description=LupiOS: add the kernel hardening boot arguments after the first startup
+
+[Timer]
+# Late enough that the user is logged in to see the notification, and startup is done
+OnBootSec=5min
+
+[Install]
+WantedBy=timers.target

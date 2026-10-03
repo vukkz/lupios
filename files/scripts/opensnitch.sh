@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OpenSnitch: the per-app firewall behind `wolf outgoing` (apps ask before they connect).
+# OpenSnitch: the per-app firewall behind `lupi outgoing` (apps ask before they connect).
 # It isn't in Fedora's repos, so install the official release, pinned to a version and checked
 # against GitHub's published checksums: if the files ever change, the build fails instead of
 # shipping them. To update: bump VERSION and copy the new sha256 values from
@@ -23,8 +23,8 @@ done
 dnf -y install "$dir/opensnitch-ui-$VERSION-1.noarch.rpm" python3-grpcio python3-protobuf
 
 # The daemon, without its install scripts: they only enable and start the service. Starting can't
-# work during a build, and dnf5 then fails the whole install. Wolf OS ships it off anyway:
-# `wolf outgoing on` (or the sheep level) turns it on, and /etc/xdg/autostart opens the pop-up only then.
+# work during a build, and dnf5 then fails the whole install. LupiOS ships it off anyway:
+# `lupi outgoing on` (or the sheep level) turns it on, and /etc/xdg/autostart opens the pop-up only then.
 dnf -y install --setopt=tsflags=noscripts "$dir/opensnitch-$VERSION-1.x86_64.rpm"
 rm -rf "${dir:?}"
 

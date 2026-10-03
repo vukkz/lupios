@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Zones only filter what comes in. This policy filters what this PC (HOST) sends out on
+     untrusted networks (zone lupios-public): no local-discovery announcements. It covers every
+     program that announces itself, e.g. avahi-daemon, which publishes "<hostname>.local" on
+     its own and ignores NetworkManager's per-connection mdns/llmnr settings. -->
+<policy target="CONTINUE">
+  <short>LupiOS Public: stay quiet</short>
+  <description>On untrusted networks, drop this PC's outgoing local-discovery traffic, so it doesn't announce its name or services: mDNS (.local names, avahi), LLMNR, NetBIOS names and SSDP/UPnP.</description>
+  <ingress-zone name="HOST"/>
+  <egress-zone name="lupios-public"/>
+  <rule>
+    <port port="5353" protocol="udp"/>
+    <drop/>
+  </rule>
+  <rule>
+    <port port="5355" protocol="udp"/>
+    <drop/>
+  </rule>
+  <rule>
+    <port port="5355" protocol="tcp"/>
+    <drop/>
+  </rule>
+  <rule>
+    <port port="137-138" protocol="udp"/>
+    <drop/>
+  </rule>
+  <rule>
+    <port port="1900" protocol="udp"/>
+    <drop/>
+  </rule>
+</policy>

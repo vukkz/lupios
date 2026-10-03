@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<zone target="DROP">
-  <short>Wolf Public</short>
-  <description>Wolf OS zone for untrusted networks (public Wi-Fi). Silently drops every incoming connection, including local device discovery (mDNS) and pings, so other people on the network can't see or probe this machine. Outgoing traffic is allowed, except local-discovery announcements (policy wolf-public-quiet).</description>
-  <service name="dhcpv6-client"/>
-</zone>

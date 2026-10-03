@@ -1,8 +1,0 @@
-[Unit]
-Description=Wolf OS: install the default apps shortly after the first start
-
-[Timer]
-OnBootSec=30s
-
-[Install]
-WantedBy=timers.target

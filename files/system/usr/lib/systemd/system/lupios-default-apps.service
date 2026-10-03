@@ -1,0 +1,14 @@
+[Unit]
+Description=LupiOS: install the default apps (Firefox, Flatseal) once
+Documentation=https://github.com/vukkz/lupios
+Wants=network-online.target
+After=network-online.target
+# Only until it has worked once (lupi creates this file): an app the user removes stays removed
+ConditionPathExists=!/var/lib/lupios/default-apps-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/lupi _default-apps
+# No internet yet, or Flathub is down: try again later
+Restart=on-failure
+RestartSec=10min

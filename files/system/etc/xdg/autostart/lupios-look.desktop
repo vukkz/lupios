@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LupiOS look
+Comment=Applies the LupiOS colours once per user
+Exec=/usr/libexec/lupios-look
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

@@ -1,9 +1,9 @@
-# Wolf Lab: Kali Linux hacking tools, kept off the host system.
+# Lupi Lab: Kali Linux hacking tools, kept off the host system.
 # Built and signed by .github/workflows/build-lab.yml, entered with `ujust lab`.
 FROM docker.io/kalilinux/kali-rolling:latest
 
-LABEL org.opencontainers.image.source="https://github.com/vukkz/wolf-os" \
-      org.opencontainers.image.description="Wolf OS Lab: Kali Linux tools for distrobox" \
+LABEL org.opencontainers.image.source="https://github.com/vukkz/lupios" \
+      org.opencontainers.image.description="LupiOS Lab: Kali Linux tools for distrobox" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 ARG DEBIAN_FRONTEND=noninteractive

@@ -1,10 +1,10 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# Wolf OS for AMD and Intel graphics (and VMs).
+# LupiOS for AMD and Intel graphics (and VMs).
 # image will be published to ghcr.io/<user>/<name>
-name: wolf-os
+name: lupios
 # description will be included in the image's metadata
-description: Wolf OS - a hardened, rollback-safe everyday desktop with an isolated hacking lab.
+description: LupiOS - a hardened, rollback-safe everyday desktop with an isolated hacking lab.
 
 # the base image to build on top of (FROM) and the version tag to use
 # kinoite-main = Fedora Atomic KDE Plasma + Universal Blue extras (codecs, ujust, drivers)

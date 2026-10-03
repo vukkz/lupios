@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- Lets the LupiOS panel widget and LupiOS Welcome run `lupi` as root through pkexec.
+     Asks for your password, then remembers it for a few minutes (auth_admin_keep). -->
+<policyconfig>
+  <vendor>LupiOS</vendor>
+  <vendor_url>https://github.com/vukkz/lupios</vendor_url>
+  <action id="org.lupios.lupi">
+    <description>Change LupiOS settings</description>
+    <message>LupiOS needs your password to change security, network or Game Mode settings</message>
+    <icon_name>lupios-logo</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/lupi</annotate>
+  </action>
+</policyconfig>

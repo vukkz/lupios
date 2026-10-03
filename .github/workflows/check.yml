@@ -1,5 +1,5 @@
 name: check
-# Fast sanity checks, so a typo doesn't ship in an image and break wolf.
+# Fast sanity checks, so a typo doesn't ship in an image and break lupi.
 on:
   push:
   pull_request:
@@ -18,16 +18,16 @@ jobs:
       - name: Shell scripts pass shellcheck
         run: shellcheck -S warning files/scripts/*.sh files/system/usr/bin/* files/system/usr/libexec/* files/system/etc/profile.d/*.sh files/system/usr/lib/NetworkManager/dispatcher.d/*
 
-      # systemd services (wolf-kargs) and NetworkManager's dispatcher (network trust) start wolf
+      # systemd services (lupios-kargs) and NetworkManager's dispatcher (network trust) start lupi
       # with almost no environment: no $HOME, no $USER. With `set -u`, anything at the top of the
       # script that needs them would stop it before it does anything.
-      - name: wolf starts without $HOME, like systemd and NetworkManager run it
-        run: env -i PATH=/usr/bin:/bin bash files/system/usr/bin/wolf help >/dev/null
+      - name: lupi starts without $HOME, like systemd and NetworkManager run it
+        run: env -i PATH=/usr/bin:/bin bash files/system/usr/bin/lupi help >/dev/null
 
       - name: Artwork is up to date with art/generate.mjs
         run: |
           node art/generate.mjs
-          git diff --exit-code -- files/system/usr/share/wolf-os/art files/system/usr/share/wolf-os/fastfetch-logo.txt art/preview.html iso/anaconda
+          git diff --exit-code -- files/system/usr/share/lupios/art files/system/usr/share/lupios/fastfetch-logo.txt art/preview.html iso/anaconda
 
       - name: No Windows line endings
         run: |

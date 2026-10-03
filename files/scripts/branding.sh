@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rename the OS to Wolf OS (shown in the boot menu, fastfetch, system settings).
+# Rename the OS to LupiOS (shown in the boot menu, fastfetch, system settings).
 # ID stays "fedora" on purpose so Fedora tooling (dnf, toolbox, flatpak) keeps working.
 set -euo pipefail
 
@@ -14,13 +14,13 @@ set_field() {
     fi
 }
 
-set_field NAME "Wolf OS"
-# No number in the name: Wolf OS updates continuously, and 44 is the Fedora version underneath.
-# It stays in VERSION_ID, which tools read (wolf channel builds the image tag from it).
-set_field PRETTY_NAME "Wolf OS"
-set_field HOME_URL "https://github.com/vukkz/wolf-os"
-set_field BUG_REPORT_URL "https://github.com/vukkz/wolf-os/issues"
-set_field DEFAULT_HOSTNAME "wolf-os"
-set_field LOGO "wolf-os-logo" # icon installed by look.sh
+set_field NAME "LupiOS"
+# No number in the name: LupiOS updates continuously, and 44 is the Fedora version underneath.
+# It stays in VERSION_ID, which tools read (lupi channel builds the image tag from it).
+set_field PRETTY_NAME "LupiOS"
+set_field HOME_URL "https://github.com/vukkz/lupios"
+set_field BUG_REPORT_URL "https://github.com/vukkz/lupios/issues"
+set_field DEFAULT_HOSTNAME "lupios"
+set_field LOGO "lupios-logo" # icon installed by look.sh
 
 cat "$file"

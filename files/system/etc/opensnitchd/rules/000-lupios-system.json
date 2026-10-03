@@ -1,0 +1,18 @@
+{
+  "created": "2026-09-28T00:00:00Z",
+  "updated": "2026-09-28T00:00:00Z",
+  "name": "000-lupios-system",
+  "description": "LupiOS: its own system services may connect without asking: DNS (systemd-resolved), network setup (NetworkManager), time (chronyd), system, app and firmware updates (rpm-ostree, bootc, skopeo, uupd, flatpak, fwupd) and container downloads (podman, used by lupi lab and lupi install). A deny rule of your own still wins, and you can edit or delete this rule like any other.",
+  "action": "allow",
+  "duration": "always",
+  "operator": {
+    "type": "regexp",
+    "operand": "process.path",
+    "sensitive": false,
+    "data": "^(/usr/lib/systemd/systemd-resolved|/usr/s?bin/(NetworkManager|chronyd|rpm-ostree|bootc|skopeo|uupd|flatpak|podman)|/usr/libexec/fwupd/fwupd)$",
+    "list": []
+  },
+  "enabled": true,
+  "precedence": false,
+  "nolog": false
+}

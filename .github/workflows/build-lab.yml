@@ -18,11 +18,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/wolf-os-lab
+  IMAGE: ghcr.io/${{ github.repository_owner }}/lupios-lab
 
 jobs:
   build:
-    name: Build Wolf Lab
+    name: Build Lupi Lab
     runs-on: ubuntu-latest
     permissions:
       contents: read

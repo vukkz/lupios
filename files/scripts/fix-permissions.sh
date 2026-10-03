@@ -2,5 +2,5 @@
 # Commits made on Windows can lose the "executable" flag, so set it here.
 set -euo pipefail
 
-chmod 0755 /usr/bin/wolf /usr/bin/wolf-security-check /usr/libexec/wolf-os-look \
-    /usr/libexec/wolf-outgoing-ui /usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust
+chmod 0755 /usr/bin/lupi /usr/bin/lupi-security-check /usr/libexec/lupios-look \
+    /usr/libexec/lupi-outgoing-ui /usr/lib/NetworkManager/dispatcher.d/90-lupios-network-trust

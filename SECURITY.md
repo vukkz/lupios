@@ -1,8 +1,8 @@
-# Wolf OS security
+# LupiOS security
 
-Wolf OS aims for **hardening that doesn't get in your way**. Every setting here is on
+LupiOS aims for **hardening that doesn't get in your way**. Every setting here is on
 by default unless marked *opt-in*. Each one lists what it protects against, what it
-can break, and how to undo it. Run `wolf check` to see the live status.
+can break, and how to undo it. Run `lupi check` to see the live status.
 
 Base: Fedora Atomic 44 (KDE Plasma) via Universal Blue. That already gives you
 SELinux enforcing, a read-only `/usr`, atomic updates with rollback, and sandboxed
@@ -12,13 +12,13 @@ Flatpak apps. Everything below is added on top.
 
 | Setting | Why | Trade-off |
 |---|---|---|
-| Images signed with cosign (`cosign.pub`) | Your system only accepts updates signed with the Wolf OS key, so a hijacked registry can't push you a malicious OS | You must rebase with `ostree-image-signed:` once (see README) |
+| Images signed with cosign (`cosign.pub`) | Your system only accepts updates signed with the LupiOS key, so a hijacked registry can't push you a malicious OS | You must rebase with `ostree-image-signed:` once (see README) |
 | Automatic updates (Universal Blue default) | Security fixes arrive without you remembering | Updates apply on the next reboot |
 | Fedora version pinned (`image-version: 44`) | Big upgrades are a deliberate change, not a surprise | Moving to Fedora 45 is a manual edit of `recipe.yml` |
 
-## Firewall: `files/system/usr/lib/firewalld/zones/wolf.xml`
+## Firewall: `files/system/usr/lib/firewalld/zones/lupios.xml`
 
-The default zone is `wolf`: **all incoming connections are blocked** except DHCPv6
+The default zone is `lupios`: **all incoming connections are blocked** except DHCPv6
 and mDNS (finding printers and devices on your LAN). Outgoing traffic isn't restricted.
 Stock Fedora desktops allow incoming ports 1025–65535.
 
@@ -33,7 +33,7 @@ Stock Fedora desktops allow incoming ports 1025–65535.
 
 Then `sudo firewall-cmd --reload`. Undo everything: `sudo firewall-cmd --set-default-zone=FedoraWorkstation`.
 
-## Kernel settings: `files/system/usr/lib/sysctl.d/90-wolf-hardening.conf`
+## Kernel settings: `files/system/usr/lib/sysctl.d/90-lupios-hardening.conf`
 
 | Setting | Why | Can break |
 |---|---|---|
@@ -55,22 +55,22 @@ To change one: put the same key in `/etc/sysctl.d/99-local.conf`, then run `sudo
 ## Kernel boot arguments: added automatically, once
 
 `slab_nomerge init_on_alloc=1 page_alloc.shuffle=1 randomize_kstack_offset=on vsyscall=none`
-(the list is in `files/system/usr/share/wolf-os/kargs`)
+(the list is in `files/system/usr/share/lupios/kargs`)
 
 These make kernel memory-corruption bugs much harder to exploit. The cost is a small
 amount of performance and memory.
 - `vsyscall=none` breaks only ancient (pre-2012) Linux programs. Windows games through Proton aren't affected.
 - `init_on_free=1` was left out on purpose because of its bigger performance cost.
 
-Updates through `rpm-ostree` don't apply kernel arguments from the image, so Wolf OS adds them
-itself: `wolf-kargs.timer` runs `wolf _kargs-auto` 5 minutes after startup, shows a notification,
+Updates through `rpm-ostree` don't apply kernel arguments from the image, so LupiOS adds them
+itself: `lupios-kargs.timer` runs `lupi _kargs-auto` 5 minutes after startup, shows a notification,
 and the arguments are active from the next restart on. It runs only until it has worked once.
 - Adding them creates a new boot entry. The first time, the previous entry becomes the same version
   without the extra arguments, so the rollback slot holds no older version until the next update.
-- **Undo with `wolf kargs off`.** That choice is remembered (`/var/lib/wolf-os/kargs-decided`), and
-  Wolf OS never adds them back by itself. `wolf kargs on` turns them on again.
+- **Undo with `lupi kargs off`.** That choice is remembered (`/var/lib/lupios/kargs-decided`), and
+  LupiOS never adds them back by itself. `lupi kargs on` turns them on again.
 
-## Blocked kernel modules: `files/system/usr/lib/modprobe.d/wolf-blacklist.conf`
+## Blocked kernel modules: `files/system/usr/lib/modprobe.d/lupios-blacklist.conf`
 
 These modules can't be auto-loaded:
 - Rare network protocols (DCCP, SCTP, RDS, TIPC, and others) that have had many kernel bugs.
@@ -81,18 +81,18 @@ These modules can't be auto-loaded:
 **Can break:** FireWire audio interfaces and camcorders, which are very rare now.
 HFS+ (Mac drives), UDF (discs) and exFAT still work.
 
-## Network privacy: `files/system/usr/lib/NetworkManager/conf.d/90-wolf-privacy.conf`
+## Network privacy: `files/system/usr/lib/NetworkManager/conf.d/90-lupios-privacy.conf`
 
 - Each Wi-Fi network sees a different MAC address that stays the same for that network. Networks can't track you across locations, but captive portals and router reservations still work.
 - Temporary IPv6 addresses are preferred for outgoing connections.
 
-## USBGuard (*opt-in*): `wolf usbguard on`
+## USBGuard (*opt-in*): `lupi usbguard on`
 
 When it's on, only the USB devices plugged in when you turned it on are allowed.
 A malicious USB stick pretending to be a keyboard gets blocked. It's off by default
 because it's easy to lock yourself out of a new keyboard.
 
-## Outgoing guard (*opt-in, on in sheep*): `wolf outgoing on`
+## Outgoing guard (*opt-in, on in sheep*): `lupi outgoing on`
 
 The firewall above stops strangers connecting **to** you. The outgoing guard covers the
 other direction: [OpenSnitch](https://github.com/evilsocket/opensnitch) asks the first time
@@ -103,8 +103,8 @@ or game mod phoning home, a malicious package calling out.
 - **Installed from OpenSnitch's official release**, pinned to a version and checked against
   its published SHA-256 checksums at build time (`files/scripts/opensnitch.sh`). It isn't in
   Fedora's repos.
-- **Wolf OS's own services are pre-approved** (DNS, network setup, time, system, app and firmware
-  updates, container downloads) in `/etc/opensnitchd/rules/000-wolf-os-system.json`, so the
+- **LupiOS's own services are pre-approved** (DNS, network setup, time, system, app and firmware
+  updates, container downloads) in `/etc/opensnitchd/rules/000-lupios-system.json`, so the
   first minutes aren't a wall of questions. A deny rule of your own still wins.
 - **Off by default**, because the questions take getting used to, and a friend who clicks
   Allow on everything gains nothing. The sheep level turns it on, and off again when you leave
@@ -116,19 +116,19 @@ or game mod phoning home, a malicious package calling out.
   on purpose.
 - **Malware inside an app you already allowed** (your browser, say) can use that app's permission.
 - **Traffic that can't be tied to an app** passes, for example raw packets from `nmap` scans
-  in `wolf lab root`.
+  in `lupi lab root`.
 
-## Network trust: `wolf net`
+## Network trust: `lupi net`
 
 Every Wi-Fi or wired network has a trust level. The first time you connect to one,
-Wolf OS picks a safe default and sends a notification:
+LupiOS picks a safe default and sends a notification:
 - **New Wi-Fi networks are public** (you might be in a café).
 - **New wired networks are home.**
 
-Change it any time with `wolf net home` or `wolf net public`. The file behind this
-is `files/system/usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust`.
+Change it any time with `lupi net home` or `lupi net public`. The file behind this
+is `files/system/usr/lib/NetworkManager/dispatcher.d/90-lupios-network-trust`.
 
-| | Home (zone `wolf`) | Public (zone `wolf-public`) |
+| | Home (zone `lupios`) | Public (zone `lupios-public`) |
 |---|---|---|
 | Incoming connections | Blocked, except device discovery (mDNS) | **All silently dropped**, including pings. Scanners see nothing |
 | Announce this PC's name and services (mDNS/avahi, LLMNR, NetBIOS, SSDP) | Yes | **No: the firewall drops them on the way out**, whichever app sends them |
@@ -138,7 +138,7 @@ is `files/system/usr/lib/NetworkManager/dispatcher.d/90-wolf-network-trust`.
 Staying quiet takes two parts. NetworkManager's `mdns`/`llmnr` settings only cover
 systemd-resolved, but `avahi-daemon` announces `<hostname>.local` on its own, and browsers
 and music apps do their own discovery too. So on public networks a firewall *policy*
-(`files/system/usr/lib/firewalld/policies/wolf-public-quiet.xml`) drops everything this PC
+(`files/system/usr/lib/firewalld/policies/lupios-public-quiet.xml`) drops everything this PC
 sends on the discovery ports: mDNS 5353, LLMNR 5355, NetBIOS 137–138 and SSDP 1900. Zones only
 filter incoming traffic; policies can filter what leaves. To see it work, on a public network
 run `echo hi > /dev/udp/224.0.0.251/5353`: it fails with "Operation not permitted", while the
@@ -146,11 +146,11 @@ same on port 5354, or on a home network, goes through.
 
 **Can break on public networks:** casting to a TV, network printers and KDE Connect,
 because they rely on devices finding each other. That's the point on a network you
-don't control. Use `wolf net home` on networks you trust.
+don't control. Use `lupi net home` on networks you trust.
 
-## Game Mode: `wolf game on`
+## Game Mode: `lupi game on`
 
-A temporary mode for playing. **Everything it changes resets at reboot or with `wolf game off`.**
+A temporary mode for playing. **Everything it changes resets at reboot or with `lupi game off`.**
 - Opens Steam Remote Play and Steam LAN game transfer (firewalld services `steam-streaming`,
   `steam-lan-transfer`), but **only on home networks**. On public networks they stay closed.
 - Turns off the split-lock slowdown (`kernel.split_lock_mitigate`), as SteamOS always does: it
@@ -159,14 +159,14 @@ A temporary mode for playing. **Everything it changes resets at reboot or with `
 - Pauses automatic updates, so they don't take bandwidth or CPU mid-game.
 - Switches to the *performance* power profile.
 
-It works on any security level. Older versions also had a *gaming* level; it became part of Game
-Mode, because a permanent switch and a temporary one, both about gaming, were confusing. Pausing
-updates must never be permanent, so it can't be a level.
+It works on any security level. There's deliberately no "gaming" security level: a permanent
+switch and a temporary one, both about gaming, would be confusing, and pausing updates must never
+be permanent, so it can't be a level.
 
-## Security levels: `wolf level`
+## Security levels: `lupi level`
 
 One switch that moves a bundle of settings together. It stays until you change it.
-The files are in `files/system/usr/share/wolf-os/levels/`.
+The files are in `files/system/usr/share/lupios/levels/`.
 
 | | wolf (default) | sheep (maximum caution) |
 |---|---|---|
@@ -182,7 +182,7 @@ The files are in `files/system/usr/share/wolf-os/levels/`.
 | Outgoing guard: apps ask before they connect (OpenSnitch) | Your choice | On |
 
 Switching levels is instant and needs no reboot. **Levels never change kernel boot
-arguments.** On Wolf OS that creates a new boot entry, which takes a minute, needs a
+arguments.** On LupiOS that creates a new boot entry, which takes a minute, needs a
 reboot, and pushes your previous OS version out of the rollback slot.
 
 **Extra hardening you can add by hand:** wipe freed memory, so leftover passwords and
@@ -192,40 +192,40 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 
 **Sheep breaks some things:**
 - Wi-Fi login pages (hotels, airports, trains) don't load, because DNS only goes to
-  Quad9. Switch to `wolf level wolf`, log in, then switch back.
+  Quad9. Switch to `lupi level wolf`, log in, then switch back.
 - A few apps that use io_uring can fail.
 - Every app asks once before it goes online, so expect questions in the first minutes and
   after installing something new.
 
-## The wolf panel widget and Wolf Welcome
+## The LupiOS panel widget and LupiOS Welcome
 
-Both run `/usr/bin/wolf` as root through `pkexec`, so every change asks for your password.
-The polkit rule in `files/system/usr/share/polkit-1/actions/org.wolfos.wolf.policy`:
-- **Only covers `/usr/bin/wolf`,** which lives in the read-only system image and can't be swapped out.
+Both run `/usr/bin/lupi` as root through `pkexec`, so every change asks for your password.
+The polkit rule in `files/system/usr/share/polkit-1/actions/org.lupios.lupi.policy`:
+- **Only covers `/usr/bin/lupi`,** which lives in the read-only system image and can't be swapped out.
 - **Remembers your password for a few minutes** (`auth_admin_keep`), so clicking through a few
   settings doesn't ask every time.
 - **Only works for someone at the machine.** A remote or inactive session always has to type the password.
 
-Reading the current state (`wolf state`) needs no password and changes nothing.
+Reading the current state (`lupi state`) needs no password and changes nothing.
 
-## Installing software: `wolf install`
+## Installing software: `lupi install`
 
 - **Apps come from Flathub** and run in Flatpak's sandbox. See or tighten each app's permissions in **Flatseal**.
-- **Command-line tools go into the `wolf-tools` box** (Arch Linux, packages signed by Arch).
+- **Command-line tools go into the `lupi-tools` box** (Arch Linux, packages signed by Arch).
   Their commands are linked into `~/.local/bin`. Like the Lab, the box keeps them off the
   system image, but it **is not a sandbox**: a tool in it can reach your files.
 - Nothing is ever installed into the system image itself. Use `rpm-ostree install` only
   if something truly has to be part of the system, such as a driver.
 
-## Wolf Lab: `wolf lab`
+## Lupi Lab: `lupi lab`
 
 The Kali tools live in a container (`lab/Containerfile`), not on the host. Here's
 exactly what that does and doesn't protect.
 
 **What it gives you:**
 - No attack tools, and none of their thousands of dependencies, installed on the host system.
-- Tools run as your user, not root. Only `wolf lab root` gets raw network access.
-- The lab has its own home folder (`~/WolfLab`), so tool configs and loot stay separate.
+- Tools run as your user, not root. Only `lupi lab root` gets raw network access.
+- The lab has its own home folder (`~/LupiLab`), so tool configs and loot stay separate.
 - The lab image is rebuilt weekly and signed with the same key as the OS.
 
 **What it doesn't do:** it is **not a sandbox**. Distrobox shares your user account
@@ -247,5 +247,5 @@ built on plain `podman` with no access to host files.
 
 ## Reporting a security problem
 
-Open an issue at https://github.com/vukkz/wolf-os/issues, or for anything sensitive
+Open an issue at https://github.com/vukkz/lupios/issues, or for anything sensitive
 use GitHub's private vulnerability reporting on the repo's **Security** tab.

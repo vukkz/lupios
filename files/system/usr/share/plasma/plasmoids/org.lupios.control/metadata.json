@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "LupiOS" }],
+        "Category": "System Information",
+        "Description": "Security level, network trust and Game Mode for LupiOS",
+        "EnabledByDefault": true,
+        "FormFactors": ["desktop"],
+        "Icon": "lupios-logo",
+        "Id": "org.lupios.control",
+        "License": "Apache-2.0",
+        "Name": "LupiOS",
+        "Website": "https://github.com/vukkz/lupios"
+    },
+    "X-KDE-Keywords": "lupi,lupios,wolf,security,firewall,network,game mode,level",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-NotificationAreaCategory": "SystemServices"
+}

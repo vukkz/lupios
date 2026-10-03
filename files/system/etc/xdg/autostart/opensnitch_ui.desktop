@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=OpenSnitch
-Comment=Asks before apps connect to the internet, while the Wolf OS outgoing guard is on
-Exec=/usr/libexec/wolf-outgoing-ui
+Comment=Asks before apps connect to the internet, while the LupiOS outgoing guard is on
+Exec=/usr/libexec/lupi-outgoing-ui
 Icon=opensnitch-ui
 Terminal=false
 NoDisplay=true

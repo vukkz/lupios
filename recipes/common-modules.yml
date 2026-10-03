@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# Everything Wolf OS adds on top of its base image. Shared by every flavour
+# Everything LupiOS adds on top of its base image. Shared by every flavour
 # (recipe.yml, recipe-nvidia.yml), so edit here and all of them change.
 modules:
   - type: files
@@ -16,14 +16,14 @@ modules:
       packages:
         - micro
         - starship
-        - distrobox # runs the Wolf Lab container (wolf lab) and the tools box (wolf install)
-        - jq # used by wolf-security-check
-        - usbguard # off by default, turned on with wolf usbguard on (or the sheep level)
+        - distrobox # runs the Lupi Lab container (lupi lab) and the tools box (lupi install)
+        - jq # used by lupi-security-check
+        - usbguard # off by default, turned on with lupi usbguard on (or the sheep level)
         - gamemode # host daemon that Steam's gamemoderun talks to
         - fastfetch # system info with the wolf logo
         - librsvg2-tools # rsvg-convert, turns the SVG artwork into PNGs in look.sh
         - steam-devices # controller/VR rules; Flatpak Steam can't install them itself
-        - libnotify # notify-send, for the "new network" message from wolf
+        - libnotify # notify-send, for the "new network" message from lupi
     remove:
       packages:
         # removing firefox (in favor of the flatpak, which is sandboxed)
@@ -31,7 +31,7 @@ modules:
         - firefox
         - firefox-langpacks
 
-  # Firefox and Flatseal (Flatpaks) are installed once on the first start by wolf-default-apps.timer,
+  # Firefox and Flatseal (Flatpaks) are installed once on the first start by lupios-default-apps.timer,
   # not by BlueBuild's default-flatpaks: that one re-installs them on every boot (so removing one
   # never sticks) and notifies at every login.
 
@@ -39,19 +39,18 @@ modules:
     scripts:
       - branding.sh
       - firewall.sh
-      - opensnitch.sh # per-app firewall for `wolf outgoing`, off by default
+      - opensnitch.sh # per-app firewall for `lupi outgoing`, off by default
       - look.sh
       - debrand.sh
       - fix-permissions.sh
-      - compat.sh
 
   - type: systemd
     system:
       enabled:
-        - wolf-kargs.timer # adds the kernel hardening boot arguments once, after install
-        - wolf-default-apps.timer # installs Firefox and Flatseal once, on the first start
+        - lupios-kargs.timer # adds the kernel hardening boot arguments once, after install
+        - lupios-default-apps.timer # installs Firefox and Flatseal once, on the first start
 
-  # Rebuild the boot image so it contains the Wolf OS boot screen and the module
+  # Rebuild the boot image so it contains the LupiOS boot screen and the module
   # blacklist. Keep this near the end so it includes everything above.
   - type: initramfs
 

@@ -1,9 +1,9 @@
-// Generates the Wolf OS artwork (SVG) into files/system/usr/share/wolf-os/art/.
+// Generates the LupiOS artwork (SVG) into files/system/usr/share/lupios/art/.
 // The image build turns these into PNGs (files/scripts/look.sh).
 // Run from the repo root:  node art/generate.mjs
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
-const OUT = "files/system/usr/share/wolf-os/art";
+const OUT = "files/system/usr/share/lupios/art";
 mkdirSync(OUT, { recursive: true });
 
 // ---- Palette -----------------------------------------------------------------
@@ -55,16 +55,16 @@ const svg = (w, h, body, extra = "") =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"${extra}>\n  ${body}\n</svg>\n`;
 
 // Icon: used for the app-menu button, About page and os-release LOGO
-writeFileSync(`${OUT}/wolf-os-logo.svg`, svg(256, 256, wolfHead()));
+writeFileSync(`${OUT}/lupios-logo.svg`, svg(256, 256, wolfHead()));
 
 // Emblem: head above the name, for the boot screen
 writeFileSync(
-  `${OUT}/wolf-os-emblem.svg`,
+  `${OUT}/lupios-emblem.svg`,
   svg(
     400,
     340,
     `<g transform="translate(88,0) scale(0.875)">\n  ${wolfHead()}\n  </g>
-  <text x="200" y="318" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="40" font-weight="300" letter-spacing="14" fill="${C.text}">WOLF OS</text>`,
+  <text x="200" y="318" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="40" font-weight="300" letter-spacing="14" fill="${C.text}">LUPIOS</text>`,
   ),
 );
 
@@ -172,11 +172,11 @@ function terminalLogo() {
     return line.trimEnd();
   }).join("\n") + "\n";
 }
-writeFileSync("files/system/usr/share/wolf-os/fastfetch-logo.txt", terminalLogo());
+writeFileSync("files/system/usr/share/lupios/fastfetch-logo.txt", terminalLogo());
 
 // ---- Installer (Anaconda) sidebar and top bar: iso/anaconda/ -----------------------------
 // The installer runs on Fedora's own packages, which brand it as Fedora. build-iso.yml turns
-// these into PNGs and iso/anaconda/wolf-os-look.tmpl puts them in place of Fedora's.
+// these into PNGs and iso/anaconda/lupios-look.tmpl puts them in place of Fedora's.
 const ISO = "iso/anaconda";
 mkdirSync(ISO, { recursive: true });
 
@@ -188,7 +188,7 @@ writeFileSync(
     170,
     138,
     `<g transform="translate(35,0) scale(0.39)">\n  ${wolfHead()}\n  </g>
-  <text x="88.5" y="130" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="20" font-weight="300" letter-spacing="7" fill="${C.text}">WOLF OS</text>`,
+  <text x="88.5" y="130" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="20" font-weight="300" letter-spacing="7" fill="${C.text}">LUPIOS</text>`,
   ),
 );
 
@@ -235,10 +235,10 @@ writeFileSync(
 
 // ---- Preview page: open art/preview.html in a browser to check everything at once -------
 const uri = (f, dir = OUT) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${dir}/${f}`)).toString("base64")}`;
-const logo = uri("wolf-os-logo.svg");
+const logo = uri("lupios-logo.svg");
 writeFileSync(
   "art/preview.html",
-  `<!doctype html><html><head><meta charset="utf-8"><title>Wolf OS art preview</title><style>
+  `<!doctype html><html><head><meta charset="utf-8"><title>LupiOS art preview</title><style>
 body{margin:0;background:#1a1d21;color:#ddd;font:14px sans-serif}
 .row{display:flex;gap:24px;align-items:end;padding:16px;flex-wrap:wrap}
 .light{background:#eff0f1;color:#222}
@@ -254,11 +254,11 @@ img.wp{width:760px;display:block}
 <div class="row"><img src="${logo}" width="256"><img src="${logo}" width="64"><img src="${logo}" width="32">
 <div class="panel"><img src="${logo}" width="24"><span>dark panel, 24px</span></div></div>
 <div class="row light"><img src="${logo}" width="128"><img src="${logo}" width="22"> light panel, 22px</div>
-<div class="row"><div class="ply"><img src="${uri("wolf-os-emblem.svg")}" height="200">
+<div class="row"><div class="ply"><img src="${uri("lupios-emblem.svg")}" height="200">
 <div style="margin-top:60px;opacity:.6">boot screen: the password box goes here</div></div></div>
 <div class="row"><img class="wp" src="${uri("wallpaper-night.svg")}"><img class="wp" src="${uri("wallpaper-emblem.svg")}"></div>
-<div class="row"><div class="inst"><div class="side"><div></div></div><div class="main"><div class="top">WOLF-OS 44 INSTALLATION</div>
-<h3>WELCOME TO WOLF-OS 44.</h3><div class="bar">INSTALLATION DESTINATION (the bar at the top of each page)</div>
+<div class="row"><div class="inst"><div class="side"><div></div></div><div class="main"><div class="top">LUPIOS 44 INSTALLATION</div>
+<h3>WELCOME TO LUPIOS 44.</h3><div class="bar">INSTALLATION DESTINATION (the bar at the top of each page)</div>
 What language would you like to use during the installation process?</div></div>
 <span>installer, at 60% size (build-iso.yml)</span></div>
 </body></html>

@@ -1,5 +1,5 @@
 name: build-iso
-# Builds the Wolf OS installer ISOs (for a USB stick) from the stable (`latest`) images.
+# Builds the LupiOS installer ISOs (for a USB stick), normally from the stable (`latest`) images.
 # Run it by hand: Actions tab > build-iso > Run workflow (or: gh workflow run build-iso.yml).
 # It takes 30-60 minutes. The ISOs appear as downloads at the bottom of the run's page.
 on:
@@ -8,8 +8,13 @@ on:
       flavour:
         description: Which flavour to build
         type: choice
-        options: [both, wolf-os, wolf-os-nvidia]
+        options: [both, lupios, lupios-nvidia]
         default: both
+      channel:
+        description: Which images to package (testing = not promoted yet, for trying out in a VM)
+        type: choice
+        options: [stable, testing]
+        default: stable
 
 jobs:
   iso:
@@ -20,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [wolf-os, wolf-os-nvidia]
+        image: [lupios, lupios-nvidia]
     env:
       WANTED: ${{ inputs.flavour == 'both' || inputs.flavour == matrix.image }}
       FEDORA_VERSION: 44 # keep in sync with image-version in recipes/
@@ -33,7 +38,7 @@ jobs:
           df -h /
 
       # The installer runs on Fedora's packages, which brand it as Fedora. Our look for it lives in
-      # iso/anaconda: render its artwork here, then wolf-os-look.tmpl swaps it in during the build.
+      # iso/anaconda: render its artwork here, then lupios-look.tmpl swaps it in during the build.
       - uses: actions/checkout@v7
         if: env.WANTED == 'true'
       - name: Render the installer artwork
@@ -54,7 +59,8 @@ jobs:
         with:
           image_repo: ghcr.io/${{ github.repository_owner }}
           image_name: ${{ matrix.image }}
-          image_tag: latest
+          # an install from a testing ISO stays on the testing channel (lupi channel stable switches)
+          image_tag: ${{ inputs.channel == 'testing' && format('br-testing-{0}', env.FEDORA_VERSION) || 'latest' }}
           version: ${{ env.FEDORA_VERSION }}
           variant: Kinoite
           iso_name: ${{ matrix.image }}-${{ env.FEDORA_VERSION }}.iso
@@ -63,7 +69,7 @@ jobs:
           # password once, on a blue "MOK management" screen after the first reboot.
           secure_boot_key_url: https://github.com/ublue-os/akmods/raw/main/certs/public_key.der
           enrollment_password: universalblue
-          additional_templates: /github/workspace/iso/anaconda/wolf-os-look.tmpl # the repo, inside the builder
+          additional_templates: /github/workspace/iso/anaconda/lupios-look.tmpl # the repo, inside the builder
 
       - name: Upload ISO
         if: env.WANTED == 'true'

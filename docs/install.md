@@ -1,14 +1,14 @@
-# Installing Wolf OS
+# Installing LupiOS
 
 About 30 minutes, most of it waiting. Read it once all the way through before you start.
 
 ## What you need
 
 - **A USB stick of 8 GB or more.** Everything on it gets erased.
-- **A 64-bit PC with at least 8 GB of RAM** and an SSD with **64 GB or more** for Wolf OS.
+- **A 64-bit PC with at least 8 GB of RAM** and an SSD with **64 GB or more** for LupiOS.
 - **Internet during setup.** Some apps download on first boot.
 
-> **Keeping Windows?** Install Wolf OS on its **own SSD**. That's by far the safest way: Windows
+> **Keeping Windows?** Install LupiOS on its **own SSD**. That's by far the safest way: Windows
 > is never touched, and you pick the system in your PC's boot menu. Before changing anything:
 > - Back up your files.
 > - If Windows uses BitLocker, save the **BitLocker recovery key**
@@ -18,8 +18,8 @@ About 30 minutes, most of it waiting. Read it once all the way through before yo
 
 | Your graphics card | ISO |
 |---|---|
-| NVIDIA (GeForce, RTX, GTX) | `wolf-os-nvidia-44.iso` |
-| AMD, Intel, or a virtual machine | `wolf-os-44.iso` |
+| NVIDIA (GeForce, RTX, GTX) | `lupios-nvidia-44.iso` |
+| AMD, Intel, or a virtual machine | `lupios-44.iso` |
 
 On Windows, you can check your graphics card in Task Manager → Performance → GPU.
 
@@ -27,11 +27,11 @@ On Windows, you can check your graphics card in Task Manager → Performance →
 
 1. Install **[Fedora Media Writer](https://fedoraproject.org/workstation/download)** (Windows and Mac)
    or **[balenaEtcher](https://etcher.balena.io)**.
-2. Choose **"Select .iso file"**, pick the Wolf OS ISO, pick your USB stick, and write it.
+2. Choose **"Select .iso file"**, pick the LupiOS ISO, pick your USB stick, and write it.
 
 *Optional:* to check the download isn't damaged, run this in Windows PowerShell and compare the
 result with the `-CHECKSUM` file that came with the ISO:
-`Get-FileHash .\wolf-os-44.iso -Algorithm SHA256`
+`Get-FileHash .\lupios-44.iso -Algorithm SHA256`
 
 ## 3. Boot from the USB stick
 
@@ -45,9 +45,9 @@ settings, install, then turn it back on after step 5.
 
 ## 4. Install
 
-1. Choose **Install Wolf-OS 44** and your language.
+1. Choose **Install lupios 44** (the first entry) and your language.
 2. **Installation Destination:**
-   - Pick the disk for Wolf OS. **Double-check it's not your Windows disk.**
+   - Pick the disk for LupiOS. **Double-check it's not your Windows disk.**
    - Leave storage on **Automatic**.
    - Tick **Encrypt my data** and choose a passphrase. You'll type it at every boot, and there's
      no way to recover it if you forget it.
@@ -56,7 +56,7 @@ settings, install, then turn it back on after step 5.
 
 ## 5. First boot
 
-1. **A blue "MOK management" screen may appear.** It lets Wolf OS's drivers work with Secure Boot,
+1. **A blue "MOK management" screen may appear.** It lets LupiOS's drivers work with Secure Boot,
    and it only shows once. **Be quick, it has a 10-second timer.**
    1. Choose **Enroll MOK**, then **Continue**, then **Yes**.
    2. Type the password **`universalblue`** (nothing appears while you type), then choose **Reboot**.
@@ -65,16 +65,16 @@ settings, install, then turn it back on after step 5.
 2. Type your disk passphrase.
 3. KDE asks you to create your user. This first user is the administrator: it can install
    software and change system settings.
-4. **Wolf Welcome** opens and walks you through your security level, gaming and the Lab.
+4. **LupiOS Welcome** opens and walks you through your security level, gaming and the Lab.
 
 ## 6. One restart to finish
 
-About 5 minutes after you start Wolf OS, it adds extra kernel hardening by itself, and a
+About 5 minutes after you start LupiOS, it adds extra kernel hardening by itself, and a
 **"Kernel hardening added"** message pops up. Restart once after that message. Then open the
 terminal (**Konsole**) and run:
 
 ```bash
-wolf check
+lupi check
 ```
 
 You should see ✔ on everything, and a full score if Secure Boot is on.
@@ -83,6 +83,6 @@ You should see ✔ on everything, and a full score if Secure Boot is on.
 
 - **An update broke something:** restart and pick the **second entry** in the boot menu. That's the
   previous version.
-- **`wolf lab` says `crun: ptsname: Inappropriate ioctl for device`:** the lab's first setup was
-  interrupted. Run `podman stop wolf-lab`, then `wolf lab` again and let it finish.
-- **Anything else:** open an issue at https://github.com/vukkz/wolf-os/issues with a photo of the screen.
+- **`lupi lab` says `crun: ptsname: Inappropriate ioctl for device`:** the lab's first setup was
+  interrupted. Run `podman stop lupi-lab`, then `lupi lab` again and let it finish.
+- **Anything else:** open an issue at https://github.com/vukkz/lupios/issues with a photo of the screen.
