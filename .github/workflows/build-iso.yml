@@ -63,7 +63,7 @@ jobs:
           image_tag: ${{ inputs.channel == 'testing' && format('br-testing-{0}', env.FEDORA_VERSION) || 'latest' }}
           version: ${{ env.FEDORA_VERSION }}
           variant: Kinoite
-          iso_name: ${{ matrix.image }}-${{ env.FEDORA_VERSION }}.iso
+          iso_name: ${{ matrix.image }}.iso # lupios.iso: no Fedora version in the name, the OS updates continuously
           # Enroll Universal Blue's Secure Boot key during install, so drivers it signs
           # (like NVIDIA's) load with Secure Boot on. The installed PC asks for this
           # password once, on a blue "MOK management" screen after the first reboot.
@@ -75,7 +75,7 @@ jobs:
         if: env.WANTED == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.image }}-${{ env.FEDORA_VERSION }}-iso
+          name: ${{ matrix.image }}-iso
           path: |
             ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}
             ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}-CHECKSUM

@@ -18,8 +18,8 @@ About 30 minutes, most of it waiting. Read it once all the way through before yo
 
 | Your graphics card | ISO |
 |---|---|
-| NVIDIA (GeForce, RTX, GTX) | `lupios-nvidia-44.iso` |
-| AMD, Intel, or a virtual machine | `lupios-44.iso` |
+| NVIDIA (GeForce, RTX, GTX) | `lupios-nvidia.iso` |
+| AMD, Intel, or a virtual machine | `lupios.iso` |
 
 On Windows, you can check your graphics card in Task Manager → Performance → GPU.
 
@@ -31,7 +31,7 @@ On Windows, you can check your graphics card in Task Manager → Performance →
 
 *Optional:* to check the download isn't damaged, run this in Windows PowerShell and compare the
 result with the `-CHECKSUM` file that came with the ISO:
-`Get-FileHash .\lupios-44.iso -Algorithm SHA256`
+`Get-FileHash .\lupios.iso -Algorithm SHA256`
 
 ## 3. Boot from the USB stick
 
