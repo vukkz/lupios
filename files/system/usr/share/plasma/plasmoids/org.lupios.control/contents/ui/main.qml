@@ -23,11 +23,11 @@ PlasmoidItem {
     property string score: ""
     property bool busy: false
     property string error: ""
-    property bool confirmSheep: false
+    property bool confirmWolf: false
 
     readonly property var levelInfo: ({
-        wolf: "The default: everything in LupiOS's security baseline.",
-        sheep: "Maximum caution: encrypted DNS, invisible to pings, USBGuard on, apps ask before connecting."
+        sheep: "The calm everyday default: everything in LupiOS's security baseline.",
+        wolf: "Maximum caution: encrypted DNS, invisible to pings, USBGuard on, apps ask before connecting."
     })
 
     Plasmoid.icon: "lupios-logo"
@@ -134,7 +134,7 @@ PlasmoidItem {
         RowLayout {
             Layout.fillWidth: true
             Repeater {
-                model: [["wolf", "Wolf"], ["sheep", "Sheep"]]
+                model: [["sheep", "Sheep"], ["wolf", "Wolf"]]
                 delegate: PlasmaComponents3.Button {
                     required property var modelData
                     Layout.fillWidth: true
@@ -144,7 +144,7 @@ PlasmoidItem {
                     enabled: !root.busy
                     onClicked: {
                         if (modelData[0] === root.level) return;
-                        if (modelData[0] === "sheep") root.confirmSheep = true;
+                        if (modelData[0] === "wolf") root.confirmWolf = true;
                         else root.act("level " + modelData[0]);
                     }
                 }
@@ -158,28 +158,28 @@ PlasmoidItem {
             font: Kirigami.Theme.smallFont
         }
 
-        // Sheep breaks Wi-Fi login pages, so ask first
+        // Wolf breaks Wi-Fi login pages, so ask first
         ColumnLayout {
-            visible: root.confirmSheep
+            visible: root.confirmWolf
             Layout.fillWidth: true
             PlasmaComponents3.Label {
                 Layout.fillWidth: true
-                text: "Sheep blocks Wi-Fi login pages (hotels, airports) and new USB devices, and apps ask before connecting. Switch to it?"
+                text: "Wolf blocks Wi-Fi login pages (hotels, airports) and new USB devices, and apps ask before connecting. Switch to it?"
                 wrapMode: Text.WordWrap
                 color: Kirigami.Theme.neutralTextColor
             }
             RowLayout {
                 PlasmaComponents3.Button {
-                    text: "Switch to Sheep"
+                    text: "Switch to Wolf"
                     onClicked: {
-                        root.confirmSheep = false;
-                        root.act("level sheep --yes");
+                        root.confirmWolf = false;
+                        root.act("level wolf --yes");
                     }
                 }
                 PlasmaComponents3.Button {
                     text: "Cancel"
                     flat: true
-                    onClicked: root.confirmSheep = false
+                    onClicked: root.confirmWolf = false
                 }
             }
         }

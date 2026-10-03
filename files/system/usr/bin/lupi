@@ -278,13 +278,14 @@ EOF
 # Security levels: lupi level (persistent)
 # ---------------------------------------------------------------------------------------
 
-current_level() { cat "$LEVEL_FILE" 2>/dev/null || echo wolf; }
+# sheep: the calm everyday default. wolf: alert, on the hunt, maximum caution.
+current_level() { cat "$LEVEL_FILE" 2>/dev/null || echo sheep; }
 
 level_dns() { # on | off
     if [[ $1 == on ]]; then
         as_root mkdir -p /etc/systemd/resolved.conf.d
-        as_root ln -sfn "$LEVELS/sheep/resolved.conf" /etc/systemd/resolved.conf.d/95-lupios-level.conf
-        as_root ln -sfn "$LEVELS/sheep/networkmanager.conf" /etc/NetworkManager/conf.d/95-lupios-level.conf
+        as_root ln -sfn "$LEVELS/wolf/resolved.conf" /etc/systemd/resolved.conf.d/95-lupios-level.conf
+        as_root ln -sfn "$LEVELS/wolf/networkmanager.conf" /etc/NetworkManager/conf.d/95-lupios-level.conf
     else
         as_root rm -f /etc/systemd/resolved.conf.d/95-lupios-level.conf /etc/NetworkManager/conf.d/95-lupios-level.conf
     fi
@@ -294,8 +295,8 @@ level_dns() { # on | off
 
 describe_levels() {
     cat <<EOF
-  ${C}lupi${N}     the default: confident, with everything in SECURITY.md
-  ${C}sheep${N}    maximum caution: the wolf level, plus encrypted DNS (Quad9), no replies to pings,
+  ${C}sheep${N}    the everyday default: calm, with every protection in SECURITY.md
+  ${C}wolf${N}     maximum caution: the sheep level, plus encrypted DNS (Quad9), no replies to pings,
            io_uring and SysRq off, no TCP timestamps, USBGuard and the outgoing guard on
            ${Y}Breaks Wi-Fi login pages (hotels, airports) and apps that need io_uring.${N}
 
@@ -311,18 +312,18 @@ cmd_level() { # [level] [--yes]
         printf '%sSecurity level:%s %s\n\n' "$B" "$N" "$current"
         describe_levels
         echo
-        echo "Change it with: lupi level wolf|sheep"
+        echo "Change it with: lupi level sheep|wolf"
         return 0
     fi
-    [[ $new == wolf || $new == sheep ]] || die "Usage: lupi level [wolf|sheep]"
+    [[ $new == sheep || $new == wolf ]] || die "Usage: lupi level [sheep|wolf]"
     [[ $new == "$current" ]] && { echo "Already on the $new level."; return 0; }
-    if [[ $new == sheep && $yes != --yes && $yes != -y ]]; then
-        echo "${Y}Sheep level (maximum caution):${N}"
+    if [[ $new == wolf && $yes != --yes && $yes != -y ]]; then
+        echo "${Y}Wolf level (maximum caution):${N}"
         echo "  - Wi-Fi networks with a login page (hotels, airports, trains) won't load it."
-        echo "    Switch to the wolf level, log in, then switch back."
+        echo "    Switch to the sheep level, log in, then switch back."
         echo "  - A few apps that need io_uring may fail. New USB devices are blocked until allowed."
         echo "  - Apps ask before they connect to the internet (most questions come in the first minutes)."
-        ask "Switch to sheep?" || { echo "Nothing changed."; return 0; }
+        ask "Switch to wolf?" || { echo "Nothing changed."; return 0; }
     fi
 
     as_root mkdir -p /etc/lupios
@@ -335,11 +336,11 @@ cmd_level() { # [level] [--yes]
 
     # Levels never change kernel boot arguments: that would create a new boot entry, take a
     # minute, need a reboot, and push the previous OS version out of the rollback slot.
-    if [[ $new == sheep ]]; then
+    if [[ $new == wolf ]]; then
         level_dns on && ok "Encrypted DNS on (Quad9)"
         usbguard_on by-level && ok "USBGuard on"
         outgoing_on by-level && ok "Outgoing guard on: apps ask before they connect"
-    elif [[ $current == sheep ]]; then
+    elif [[ $current == wolf ]]; then
         level_dns off && ok "Encrypted DNS off (using the network's DNS again)"
         [[ -e /etc/lupios/usbguard-by-level ]] && usbguard_off && ok "USBGuard off"
         [[ -e /etc/lupios/outgoing-by-level ]] && outgoing_off && ok "Outgoing guard off"
@@ -795,7 +796,7 @@ ${B}Software${N}
 
 ${B}Security${N}
   ${C}lupi check${N}                       how locked-down this system is
-  ${C}lupi level${N} [wolf|sheep]          security level: how careful (stays until you change it)
+  ${C}lupi level${N} [sheep|wolf]          security level: how careful (stays until you change it)
   ${C}lupi net${N} [home|public]           trust level of the network you're on
   ${C}lupi kargs${N} [on|off]              kernel hardening boot arguments (on by itself after install)
   ${C}lupi usbguard${N} [on|off]           block USB devices plugged in later

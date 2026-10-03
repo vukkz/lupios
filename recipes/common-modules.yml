@@ -18,7 +18,7 @@ modules:
         - starship
         - distrobox # runs the Lupi Lab container (lupi lab) and the tools box (lupi install)
         - jq # used by lupi-security-check
-        - usbguard # off by default, turned on with lupi usbguard on (or the sheep level)
+        - usbguard # off by default, turned on with lupi usbguard on (or the wolf level)
         - gamemode # host daemon that Steam's gamemoderun talks to
         - fastfetch # system info with the wolf logo
         - librsvg2-tools # rsvg-convert, turns the SVG artwork into PNGs in look.sh

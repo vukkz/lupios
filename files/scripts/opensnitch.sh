@@ -24,7 +24,7 @@ dnf -y install "$dir/opensnitch-ui-$VERSION-1.noarch.rpm" python3-grpcio python3
 
 # The daemon, without its install scripts: they only enable and start the service. Starting can't
 # work during a build, and dnf5 then fails the whole install. LupiOS ships it off anyway:
-# `lupi outgoing on` (or the sheep level) turns it on, and /etc/xdg/autostart opens the pop-up only then.
+# `lupi outgoing on` (or the wolf level) turns it on, and /etc/xdg/autostart opens the pop-up only then.
 dnf -y install --setopt=tsflags=noscripts "$dir/opensnitch-$VERSION-1.x86_64.rpm"
 rm -rf "${dir:?}"
 

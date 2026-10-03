@@ -6,7 +6,9 @@ description: The name, the Fedora base, the 6 GB download, the password on first
 ## What does the name mean?
 
 *Lupi* is Italian for "wolves": a pack. You control it all with the `lupi` command, and its two
-security levels are **wolf** (confident, the default) and **sheep** (maximum caution).
+security levels are **sheep** and **wolf**. A sheep is calm and just grazing: that's the everyday
+default, with every protection on and nothing in your way. A wolf is alert and on the hunt: that's
+maximum caution, for travel and public places.
 
 ## Why is it based on Fedora?
 

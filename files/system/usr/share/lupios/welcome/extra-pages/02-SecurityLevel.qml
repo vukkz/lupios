@@ -30,8 +30,8 @@ Welcome.Page {
 
         Repeater {
             model: [
-                ["wolf", "Wolf (recommended)", "lupios-logo", "The everyday default. Every protection in LupiOS, nothing that gets in your way."],
-                ["sheep", "Sheep", "security-high", "Maximum caution for travel and public places: encrypted DNS, invisible to pings, new USB devices blocked, apps ask before connecting. Wi-Fi login pages (hotels, airports) won't load."]
+                ["sheep", "Sheep (recommended)", "security-medium", "The calm everyday default. Every protection in LupiOS, nothing that gets in your way."],
+                ["wolf", "Wolf", "lupios-logo", "Alert and on the hunt: maximum caution for travel and public places. Encrypted DNS, invisible to pings, new USB devices blocked, apps ask before connecting. Wi-Fi login pages (hotels, airports) won't load."]
             ]
             delegate: QQC2.Button {
                 required property var modelData

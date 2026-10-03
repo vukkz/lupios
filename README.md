@@ -4,13 +4,14 @@ A hardened, rollback-safe everyday desktop with an isolated hacking lab.
 Built on Fedora Atomic 44 (KDE Plasma) with [BlueBuild](https://blue-build.org).
 
 *Lupi* is Italian for "wolves": a pack. You control it all with the `lupi` command, and its two
-security levels are **wolf** (confident, the default) and **sheep** (maximum caution).
+security levels are **sheep** (calm, the everyday default) and **wolf** (maximum caution: alert,
+on the hunt).
 
 - **Secure by default, without the pain:** firewall blocks incoming traffic, hardened kernel settings, signed updates. Every setting and its trade-off is in [SECURITY.md](SECURITY.md).
 - **Updates that can't brick you:** the whole system updates at once, and you can boot the previous version from the boot menu.
 - **Lupi Lab:** Kali's top hacking tools in a container (`lupi lab`), not on your host system.
 - **Networks that know who to trust:** new Wi-Fi networks are treated as public (invisible to other devices, random MAC address), and your home network as trusted. `lupi net` switches between them.
-- **Gaming and security in one OS:** `lupi setup gaming` installs Steam, Heroic, Lutris and ProtonUp-Qt. `lupi game on` opens Remote Play ports, fixes stutter in some games and pauses updates while you play. `lupi level wolf|sheep` changes a whole bundle of protections at once.
+- **Gaming and security in one OS:** `lupi setup gaming` installs Steam, Heroic, Lutris and ProtonUp-Qt. `lupi game on` opens Remote Play ports, fixes stutter in some games and pauses updates while you play. `lupi level sheep|wolf` changes a whole bundle of protections at once.
 - **One command for everything:** `lupi` (with tab completion). `lupi install discord` or `lupi install htop` picks the right way to install anything, and `lupi update` updates it all.
 - **The wolf next to the clock:** click it to switch security level, network trust and Game Mode, and to see your security score.
 - **LupiOS Welcome:** a first-login tour that sets up your security level, gaming and the Lab.
@@ -79,8 +80,8 @@ lupi install discord    # apps come from Flathub, command-line tools from Arch L
 lupi update             # system, apps and boxes; reboot afterwards if it says so
 lupi net public         # on a network you don't trust (new Wi-Fi networks start as public)
 lupi game on            # before playing; lupi game off afterwards
-lupi level sheep        # maximum caution; wolf is the default
-lupi outgoing on        # apps ask before they connect to the internet (on in sheep)
+lupi level wolf         # maximum caution; sheep is the everyday default
+lupi outgoing on        # apps ask before they connect to the internet (on in wolf)
 ```
 
 Run `lupi help` to see every command.

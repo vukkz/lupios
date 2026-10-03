@@ -92,7 +92,7 @@ When it's on, only the USB devices plugged in when you turned it on are allowed.
 A malicious USB stick pretending to be a keyboard gets blocked. It's off by default
 because it's easy to lock yourself out of a new keyboard.
 
-## Outgoing guard (*opt-in, on in sheep*): `lupi outgoing on`
+## Outgoing guard (*opt-in, on in wolf*): `lupi outgoing on`
 
 The firewall above stops strangers connecting **to** you. The outgoing guard covers the
 other direction: [OpenSnitch](https://github.com/evilsocket/opensnitch) asks the first time
@@ -107,8 +107,8 @@ or game mod phoning home, a malicious package calling out.
   updates, container downloads) in `/etc/opensnitchd/rules/000-lupios-system.json`, so the
   first minutes aren't a wall of questions. A deny rule of your own still wins.
 - **Off by default**, because the questions take getting used to, and a friend who clicks
-  Allow on everything gains nothing. The sheep level turns it on, and off again when you leave
-  sheep, unless you had turned it on yourself.
+  Allow on everything gains nothing. The wolf level turns it on, and off again when you leave
+  wolf, unless you had turned it on yourself.
 
 **What it can't do:**
 - **When the pop-up app isn't running, connections are allowed** (OpenSnitch's default), so a
@@ -168,7 +168,7 @@ be permanent, so it can't be a level.
 One switch that moves a bundle of settings together. It stays until you change it.
 The files are in `files/system/usr/share/lupios/levels/`.
 
-| | wolf (default) | sheep (maximum caution) |
+| | sheep (default) | wolf (maximum caution) |
 |---|---|---|
 | Everything above in this file | ✔ | ✔ |
 | Steam Remote Play/LAN ports on home networks | Only in Game Mode | Only in Game Mode |
@@ -190,9 +190,9 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 `sudo rpm-ostree kargs --append-if-missing=init_on_free=1` and reboot. Remove it with
 `--delete-if-present=init_on_free=1`.
 
-**Sheep breaks some things:**
+**Wolf breaks some things:**
 - Wi-Fi login pages (hotels, airports, trains) don't load, because DNS only goes to
-  Quad9. Switch to `lupi level wolf`, log in, then switch back.
+  Quad9. Switch to `lupi level sheep`, log in, then switch back.
 - A few apps that use io_uring can fail.
 - Every app asks once before it goes online, so expect questions in the first minutes and
   after installing something new.

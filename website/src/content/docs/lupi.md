@@ -29,11 +29,11 @@ into the system itself.
 | Command | What it does |
 |---|---|
 | `lupi check` | Shows how locked-down this PC is, with a score |
-| `lupi level [wolf\|sheep]` | Your security level: **wolf** is the confident default, **sheep** is maximum caution |
+| `lupi level [sheep\|wolf]` | Your security level: **sheep** is the calm everyday default, **wolf** is maximum caution |
 | `lupi net [home\|public]` | Trust for the network you're on. New Wi-Fi networks start as **public** |
 | `lupi kargs [on\|off]` | Kernel hardening at boot. LupiOS turns it on by itself after installing |
-| `lupi usbguard [on\|off]` | Blocks USB devices plugged in after you turn it on (on in sheep) |
-| `lupi outgoing [on\|off]` | Apps ask before they connect to the internet (on in sheep) |
+| `lupi usbguard [on\|off]` | Blocks USB devices plugged in after you turn it on (on in wolf) |
+| `lupi outgoing [on\|off]` | Apps ask before they connect to the internet (on in wolf) |
 
 What each level and setting changes, and what it can break, is all in [Security](../security/).
 

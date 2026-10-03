@@ -86,6 +86,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `HOST`, egress `lupios-public`), which drops outgoing discovery ports. Verified in the VM on 2026-10-02:
   `echo hi > /dev/udp/224.0.0.251/5353` gets EPERM on public, 5354 and home go through. avahi only logs
   failed sends at debug level, so its journal shows nothing either way.
+- Security levels: **sheep** is the everyday default, **wolf** is maximum caution (the owner swapped them on
+  2026-10-03: a sheep grazes calmly, a wolf is alert and hunting). `lupi level` points symlinks in `/etc`
+  (sysctl.d, resolved.conf.d, NetworkManager conf.d) at `/usr/share/lupios/levels/<name>/`, so renaming
+  those folders silently changes what existing installs get: check what `/etc` still points at.
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.
