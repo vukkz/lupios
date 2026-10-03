@@ -1,5 +1,5 @@
 # Lupi Lab: Kali Linux hacking tools, kept off the host system.
-# Built and signed by .github/workflows/build-lab.yml, entered with `ujust lab`.
+# Built and signed by .github/workflows/build-lab.yml, entered with `lupi lab`.
 FROM docker.io/kalilinux/kali-rolling:latest
 
 LABEL org.opencontainers.image.source="https://github.com/vukkz/lupios" \
@@ -10,13 +10,28 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # kali-tools-top10: nmap, metasploit, burpsuite, wireshark, sqlmap, hydra, john,
 # aircrack-ng, netexec, responder. kali-menu has the app-menu entries (Kali's tool
-# packages don't ship their own), so `ujust lab` can add Burp Suite to the host menu.
-# The last line is what distrobox needs, so the first entry doesn't have to download it.
+# packages don't ship their own), so `lupi lab` can add Burp Suite to the host menu.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         kali-tools-top10 \
         kali-menu \
-        sudo passwd procps less curl wget bash-completion libnss-myhostname \
-        iproute2 iputils-ping dnsutils git nano ca-certificates \
+        dnsutils git nano ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Everything distrobox installs on a box's first start (its `setup_apt` list in distrobox-init,
+# filtered the same way to the names that exist). Installed here, GitHub's servers fetch it in
+# seconds; otherwise every user's first `lupi lab` downloads it from Kali's mirrors, which took
+# over 20 minutes in testing. The first start then only refreshes Kali's package list.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends $(apt-cache show \
+        bash apt-utils bash-completion bc bzip2 curl dialog diffutils findutils gnupg gnupg2 \
+        gpgsm hostname iproute2 iputils-ping keyutils language-pack-en less libcap2-bin \
+        libkrb5-3 libnss-mdns libnss-myhostname 'libvte-2.9*-common' libvte-common locales \
+        lsof man-db manpages mtr ncurses-base openssh-client passwd pigz pinentry-curses procps \
+        rsync sudo tcpdump time traceroute tree tzdata unzip util-linux wget xauth xz-utils zip \
+        libgl1 libegl-mesa0 libegl1-mesa libgl1-mesa-glx libegl1 libglx-mesa0 libvulkan1 \
+        mesa-vulkan-drivers \
+        2>/dev/null | grep '^Package:' | sort -u | cut -d' ' -f2-) \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
