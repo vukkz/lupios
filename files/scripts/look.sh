@@ -11,6 +11,11 @@ install -Dm644 "$art/lupios-logo.svg" /usr/share/icons/hicolor/scalable/apps/lup
 # fixed-size PNG copies of the Fedora logo, which would otherwise win over the SVG.
 ln -sf lupios-logo.svg /usr/share/icons/hicolor/scalable/apps/start-here.svg
 find /usr/share/icons/hicolor -name 'start-here.png' -print -delete
+# Panel and tray sizes get the version with thicker lines: the logo's thin lines vanish at 22 px.
+for size in 16 22 24 32; do
+    install -Dm644 "$art/lupios-logo-small.svg" "/usr/share/icons/hicolor/${size}x${size}/apps/lupios-logo.svg"
+    ln -sf lupios-logo.svg "/usr/share/icons/hicolor/${size}x${size}/apps/start-here.svg"
+done
 if command -v gtk-update-icon-cache >/dev/null; then
     gtk-update-icon-cache -f /usr/share/icons/hicolor
 fi
@@ -18,7 +23,7 @@ mkdir -p /usr/share/pixmaps
 rsvg-convert -w 256 -h 256 "$art/lupios-logo.svg" -o /usr/share/pixmaps/lupios-logo.png # About page
 
 # --- Wallpapers (metadata.json for each comes from files/system) ----------------------
-for name in night emblem; do
+for name in night lines emblem; do
     dir="/usr/share/wallpapers/LupiOS-${name^}"
     mkdir -p "$dir/contents/images"
     for size in 3840x2160 2560x1440 1920x1080; do

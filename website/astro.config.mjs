@@ -13,7 +13,12 @@ export default defineConfig({
     starlight({
       title: "LupiOS",
       description: "A hardened, rollback-safe everyday Linux desktop with an isolated hacking lab.",
-      logo: { src: "./src/assets/lupios-logo.svg" },
+      logo: {
+        dark: "./src/assets/lupios-lockup-dark.svg",
+        light: "./src/assets/lupios-lockup-light.svg",
+        alt: "LupiOS",
+        replacesTitle: true,
+      },
       favicon: "/favicon.svg",
       social: [{ icon: "github", label: "GitHub", href: repo }],
       customCss: ["./src/styles/lupios.css"],

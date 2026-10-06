@@ -27,6 +27,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs).
 - `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
   `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
+  The logo is the owner's design (2026-10-06), traced to outlines in `art/logo/lupios-{mark,wordmark}.svg`:
+  one black path of straight segments each, drawn in ice blue (dark backgrounds) or deep blue (light).
+  `lupios-logo-small.svg` thickens the lines for 16–32 px icons. The terminal logo is the mark in Braille
+  dots (needs `dejavu-sans-mono-fonts`). The owner's file is a Figma export with JPEGs inside, not vectors.
 - `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://vukkz.github.io/lupios.
   `scripts/sync.mjs` copies `SECURITY.md` and `docs/install.md` in before every build (the copies are
   git-ignored), so those two files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).

@@ -17,55 +17,53 @@ const C = {
   night: "#0B1220",
   text: "#DDF4FF",
 };
-// The right half of the head is one shade darker, as if lit from the left.
-const darker = { [C.frost]: C.ice, [C.ice]: C.accent, [C.accent]: C.deep, [C.deep]: C.abyss, [C.abyss]: C.trench };
-
-// ---- Wolf head (256 x 256), drawn as left-half facets and mirrored ------------------
-const leftFacets = [
-  { fill: C.ice, pts: [[58, 26], [100, 80], [46, 104]] }, // ear
-  { fill: C.abyss, pts: [[64, 46], [90, 80], [58, 92]] }, // inner ear
-  { fill: C.frost, pts: [[100, 80], [128, 70], [128, 122]] }, // forehead
-  { fill: C.ice, pts: [[100, 80], [128, 122], [110, 134], [80, 124]] }, // brow
-  { fill: C.accent, pts: [[46, 104], [100, 80], [80, 124]] }, // temple
-  { fill: C.deep, pts: [[46, 104], [80, 124], [36, 142]] }, // upper cheek
-  { fill: C.accent, pts: [[36, 142], [80, 124], [110, 134], [98, 172], [72, 190]] }, // cheek
-  { fill: C.frost, pts: [[110, 134], [128, 122], [128, 198], [98, 172]] }, // muzzle
-  { fill: C.ice, pts: [[72, 190], [98, 172], [128, 198], [128, 238]] }, // jaw
-];
-const eye = [[82, 126], [108, 133], [100, 139], [88, 136]];
-const nose = [[114, 196], [142, 196], [128, 212]];
-
-const mirror = (pts) => pts.map(([x, y]) => [256 - x, y]).reverse();
-const poly = (pts, fill, extra = "") =>
-  `<polygon points="${pts.map((p) => p.join(",")).join(" ")}" fill="${fill}"${extra}/>`;
-
-function wolfHead({ stroke = true } = {}) {
-  const s = stroke ? ` stroke="${C.night}" stroke-width="1.5" stroke-linejoin="round"` : "";
-  const facets = [
-    ...leftFacets.map((f) => poly(f.pts, f.fill, s)),
-    ...leftFacets.map((f) => poly(mirror(f.pts), darker[f.fill], s)),
-    poly(eye, C.night),
-    poly(mirror(eye), C.night),
-    poly(nose, C.night),
-  ];
-  return facets.join("\n  ");
-}
 
 const svg = (w, h, body, extra = "") =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"${extra}>\n  ${body}\n</svg>\n`;
+const poly = (pts, fill, extra = "") =>
+  `<polygon points="${pts.map((p) => p.join(",")).join(" ")}" fill="${fill}"${extra}/>`;
 
-// Icon: used for the app-menu button, About page and os-release LOGO
-writeFileSync(`${OUT}/lupios-logo.svg`, svg(256, 256, wolfHead()));
+// ---- The logo: vukkz's design, as outlines in art/logo/ ----------------------------------
+// Each file is one black path of straight segments, filled even-odd. Drawn here in the LupiOS
+// colours: ice-blue lines on dark backgrounds, deep blue on light ones.
+function loadLogo(file) {
+  const text = readFileSync(file, "utf8");
+  const [, w, h] = text.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+  const d = text.match(/ d="([^"]+)"/)[1];
+  const loops = d.split("Z").filter((s) => s.trim()).map((s) =>
+    s.replace(/^\s*M/, "").split("L").map((p) => p.trim().split(/[\s,]+/).map(Number)));
+  return { w: +w, h: +h, d, loops };
+}
+const MARK = loadLogo("art/logo/lupios-mark.svg");
+const WORD = loadLogo("art/logo/lupios-wordmark.svg");
+const heightAt = (part, width) => (width * part.h) / part.w;
 
-// Emblem: head above the name, for the boot screen
+// One logo part, `width` wide, its top-left corner at (x, y). `bold` thickens the lines by that
+// much (in final units): at icon sizes the drawn lines get too thin to see.
+function place(part, { x = 0, y = 0, width, fill, bold = 0, extra = "" }) {
+  const s = width / part.w;
+  const stroke = bold ? ` stroke="${fill}" stroke-width="${(bold / s).toFixed(2)}" stroke-linejoin="round"` : "";
+  return `<path transform="translate(${+x.toFixed(2)} ${+y.toFixed(2)}) scale(${+s.toFixed(5)})" fill="${fill}" fill-rule="evenodd"${stroke}${extra} d="${part.d}"/>`;
+}
+
+// A soft glow behind the mark: a blurred copy in the accent colour.
+const glowFilter = (id, blur) =>
+  `<filter id="${id}" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="${blur}"/></filter>`;
+const glowing = (part, opts, { id, opacity }) =>
+  `${place(part, { ...opts, fill: C.accent, extra: ` filter="url(#${id})" opacity="${opacity}"` })}\n  ${place(part, opts)}`;
+
+// Icon: app-menu button (start-here), tray widget, About page, Welcome, os-release LOGO.
+// The small version, with thicker lines, is installed for the 16-32 px sizes (look.sh).
+const icon = (bold) => svg(256, 256, place(MARK, { x: 10, y: (256 - heightAt(MARK, 236)) / 2, width: 236, fill: C.ice, bold }));
+writeFileSync(`${OUT}/lupios-logo.svg`, icon(0));
+writeFileSync(`${OUT}/lupios-logo-small.svg`, icon(8));
+
+// Emblem: the mark above the name, for the boot screen (Plymouth renders it 260 px tall)
 writeFileSync(
   `${OUT}/lupios-emblem.svg`,
-  svg(
-    400,
-    340,
-    `<g transform="translate(88,0) scale(0.875)">\n  ${wolfHead()}\n  </g>
-  <text x="200" y="318" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="40" font-weight="300" letter-spacing="14" fill="${C.text}">LUPIOS</text>`,
-  ),
+  svg(400, 320, `<defs>${glowFilter("glow", 9)}</defs>
+  ${glowing(MARK, { x: 105, y: 18, width: 190, fill: C.ice }, { id: "glow", opacity: 0.55 })}
+  ${place(WORD, { x: 100, y: 248, width: 200, fill: C.frost })}`),
 );
 
 // ---- Seeded random, so the wallpapers come out the same every run ---------------------
@@ -76,7 +74,7 @@ function rng(seed) {
   };
 }
 
-// ---- Wallpaper: Night (mountains, moon, stars) -------------------------------------
+// ---- Wallpapers: Night (default) and Lines -------------------------------------------
 // A mountain ridge: `peaks` sharp summits with small shoulders and valleys between them.
 function ridge(rand, { baseY, amp, peaks, W }) {
   const pts = [[0, baseY - amp * 0.2 * rand()]];
@@ -94,7 +92,9 @@ function ridge(rand, { baseY, amp, peaks, W }) {
   return pts;
 }
 
-function night() {
+// Both wallpapers are the same night: same stars, moon and mountains. Night paints the
+// mountains as shapes; Lines draws them as glowing ice-blue lines, like the logo.
+function night({ lines = false } = {}) {
   const W = 3840, H = 2160, rand = rng(4242);
   const stars = Array.from({ length: 420 }, () => {
     const x = Math.round(rand() * W), y = Math.round(rand() * H * 0.62);
@@ -103,74 +103,91 @@ function night() {
     return `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.text}" opacity="${o}"/>`;
   }).join("");
   const layers = [
-    { baseY: 1420, amp: 560, peaks: 5, fill: "#12243A", snow: 0.25 },
-    { baseY: 1640, amp: 420, peaks: 7, fill: "#0E1C2E", snow: 0.16 },
-    { baseY: 1860, amp: 300, peaks: 9, fill: "#0A1523", snow: 0.1 },
+    { baseY: 1420, amp: 560, peaks: 5, fill: "#12243A", snow: 0.25, line: 0.75, width: 5 },
+    { baseY: 1640, amp: 420, peaks: 7, fill: "#0E1C2E", snow: 0.16, line: 0.45, width: 4 },
+    { baseY: 1860, amp: 300, peaks: 9, fill: "#0A1523", snow: 0.1, line: 0.25, width: 3 },
   ].map((l) => {
     const top = ridge(rand, { ...l, W });
     const body = [...top, [W, H], [0, H]];
     const line = top.map((p) => p.join(",")).join(" ");
-    return `${poly(body, l.fill)}<polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="3" opacity="${l.snow}"/>`;
+    if (!lines) {
+      return `${poly(body, l.fill)}<polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="3" opacity="${l.snow}"/>`;
+    }
+    // dark inside (hides the stars behind the mountain), a blurred glow, then the line itself
+    return `${poly(body, "#0A1422")}<polyline points="${line}" fill="none" stroke="${C.accent}" stroke-width="${l.width * 4}" stroke-linejoin="round" opacity="${(l.line * 0.35).toFixed(2)}" filter="url(#lineglow)"/><polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="${l.width}" stroke-linejoin="round" opacity="${l.line}"/>`;
   }).join("\n  ");
+  const moon = lines
+    ? `<mask id="crescent"><circle cx="2860" cy="560" r="150" fill="#fff"/><circle cx="2925" cy="520" r="135" fill="#000"/></mask>
+  <circle cx="2860" cy="560" r="150" fill="#E6F7FF" mask="url(#crescent)"/>`
+    : `<circle cx="2860" cy="560" r="150" fill="#E6F7FF"/>
+  <circle cx="2912" cy="530" r="150" fill="#0B1626" opacity="0.18"/>`;
   return svg(W, H, `<defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#050912"/><stop offset="0.65" stop-color="#0C1A2C"/><stop offset="1" stop-color="#10233A"/>
     </linearGradient>
-    <radialGradient id="glow"><stop offset="0" stop-color="${C.ice}" stop-opacity="0.35"/><stop offset="1" stop-color="${C.ice}" stop-opacity="0"/></radialGradient>
-    <radialGradient id="haze"><stop offset="0" stop-color="${C.accent}" stop-opacity="0.14"/><stop offset="1" stop-color="${C.accent}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="${C.ice}" stop-opacity="${lines ? 0.22 : 0.35}"/><stop offset="1" stop-color="${C.ice}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="haze"><stop offset="0" stop-color="${C.accent}" stop-opacity="0.14"/><stop offset="1" stop-color="${C.accent}" stop-opacity="0"/></radialGradient>${lines ? `\n    ${glowFilter("lineglow", 10)}` : ""}
   </defs>
   <rect width="${W}" height="${H}" fill="url(#sky)"/>
   <ellipse cx="${W * 0.55}" cy="1250" rx="2600" ry="520" fill="url(#haze)"/>
   ${stars}
   <circle cx="2860" cy="560" r="520" fill="url(#glow)"/>
-  <circle cx="2860" cy="560" r="150" fill="#E6F7FF"/>
-  <circle cx="2912" cy="530" r="150" fill="#0B1626" opacity="0.18"/>
+  ${moon}
   ${layers}`);
 }
 
-// ---- Wallpaper: Emblem (logo on a dark gradient) -------------------------------------
+// ---- Wallpaper: Emblem (the mark on a dark gradient) ---------------------------------
 function emblem() {
-  const W = 3840, H = 2160;
+  const W = 3840, H = 2160, width = 760, h = heightAt(MARK, width);
   return svg(W, H, `<defs>
     <radialGradient id="bg" cx="0.5" cy="0.45" r="0.75">
       <stop offset="0" stop-color="#132A44"/><stop offset="0.55" stop-color="#0A1422"/><stop offset="1" stop-color="#05080F"/>
     </radialGradient>
     <radialGradient id="glow"><stop offset="0" stop-color="${C.accent}" stop-opacity="0.28"/><stop offset="1" stop-color="${C.accent}" stop-opacity="0"/></radialGradient>
+    ${glowFilter("markglow", 26)}
   </defs>
   <rect width="${W}" height="${H}" fill="url(#bg)"/>
   <circle cx="${W / 2}" cy="${H * 0.46}" r="760" fill="url(#glow)"/>
-  <g transform="translate(${W / 2 - 320},${H * 0.46 - 330}) scale(2.5)" opacity="0.92">
-  ${wolfHead()}
-  </g>`);
+  ${glowing(MARK, { x: (W - width) / 2, y: H * 0.46 - h / 2, width, fill: C.ice }, { id: "markglow", opacity: 0.5 })}`);
 }
 
 writeFileSync(`${OUT}/wallpaper-night.svg`, night());
+writeFileSync(`${OUT}/wallpaper-lines.svg`, night({ lines: true }));
 writeFileSync(`${OUT}/wallpaper-emblem.svg`, emblem());
 
-// ---- Terminal logo for fastfetch: the same head as blocks, 31 columns wide ---------------
-// Each row lists filled column ranges for the left half; the right half is mirrored.
-// $1 = ice (left), $2 = accent (right), $3 = deep blue (inner ears); eyes and nose are gaps.
-function terminalLogo() {
-  const W = 31;
-  const rows = [[[7, 7]], [[6, 8]], [[6, 10]], [[5, 11], [14, 15]], [[5, 15]], [[4, 15]], [[4, 15]],
-    [[4, 15]], [[5, 15]], [[7, 15]], [[9, 15]], [[11, 15]], [[13, 15]], [[15, 15]]];
-  const innerEar = { 1: [7, 7], 2: [8, 9], 3: [8, 10] };
-  const gaps = { 7: [9, 12], 11: [14, 15] }; // eyes, nose
-  return rows.map((ranges, r) => {
-    const cells = Array(W).fill(" ");
-    // right first, so the centre column (15) keeps the left colour
-    const set = (a, b, left, right) => { for (let c = a; c <= b; c++) { cells[W - 1 - c] = right; cells[c] = left; } };
-    for (const [a, b] of ranges) set(a, b, "$1", "$2");
-    if (innerEar[r]) set(...innerEar[r], "$3", "$3");
-    if (gaps[r]) set(...gaps[r], " ", " ");
-    let line = "", colour = "";
-    for (const cell of cells) {
-      if (cell === " ") { line += " "; continue; }
-      if (cell !== colour) { line += cell; colour = cell; }
-      line += "█";
+// ---- Terminal logo for fastfetch: the mark in Braille dots -------------------------------
+// Each Braille character is a 2 x 4 grid of dots, and terminal cells are twice as tall as wide,
+// so the dots are square: fine enough for the logo's lines. Each dot is on if enough of its
+// area is inside the mark (3 x 3 samples, even-odd like the SVG fill).
+function insideMark(px, py) {
+  let inside = false;
+  for (const loop of MARK.loops)
+    for (let i = 0, j = loop.length - 1; i < loop.length; j = i++) {
+      const [xi, yi] = loop[i], [xj, yj] = loop[j];
+      if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
     }
-    return line.trimEnd();
-  }).join("\n") + "\n";
+  return inside;
+}
+function terminalLogo(cols = 30) {
+  const dot = MARK.w / (cols * 2), rows = Math.ceil(MARK.h / dot / 4);
+  const bits = [[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]]; // [row][column] in a cell
+  const on = (dx, dy) => {
+    let hits = 0;
+    for (let sy = 0; sy < 3; sy++)
+      for (let sx = 0; sx < 3; sx++) hits += insideMark((dx + (sx + 0.5) / 3) * dot, (dy + (sy + 0.5) / 3) * dot);
+    return hits >= 3;
+  };
+  const lines = [];
+  for (let r = 0; r < rows; r++) {
+    let line = "";
+    for (let c = 0; c < cols; c++) {
+      let b = 0;
+      for (let y = 0; y < 4; y++) for (let x = 0; x < 2; x++) if (on(c * 2 + x, r * 4 + y)) b |= bits[y][x];
+      line += b ? String.fromCodePoint(0x2800 + b) : " ";
+    }
+    lines.push(line.trimEnd());
+  }
+  return lines.map((l) => (l ? `$1${l}` : l)).join("\n") + "\n";
 }
 writeFileSync("files/system/usr/share/lupios/fastfetch-logo.txt", terminalLogo());
 
@@ -180,19 +197,14 @@ writeFileSync("files/system/usr/share/lupios/fastfetch-logo.txt", terminalLogo()
 const ISO = "iso/anaconda";
 mkdirSync(ISO, { recursive: true });
 
-// Top of the sidebar (about 190 px wide): the head above the name. letter-spacing also pads
-// after the last letter, so the text is nudged right by half of it to look centred.
+// Top of the sidebar (about 190 px wide): the mark above the name
 writeFileSync(
   `${ISO}/sidebar-logo.svg`,
-  svg(
-    170,
-    138,
-    `<g transform="translate(35,0) scale(0.39)">\n  ${wolfHead()}\n  </g>
-  <text x="88.5" y="130" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif" font-size="20" font-weight="300" letter-spacing="7" fill="${C.text}">LUPIOS</text>`,
-  ),
+  svg(170, 138, `${place(MARK, { x: 43, y: 2, width: 84, fill: C.ice })}
+  ${place(WORD, { x: 30, y: 102, width: 110, fill: C.frost })}`),
 );
 
-// Behind it: the Night wallpaper's sky and mountains, tall and narrow. The stylesheet scales it
+// Behind it: the Lines wallpaper's sky and mountains, tall and narrow. The stylesheet scales it
 // to cover the sidebar and pins the bottom, so the mountains always show.
 function sidebarBg() {
   const W = 400, H = 1200, rand = rng(707);
@@ -202,13 +214,13 @@ function sidebarBg() {
     return `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.text}" opacity="${(0.2 + rand() * 0.5).toFixed(2)}"/>`;
   }).join("");
   const layers = [
-    { baseY: 1030, amp: 190, peaks: 2, fill: "#12243A", snow: 0.25 },
-    { baseY: 1110, amp: 140, peaks: 3, fill: "#0E1C2E", snow: 0.16 },
-    { baseY: 1190, amp: 100, peaks: 4, fill: "#0A1523", snow: 0.1 },
+    { baseY: 1030, amp: 190, peaks: 2, line: 0.7 },
+    { baseY: 1110, amp: 140, peaks: 3, line: 0.4 },
+    { baseY: 1190, amp: 100, peaks: 4, line: 0.22 },
   ].map((l) => {
     const top = ridge(rand, { ...l, W });
     const line = top.map((p) => p.join(",")).join(" ");
-    return `${poly([...top, [W, H], [0, H]], l.fill)}<polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="2" opacity="${l.snow}"/>`;
+    return `${poly([...top, [W, H], [0, H]], "#0A1422")}<polyline points="${line}" fill="none" stroke="${C.ice}" stroke-width="3" stroke-linejoin="round" opacity="${l.line}"/>`;
   }).join("\n  ");
   return svg(W, H, `<defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -239,8 +251,15 @@ writeFileSync(
 const WEB = "website/src/assets";
 mkdirSync(WEB, { recursive: true });
 mkdirSync("website/public", { recursive: true });
-writeFileSync(`${WEB}/lupios-logo.svg`, svg(256, 256, wolfHead()));
-writeFileSync("website/public/favicon.svg", svg(256, 256, wolfHead()));
+// The mark (home page) and the mark beside the name (top bar), for the dark and the light theme
+for (const [theme, mark, name] of [["dark", C.ice, C.frost], ["light", C.abyss, C.night]]) {
+  writeFileSync(`${WEB}/lupios-mark-${theme}.svg`, svg(256, 256, place(MARK, { x: 10, y: (256 - heightAt(MARK, 236)) / 2, width: 236, fill: mark })));
+  writeFileSync(`${WEB}/lupios-lockup-${theme}.svg`, svg(318, 100, `${place(MARK, { x: 0, y: 0, width: 101, fill: mark })}
+  ${place(WORD, { x: 126, y: 50 - heightAt(WORD, 192) / 2, width: 192, fill: name })}`));
+}
+// Browser tabs can be light or dark, so the favicon brings its own navy tile
+writeFileSync("website/public/favicon.svg", svg(256, 256, `<rect width="256" height="256" rx="56" fill="${C.night}"/>
+  ${place(MARK, { x: 34, y: (256 - heightAt(MARK, 188)) / 2, width: 188, fill: C.ice, bold: 8 })}`));
 
 function heroMountains({ sky, star, layers, snow }) {
   const W = 2400, H = 900, rand = rng(1312), sr = rng(77); // separate, so both themes get the same mountains
@@ -284,7 +303,7 @@ writeFileSync(`${WEB}/hero-day.svg`, heroMountains({
 
 // ---- Preview page: open art/preview.html in a browser to check everything at once -------
 const uri = (f, dir = OUT) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${dir}/${f}`)).toString("base64")}`;
-const logo = uri("lupios-logo.svg");
+const logo = uri("lupios-logo.svg"), small = uri("lupios-logo-small.svg");
 writeFileSync(
   "art/preview.html",
   `<!doctype html><html><head><meta charset="utf-8"><title>LupiOS art preview</title><style>
@@ -300,12 +319,13 @@ img.wp{width:760px;display:block}
 .inst .main{flex:1;padding:14px 20px}.inst .top{text-align:right;font-size:11px}
 .inst .bar{height:34px;margin:12px -20px;background:url(${uri("topbar-bg.svg", ISO)}) 0 0/cover;color:#fff;padding:9px 20px;box-sizing:border-box;font-size:12px}
 </style></head><body>
-<div class="row"><img src="${logo}" width="256"><img src="${logo}" width="64"><img src="${logo}" width="32">
-<div class="panel"><img src="${logo}" width="24"><span>dark panel, 24px</span></div></div>
-<div class="row light"><img src="${logo}" width="128"><img src="${logo}" width="22"> light panel, 22px</div>
+<div class="row"><img src="${logo}" width="256"><img src="${logo}" width="64"><span>icon (48 px and up)</span>
+<img src="${small}" width="32"><img src="${small}" width="22"><img src="${small}" width="16"><span>small icon, thicker lines (16-32 px)</span>
+<div class="panel"><img src="${small}" width="24"><span>dark panel, 24px</span></div></div>
 <div class="row"><div class="ply"><img src="${uri("lupios-emblem.svg")}" height="200">
 <div style="margin-top:60px;opacity:.6">boot screen: the password box goes here</div></div></div>
-<div class="row"><img class="wp" src="${uri("wallpaper-night.svg")}"><img class="wp" src="${uri("wallpaper-emblem.svg")}"></div>
+<div class="row"><img class="wp" src="${uri("wallpaper-night.svg")}"><img class="wp" src="${uri("wallpaper-lines.svg")}"><img class="wp" src="${uri("wallpaper-emblem.svg")}">
+<span>wallpapers: Night (default), Lines, Emblem</span></div>
 <div class="row"><div class="inst"><div class="side"><div></div></div><div class="main"><div class="top">LUPIOS 44 INSTALLATION</div>
 <h3>WELCOME TO LUPIOS 44.</h3><div class="bar">INSTALLATION DESTINATION (the bar at the top of each page)</div>
 What language would you like to use during the installation process?</div></div>

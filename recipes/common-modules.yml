@@ -21,6 +21,7 @@ modules:
         - usbguard # off by default, turned on with lupi usbguard on (or the wolf level)
         - gamemode # host daemon that Steam's gamemoderun talks to
         - fastfetch # system info with the wolf logo
+        - dejavu-sans-mono-fonts # has the Braille dots the terminal logo is drawn with
         - librsvg2-tools # rsvg-convert, turns the SVG artwork into PNGs in look.sh
         - steam-devices # controller/VR rules; Flatpak Steam can't install them itself
         - libnotify # notify-send, for the "new network" message from lupi

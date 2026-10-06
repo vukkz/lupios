@@ -4,7 +4,7 @@
   "logo": {
     "type": "file",
     "source": "/usr/share/lupios/fastfetch-logo.txt",
-    "color": { "1": "#8BE0FF", "2": "#33B5F0", "3": "#0F4C7A" },
+    "color": { "1": "#8BE0FF" },
     "padding": { "top": 1, "right": 3 }
   },
   "display": {
