@@ -71,6 +71,29 @@ jobs:
           enrollment_password: universalblue
           additional_templates: /github/workspace/iso/anaconda/lupios-look.tmpl # the repo, inside the builder
 
+      # The website's download buttons point here (website/src/downloads.ts). Only stable ISOs go
+      # public. Needs two repo settings, or the step is skipped: the secret SF_SSH_KEY (the private
+      # half of an upload key the owner added to their SourceForge account) and the variable SF_USER.
+      - name: Publish on SourceForge
+        if: env.WANTED == 'true' && inputs.channel == 'stable' && vars.SF_USER != ''
+        env:
+          SF_USER: ${{ vars.SF_USER }}
+          SF_SSH_KEY: ${{ secrets.SF_SSH_KEY }}
+          ISO: ${{ steps.build.outputs.iso_path }}/${{ steps.build.outputs.iso_name }}
+        run: |
+          install -d -m 700 ~/.ssh
+          # tr: the key may have been pasted with Windows line endings
+          printf '%s\n' "$SF_SSH_KEY" | tr -d '\r' > ~/.ssh/sourceforge
+          chmod 600 ~/.ssh/sourceforge
+          # SourceForge's upload server key, checked against the fingerprint SourceForge publishes
+          # (SHA256:209BDmH3jsRyO9UeGPPgLWPSegKmYCBIya0nR/AWWCY): an impostor server gets nothing.
+          echo "frs.sourceforge.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOQD35Ujalhh+JJkPvMckDlhu4dS7WH6NsOJ15iGCJLC" > ~/.ssh/known_hosts
+          # rsync uploads to a temporary name and renames at the end, so mirrors never see half an ISO.
+          # The ISO goes first, then its checksum.
+          rsync -v -e "ssh -i $HOME/.ssh/sourceforge -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
+            "$ISO" "$ISO-CHECKSUM" "$SF_USER@frs.sourceforge.net:/home/frs/project/lupios/"
+          rm -f ~/.ssh/sourceforge
+
       - name: Upload ISO
         if: env.WANTED == 'true'
         uses: actions/upload-artifact@v7
