@@ -3,6 +3,8 @@
 A hardened, rollback-safe everyday desktop with an isolated hacking lab.
 Built on Fedora Atomic 44 (KDE Plasma) with [BlueBuild](https://blue-build.org).
 
+**Website, downloads and guides: https://vukkz.github.io/lupios**
+
 *Lupi* is Italian for "wolves": a pack. You control it all with the `lupi` command, and its two
 security levels are **sheep** (calm, the everyday default) and **wolf** (maximum caution: alert,
 on the hunt).

@@ -100,21 +100,21 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 
 ## Open items
 - Owner hasn't reported `flatpak remotes` output or remaining "Fedora" branding yet.
-- Fresh install from our ISO with Secure Boot verified in the VM on 2026-09-30 (installer look, first-boot
-  user, MOK, `lupi channel testing`, automatic kargs, `lupi check`). Rebuild the ISOs from `main` after
-  promoting, so they carry the LupiOS installer look and the new image.
+- Fresh install from our ISO with Secure Boot verified in the VM (2026-09-30, again as LupiOS on 2026-10-03:
+  installer look, first-boot user, MOK, automatic kargs, `lupi check`, `lupi lab`). Rebuild the ISOs from
+  `main` after promoting anything that changes the installer or should reach new installs.
 - Real hardware (NVIDIA RTX 3050, gaming, Secure Boot, Wi-Fi trust, dispatcher notification) is untested:
   waiting for the owner's second SSD for dual-boot.
 - Renamed from Wolf OS to LupiOS on 2026-10-03 ("Wolf OS"/WolfOS was crowded: a commercial Wolf-OS, hobby
   WolfOS distros, Wolfi). LupiOS was checked clean: no OS of that name, `lupi` clashes with no package
   (Repology), SourceForge `lupios` and lupios.org/.dev/.io/.com free. The old `wolf-os` images on GHCR are
   frozen; no compatibility code for Wolf OS installs (only the owner's VM had one; it gets reinstalled).
-- Before going public: ISO hosting (SourceForge `lupios`), a website (Astro Starlight on GitHub Pages), Fedora 45 rebase
-  (around Oct–Nov 2026), and a boot test in CI.
+- Before going public: ISO hosting (SourceForge `lupios`: waiting on SourceForge support to verify the owner's
+  phone), Fedora 45 rebase (around Oct–Nov 2026; no Universal Blue 45 images yet on 2026-10-06), and a boot
+  test in CI. The website is live since 2026-10-03.
 - Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
   policy for the lab image.
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
   customise their own terminal). LupiOS only adds defaults to it: fastfetch and the prompt.
-- Untested in the VM: `lupi outgoing` (OpenSnitch eBPF under our sysctls, the pre-approved rule, the
-  autostart unit name `app-opensnitch_ui@autostart.service`). The installer's sidebar shows the LupiOS
-  look (verified in the VM on 2026-09-30); its boot menu and boot splash weren't checked yet.
+- `lupi outgoing` (OpenSnitch) was verified working in the VM on 2026-09-30. The installer's boot menu
+  and boot splash weren't checked yet (only its sidebar).
