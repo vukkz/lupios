@@ -49,6 +49,10 @@ jobs:
           # downloaded ~535 MB even when nothing had changed. Now identical contents give identical
           # pieces, and an update only downloads what really changed. Slower builds.
           build_chunked_oci: true
+          # Normally each build reuses the previous build's layer layout (smaller updates). For the
+          # NVIDIA image that crashes rpm-ostree on every build after the first (an assertion in
+          # ostree-ext's chunking.rs, October 2026), so it plans its layout from scratch instead.
+          rechunk_clear_plan: ${{ matrix.recipe == 'recipe-nvidia.yml' }}
 
   # Boot the image just pushed in a virtual machine and check it from inside (boot-test.yml).
   # Only the main flavour: the NVIDIA one is the same LupiOS plus a driver a VM can't use.
