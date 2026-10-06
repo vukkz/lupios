@@ -24,7 +24,18 @@ hero:
 ---
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
+import { Image } from "astro:assets";
 import Downloads from "../../components/Downloads.astro";
+import desktop from "../../assets/screenshots/desktop.png";
+
+<figure class="screenshot not-content">
+  <Image
+    src={desktop}
+    widths={[640, 1280, 1920]}
+    sizes="(min-width: 72rem) 72rem, 100vw"
+    alt="The LupiOS desktop: the Lines wallpaper, Konsole showing the wolf logo and system information, and the LupiOS panel open next to the clock with the security level, network trust and Game Mode."
+  />
+</figure>
 
 ## Why LupiOS
 

@@ -85,6 +85,9 @@ HFS+ (Mac drives), UDF (discs) and exFAT still work.
 
 - Each Wi-Fi network sees a different MAC address that stays the same for that network. Networks can't track you across locations, but captive portals and router reservations still work.
 - Temporary IPv6 addresses are preferred for outgoing connections.
+- Networks can't rename your PC. A fresh install has no name of its own yet, and NetworkManager would
+  otherwise take one from the network: whatever the router or its DNS hands out. Your PC stays
+  `lupios` until you choose a name with `hostnamectl hostname NAME`.
 
 ## USBGuard (*opt-in*): `lupi usbguard on`
 
