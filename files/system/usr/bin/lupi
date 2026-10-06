@@ -819,6 +819,18 @@ Universal Blue's own extra commands: ${C}ujust${N}
 EOF
 }
 
+# Through pkexec, lupi runs as root on the strength of a password typed into the widget or LupiOS
+# Welcome, and polkit may let any program in the session reuse that for a few minutes. So pkexec
+# only gets the switches those two offer. Everything else (the lab, installs, updates) could hand
+# out a root shell: run it in a terminal, where sudo asks for the password itself.
+if [[ -n ${PKEXEC_UID:-} ]]; then
+    case "$#:${1:-} ${2:-} ${3:-}" in
+        "2:level sheep " | "2:level wolf " | "3:level sheep --yes" | "3:level wolf --yes" | \
+            "2:net home " | "2:net public " | "2:game on " | "2:game off ") ;;
+        *) die "lupi $*: not available through pkexec (the panel widget and Welcome). Run it in a terminal." ;;
+    esac
+fi
+
 case ${1:-help} in
     check | status) exec /usr/bin/lupi-security-check ;;
     level) cmd_level "${2:-}" "${3:-}" ;;

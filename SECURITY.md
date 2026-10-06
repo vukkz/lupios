@@ -205,6 +205,10 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 Both run `/usr/bin/lupi` as root through `pkexec`, so every change asks for your password.
 The polkit rule in `files/system/usr/share/polkit-1/actions/org.lupios.lupi.policy`:
 - **Only covers `/usr/bin/lupi`,** which lives in the read-only system image and can't be swapped out.
+- **Only the switches the widget and Welcome offer** work this way: the security level, network trust and
+  Game Mode. `lupi` refuses everything else when started through `pkexec`, because commands like
+  `lupi lab` could otherwise hand a root shell to any program allowed to use `pkexec` (found in a review
+  on 2026-10-07). Those run in a terminal, where `sudo` asks for your password itself.
 - **Remembers your password for a few minutes** (`auth_admin_keep`), so clicking through a few
   settings doesn't ask every time.
 - **Only works for someone at the machine.** A remote or inactive session always has to type the password.
