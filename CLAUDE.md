@@ -66,7 +66,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `/usr/share/plasma/plasma-welcome/extra-pages/NN-Name.qml`. `debrand.sh` removes `plasma-welcome-fedora`
   with `rpm -e` *before* copying ours (dnf would also drop Flathub's remote package).
 - Tray widget: `X-Plasma-NotificationAreaCategory` + `EnabledByDefault` auto-adds it. Commands run
-  through the `plasma5support` executable engine. Root actions go through polkit action `org.lupios.lupi`.
+  through the `plasma5support` executable engine. Root actions go through polkit action `org.lupios.lupi`
+  (`auth_admin`: password every time). Started through pkexec (`PKEXEC_UID` set), `lupi` only accepts
+  `level sheep|wolf [--yes]`, `net home|public`, `game on|off`: anything else could give a root shell
+  (security review 2026-10-07). A new widget/Welcome button that needs root must be added to that list.
 - BlueBuild tags: default branch → `latest`, `44`, date. Other branches → `br-<branch>-44`.
 - ISO: `jasonn3/build-container-installer@v1.5.0`, installer product name = image name, Secure Boot key
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.

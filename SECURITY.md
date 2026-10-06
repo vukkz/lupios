@@ -209,9 +209,9 @@ The polkit rule in `files/system/usr/share/polkit-1/actions/org.lupios.lupi.poli
   Game Mode. `lupi` refuses everything else when started through `pkexec`, because commands like
   `lupi lab` could otherwise hand a root shell to any program allowed to use `pkexec` (found in a review
   on 2026-10-07). Those run in a terminal, where `sudo` asks for your password itself.
-- **Remembers your password for a few minutes** (`auth_admin_keep`), so clicking through a few
-  settings doesn't ask every time.
-- **Only works for someone at the machine.** A remote or inactive session always has to type the password.
+- **Asks for your password every time** (`auth_admin`). polkit could remember it for a few minutes
+  (`auth_admin_keep`), but then any program in your session could flip these switches without asking
+  in that time. **Trade-off:** changing three settings in a row means typing the password three times.
 
 Reading the current state (`lupi state`) needs no password and changes nothing.
 
