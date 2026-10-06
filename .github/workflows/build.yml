@@ -43,3 +43,9 @@ jobs:
 
           # enabled by default, disable if your image is small and you want faster builds
           maximize_build_space: true
+
+          # Repack the finished image by package (Fedora's rpm-ostree compose build-chunked-oci).
+          # Without it, every daily rebuild recreated LupiOS's layers from scratch, so each update
+          # downloaded ~535 MB even when nothing had changed. Now identical contents give identical
+          # pieces, and an update only downloads what really changed. Slower builds.
+          build_chunked_oci: true
