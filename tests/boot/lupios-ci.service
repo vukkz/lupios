@@ -1,0 +1,15 @@
+# Runs once inside the test VM, after boot. Not part of the image: the boot test hands it to
+# systemd as a credential (systemd.extra-unit.*), together with checks.sh, and pulls it in with
+# the systemd.wants= kernel argument it installs the test disk with.
+[Unit]
+Description=LupiOS boot test checks
+After=multi-user.target graphical.target
+
+[Service]
+Type=oneshot
+ImportCredential=lupios-ci.*
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/ttyS0
+ExecStart=/usr/bin/bash %d/lupios-ci.checks
+ExecStopPost=/usr/bin/systemctl poweroff --no-block

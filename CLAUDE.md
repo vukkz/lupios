@@ -9,7 +9,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - **New work goes to the `testing` branch first** (image tag `br-testing-44`). Promote to stable only
   when the owner approves: `git push origin testing:main` (tag `latest`, what users get).
 - After pushing, watch the builds with `gh run list/watch -R vukkz/lupios` and read the build log
-  for evidence that the change landed, not just a green tick. Image builds take about 15 min.
+  for evidence that the change landed, not just a green tick. Image builds take about 15 min (longer with
+  rechunking), then the **Boot test** job (~15 min). Only promote a `testing` build whose boot test passed.
 - **Don't push to a branch while a build on that branch is running:** `build.yml` cancels in-progress
   builds on the same ref (`cancel-in-progress`), which also breaks anything waiting for that build.
 - A new branch created identical to another skips `paths-ignore` workflows. Start it with
@@ -24,6 +25,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `files/system/usr/bin/lupi`: the control tool (bash; sections: net, game, setup, level, usbguard, kargs,
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
 - `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run).
+- `boot-test.yml` (called by `build.yml` after every build, or run by hand for any image) + `tests/boot/`:
+  `bootc install to-disk --via-loopback` makes a disk from the image, QEMU/KVM boots it, and `checks.sh`
+  runs inside as root and prints `LUPIOS-CI` lines to the serial console. The checks reach the VM as systemd
+  credentials (`systemd.extra-unit.*` over SMBIOS, the script over fw_cfg), pulled in by the
+  `systemd.wants=` kernel argument on the test disk only, so the image itself is never changed for testing.
+  `mcelog.service` always fails in a VM (no hardware machine checks) and is ignored there.
   `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs).
 - `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
   `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
@@ -110,8 +117,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   (Repology), SourceForge `lupios` and lupios.org/.dev/.io/.com free. The old `wolf-os` images on GHCR are
   frozen; no compatibility code for Wolf OS installs (only the owner's VM had one; it gets reinstalled).
 - Before going public: ISO hosting (SourceForge `lupios`: waiting on SourceForge support to verify the owner's
-  phone), Fedora 45 rebase (around Oct–Nov 2026; no Universal Blue 45 images yet on 2026-10-06), and a boot
-  test in CI. The website is live since 2026-10-03.
+  phone), and the Fedora 45 rebase (around Oct–Nov 2026; no Universal Blue 45 images yet on 2026-10-06).
+  The website is live since 2026-10-03, the boot test runs since 2026-10-07.
+- Rechunking (`build_chunked_oci` in build.yml, on `testing` only): images 22% smaller, but the second NVIDIA
+  build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion, when reusing the previous build's
+  layout as baseline). Don't promote it until NVIDIA builds are reliable. The remaining daily update is
+  mostly the rebuilt initramfs (375 MB layer), which differs on every build.
 - Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
   policy for the lab image.
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and

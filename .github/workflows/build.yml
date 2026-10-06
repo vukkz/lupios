@@ -49,3 +49,17 @@ jobs:
           # downloaded ~535 MB even when nothing had changed. Now identical contents give identical
           # pieces, and an update only downloads what really changed. Slower builds.
           build_chunked_oci: true
+
+  # Boot the image just pushed in a virtual machine and check it from inside (boot-test.yml).
+  # Only the main flavour: the NVIDIA one is the same LupiOS plus a driver a VM can't use.
+  # It runs even when a build failed, so a failed NVIDIA build doesn't hide the main image's result
+  # (if the main build failed, it re-tests the previous image). Pull requests push no image: skipped.
+  boot-test:
+    name: Boot test
+    needs: bluebuild
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/boot-test.yml
+    with:
+      image: ghcr.io/${{ github.repository_owner }}/lupios:${{ github.ref_name == 'main' && 'latest' || format('br-{0}-44', github.ref_name) }}
