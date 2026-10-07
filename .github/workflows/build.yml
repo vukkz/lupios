@@ -9,6 +9,7 @@ on:
       - "**.md"
       - "website/**"
       - ".github/workflows/website.yml"
+      - ".github/ISSUE_TEMPLATE/**"
 
   pull_request:
   workflow_dispatch: # allow manually triggering builds

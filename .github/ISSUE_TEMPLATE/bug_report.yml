@@ -1,0 +1,55 @@
+name: Something doesn't work
+description: Report a bug in LupiOS
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Found a security hole?** Please don't post it here: use the repo's
+        Security tab ("Report a vulnerability") so it stays private until it's fixed.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: flavour
+    attributes:
+      label: Which LupiOS?
+      options:
+        - lupios (AMD/Intel graphics or a virtual machine)
+        - lupios-nvidia
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Update channel
+      description: "`lupi channel` tells you."
+      options:
+        - stable
+        - testing
+    validations:
+      required: true
+  - type: dropdown
+    id: machine
+    attributes:
+      label: Where does it run?
+      options:
+        - A real PC or laptop
+        - A virtual machine (VirtualBox, VMware, GNOME Boxes, ...)
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of `lupi check`
+      description: Run it in the terminal (Konsole) and paste the result.
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Photos of the screen, error messages, when it started (after an update?).

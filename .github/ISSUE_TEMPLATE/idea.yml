@@ -1,0 +1,15 @@
+name: An idea for LupiOS
+description: Suggest a feature or a change
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like LupiOS to do?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why?
+      description: What problem does it solve for you? If it's about security, what does it protect against, and what could it break?

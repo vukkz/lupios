@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem (privately)
+    url: https://github.com/vukkz/lupios/security/advisories/new
+    about: Security holes go here, not in a public issue, so they can be fixed before anyone else knows.
+  - name: Install guide, the lupi command, FAQ
+    url: https://vukkz.github.io/lupios
+    about: Many questions are answered on the website.
