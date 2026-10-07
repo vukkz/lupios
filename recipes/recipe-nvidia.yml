@@ -3,7 +3,7 @@
 # LupiOS for NVIDIA graphics. Identical to recipe.yml except for the base image,
 # which adds NVIDIA's driver (built and signed for every kernel by Universal Blue).
 name: lupios-nvidia
-description: LupiOS (NVIDIA) - a hardened, rollback-safe everyday desktop with an isolated hacking lab.
+description: LupiOS (NVIDIA) - a hardened, rollback-safe everyday desktop, with Kali's hacking tools one command away.
 
 base-image: ghcr.io/ublue-os/kinoite-nvidia
 image-version: 44 # keep in sync with recipe.yml

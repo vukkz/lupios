@@ -1,5 +1,5 @@
 // Copies the repo's own docs into the site, so every text has one home: SECURITY.md and
-// docs/install.md stay the originals (GitHub shows them, and the OS points to them), and the site
+// docs/*.md stay the originals (GitHub shows them, and the OS points to them), and the site
 // shows the same words. Runs before every `npm run dev` and `npm run build`; the copies are git-ignored.
 import { readFileSync, writeFileSync } from "node:fs";
 import { posix } from "node:path";
@@ -11,6 +11,12 @@ const pages = [
     to: "install",
     title: "Install LupiOS",
     description: "Put LupiOS on a USB stick and install it, step by step. About 30 minutes.",
+  },
+  {
+    from: "docs/dual-boot.md",
+    to: "dual-boot",
+    title: "Keeping Windows",
+    description: "LupiOS and Windows on the same PC, each on its own SSD: what to do before, during and after installing.",
   },
   {
     from: "SECURITY.md",

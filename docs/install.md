@@ -13,6 +13,8 @@ About 30 minutes, most of it waiting. Read it once all the way through before yo
 > - Back up your files.
 > - If Windows uses BitLocker, save the **BitLocker recovery key**
 >   (account.microsoft.com/devices/recoverykey). Changing boot settings can make Windows ask for it.
+>
+> The full checklist, from Fast Startup to the clock: [Keeping Windows](dual-boot.md).
 
 ## 1. Pick your ISO
 

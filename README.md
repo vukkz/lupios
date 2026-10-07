@@ -1,6 +1,6 @@
 # LupiOS &nbsp; [![bluebuild build badge](https://github.com/vukkz/lupios/actions/workflows/build.yml/badge.svg)](https://github.com/vukkz/lupios/actions/workflows/build.yml)
 
-A hardened, rollback-safe everyday desktop with an isolated hacking lab.
+A hardened, rollback-safe everyday desktop, with Kali's hacking tools one command away.
 Built on Fedora Atomic 44 (KDE Plasma) with [BlueBuild](https://blue-build.org).
 
 **Website, downloads and guides: https://vukkz.github.io/lupios**
@@ -105,8 +105,8 @@ Run `lupi help` to see every command.
 Switch with `lupi channel stable` or `lupi channel testing`, then reboot.
 
 **How changes ship:**
-1. New work is pushed to the `testing` branch. After each image build, GitHub boots the new image in a
-   virtual machine and checks it from inside (the **Boot test**: [tests/boot/](tests/boot/)): it has to start,
+1. New work is pushed to the `testing` branch. After each image build, GitHub boots both new images (AMD/Intel and NVIDIA) in a
+   virtual machine and checks them from inside (the **Boot test**: [tests/boot/](tests/boot/)): each has to start,
    be LupiOS, and keep every promise in [SECURITY.md](SECURITY.md). It checks each kernel setting, blocked
    module and firewall rule, and switches the security level, network trust and Game Mode the way the panel
    widget does. It also checks that only a Lab image signed by LupiOS is accepted.

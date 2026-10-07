@@ -12,7 +12,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "LupiOS",
-      description: "A hardened, rollback-safe everyday Linux desktop with an isolated hacking lab.",
+      description: "A hardened, rollback-safe everyday Linux desktop, with Kali's hacking tools one command away.",
       logo: {
         dark: "./src/assets/lupios-lockup-dark.svg",
         light: "./src/assets/lupios-lockup-light.svg",
@@ -24,9 +24,9 @@ export default defineConfig({
       customCss: ["./src/styles/lupios.css"],
       editLink: { baseUrl: `${repo}/edit/main/website/` },
       sidebar: [
-        { label: "Get LupiOS", items: ["download", "install"] },
+        { label: "Get LupiOS", items: ["download", "install", "dual-boot"] },
         { label: "Use it", items: ["lupi"] },
-        { label: "Learn more", items: ["security", "faq"] },
+        { label: "Learn more", items: ["security", "changes", "faq"] },
       ],
     }),
   ],

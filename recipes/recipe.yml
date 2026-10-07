@@ -4,7 +4,7 @@
 # image will be published to ghcr.io/<user>/<name>
 name: lupios
 # description will be included in the image's metadata
-description: LupiOS - a hardened, rollback-safe everyday desktop with an isolated hacking lab.
+description: LupiOS - a hardened, rollback-safe everyday desktop, with Kali's hacking tools one command away.
 
 # the base image to build on top of (FROM) and the version tag to use
 # kinoite-main = Fedora Atomic KDE Plasma + Universal Blue extras (codecs, ujust, drivers)

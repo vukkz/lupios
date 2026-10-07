@@ -4,3 +4,5 @@ dist/
 # Copied from the repo by scripts/sync.mjs before every build: edit the originals instead
 src/content/docs/install.md
 src/content/docs/security.md
+src/content/docs/dual-boot.md
+src/content/docs/changes.md

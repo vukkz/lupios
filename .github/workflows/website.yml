@@ -1,20 +1,16 @@
 name: website
 # Builds the website (website/) and publishes it on GitHub Pages: https://vukkz.github.io/lupios
-# It runs when the site, or a doc it copies (SECURITY.md, docs/install.md), changes. On `testing`
-# and in pull requests it only checks that the site builds: only `main` publishes.
+# It runs on every push to `main` and `testing`, whatever changed: the "What's new" page lists the
+# branch's commits. Pull requests only when the site or a doc it copies (SECURITY.md, docs/*.md)
+# changes. Only `main` publishes; elsewhere it just checks that the site builds.
 on:
   push:
     branches: [main, testing]
-    paths:
-      - "website/**"
-      - "SECURITY.md"
-      - "docs/install.md"
-      - ".github/workflows/website.yml"
   pull_request:
     paths:
       - "website/**"
       - "SECURITY.md"
-      - "docs/install.md"
+      - "docs/*.md"
       - ".github/workflows/website.yml"
   workflow_dispatch:
 
@@ -31,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the whole history: scripts/changes.mjs makes the "What's new" page from it
       - uses: withastro/action@v6 # installs, runs `npm run build`, packages dist/ for Pages
         with:
           path: website
