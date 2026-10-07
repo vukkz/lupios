@@ -10,6 +10,9 @@ description: LupiOS - a hardened, rollback-safe everyday desktop with an isolate
 # kinoite-main = Fedora Atomic KDE Plasma + Universal Blue extras (codecs, ujust, drivers)
 base-image: ghcr.io/ublue-os/kinoite-main
 image-version: 44 # pinned: moving to Fedora 45 is a deliberate change, not a surprise
+# BlueBuild would also copy its own CLI and cosign into the image: build tools no LupiOS user needs
+blue-build-tag: none
+cosign-version: none
 
 modules:
   - from-file: common-modules.yml

@@ -124,8 +124,14 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   The website is live since 2026-10-03, the boot test runs since 2026-10-07.
 - Rechunking (`build_chunked_oci` in build.yml, on `testing` only): images 22% smaller, but the second NVIDIA
   build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion, when reusing the previous build's
-  layout as baseline). Don't promote it until NVIDIA builds are reliable. The remaining daily update is
-  mostly the rebuilt initramfs (375 MB layer), which differs on every build.
+  layout as baseline; NVIDIA now uses `rechunk_clear_plan`). Don't promote it until NVIDIA builds are
+  reliable. A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
+  (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
+  times; stored twice) and the fontconfig caches, and rpm-ostree packs those into one ~375 MB "unpackaged
+  content" layer with the initramfs and other non-RPM files, so that whole layer is re-downloaded.
+- BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
+  recipe says `blue-build-tag: none`, `cosign-version: none`; nushell is still needed during the build (dnf
+  and script@v2 modules run on it), so the last module deletes it with `script@v1` (plain shell).
 - Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
   policy for the lab image.
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
