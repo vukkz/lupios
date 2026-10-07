@@ -289,8 +289,10 @@ level_dns() { # on | off
     else
         as_root rm -f /etc/systemd/resolved.conf.d/95-lupios-level.conf /etc/NetworkManager/conf.d/95-lupios-level.conf
     fi
-    as_root systemctl restart systemd-resolved
+    # NetworkManager first: on wolf it stops handing the network's DNS servers to systemd-resolved, and
+    # the restart then clears the ones it handed over before. On sheep it hands them over again.
     as_root systemctl reload NetworkManager
+    as_root systemctl restart systemd-resolved
 }
 
 describe_levels() {

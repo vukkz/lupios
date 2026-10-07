@@ -60,9 +60,11 @@ jobs:
         uses: sigstore/cosign-installer@v3
 
       - name: Sign image # same key as the OS image (cosign.pub in the repo root)
+        # The push is a list (the amd64 image plus build provenance). podman checks the signature of the
+        # image it actually pulls, not the list, so --recursive signs both.
         if: github.event_name != 'pull_request'
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
           COSIGN_PASSWORD: ""
           DIGEST: ${{ steps.build.outputs.digest }}
-        run: cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${IMAGE}@${DIGEST}"
+        run: cosign sign --yes --recursive --key env://COSIGN_PRIVATE_KEY "${IMAGE}@${DIGEST}"

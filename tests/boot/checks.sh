@@ -206,8 +206,8 @@ else
     check "switch to public, as the widget does" widget net public
     expect "public: firewall zone" "lupios-public" firewall-cmd --get-zone-of-interface="$dev"
     # nmcli prints these settings as "no" or as their number, 0, depending on its version
-    check "public: no mDNS or LLMNR" bash -c \
-        "nmcli -g connection.mdns,connection.llmnr connection show '$uuid' | grep -Eqx '(no|0):(no|0)'"
+    mdns=$(nmcli -g connection.mdns connection show "$uuid" 2>&1) llmnr=$(nmcli -g connection.llmnr connection show "$uuid" 2>&1)
+    if [[ $mdns =~ ^(no|0)$ && $llmnr =~ ^(no|0)$ ]]; then ok "public: no mDNS or LLMNR"; else bad "public: mDNS '$mdns', LLMNR '$llmnr'"; fi
     # The firewall policy lupios-public-quiet: this PC's own discovery announcements stay in
     refuse "public: mDNS announcements dropped on the way out" bash -c 'echo hi >/dev/udp/224.0.0.251/5353'
     check "public: other traffic still goes out" bash -c 'echo hi >/dev/udp/224.0.0.251/5354'

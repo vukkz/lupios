@@ -114,6 +114,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   after `signing`) copies the OS rule for the Lab; `registries.d/lupios-lab.yaml` says where its signatures
   are. The Lab is signed by `cosign-installer@v3` (cosign 2: `sha256-<digest>.sig` tags, which podman reads).
   If Dependabot moves it to v4 (cosign 3, a new signature format), watch the boot test's Lab step.
+  podman/skopeo check the signature of the **platform image** they pull, never the list around it (and
+  `--multi-arch=index-only` copies skip the check entirely: containers/image `copy/single.go`). buildx
+  pushes the Lab as a list (amd64 + provenance), so `build-lab.yml` signs with `cosign sign --recursive`.
+- NetworkManager hands every connection's DNS servers to systemd-resolved even with `dns=none`, unless
+  `systemd-resolved=false` (both re-read on `systemctl reload NetworkManager`). The wolf level sets both,
+  and `level_dns` reloads NetworkManager *before* restarting resolved, which clears what NM handed over.
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.
