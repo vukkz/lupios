@@ -25,7 +25,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `files/system/usr/bin/lupi`: the control tool (bash; sections: net, game, setup, level, usbguard, kargs,
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
 - `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run).
-- `boot-test.yml` (called by `build.yml` after every build, or run by hand for any image) + `tests/boot/`:
+- `boot-test.yml` (called by `build.yml` after every build for both flavours, or run by hand for any image) + `tests/boot/`:
   `bootc install to-disk --via-loopback` makes a disk from the image, QEMU/KVM boots it, and `checks.sh`
   runs inside as root and prints `LUPIOS-CI` lines to the serial console. The checks reach the VM as systemd
   credentials (`systemd.extra-unit.*` over SMBIOS, the script over fw_cfg), pulled in by the
@@ -43,8 +43,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `lupios-logo-small.svg` thickens the lines for 16–32 px icons. The terminal logo is the mark in Braille
   dots (needs `dejavu-sans-mono-fonts`). The owner's file is a Figma export with JPEGs inside, not vectors.
 - `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://vukkz.github.io/lupios.
-  `scripts/sync.mjs` copies `SECURITY.md` and `docs/install.md` in before every build (the copies are
-  git-ignored), so those two files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
+  `scripts/sync.mjs` copies `SECURITY.md`, `docs/install.md` and `docs/dual-boot.md` in before every build (the copies are
+  git-ignored), so those files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
   Preview: `npm run dev` in `website/` → http://localhost:4321/lupios/.
 
 ## Conventions
@@ -95,7 +95,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `systemctl start`, which fails in a container build, and dnf5 then fails the whole transaction even though
   it calls the error "non-critical": so the daemon RPM is installed with `tsflags=noscripts`. The pop-up
   app autostarts via our `/etc/xdg/autostart/opensnitch_ui.desktop` → `lupi-outgoing-ui`, which exits
-  unless the daemon is enabled. Daemon default: allow when no UI is connected.
+  unless the daemon is enabled. Daemon default: allow when no UI is connected. Pre-approved rules:
+  `000-lupios-system.json` (system daemons, any user) and `001-lupios-root-tools.json` (skopeo, podman, flatpak
+  only as uid 0: they can upload anything, so as the user they must ask). A `list` operator ANDs its `list`
+  entries (OpenSnitch 1.8 `daemon/rule/operator.go`; `data` is ignored for lists).
 - QML and anything Plasma can't be tested on Windows: test in the VM. VirtualBox there runs in
   Hyper-V (NEM) mode: slow, and once hung at `boot.mount` after an update (a reboot fixed it).
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
@@ -143,7 +146,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   (Repology), SourceForge `lupios` and lupios.org/.dev/.io/.com free. The old `wolf-os` images on GHCR are
   frozen; no compatibility code for Wolf OS installs (only the owner's VM had one; it gets reinstalled).
 - Before going public: ISO hosting (SourceForge `lupios`: waiting on SourceForge support to verify the owner's
-  phone), and the Fedora 45 rebase (around Oct–Nov 2026; no Universal Blue 45 images yet on 2026-10-06).
+  phone), and the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
+  no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
+  `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
+  When ublue's 45 appears: `image-version: 45` on `testing`, and the boot test shows what broke.
   The website is live since 2026-10-03, the boot test runs since 2026-10-07.
 - Rechunking (`build_chunked_oci` in build.yml, on `testing` only): images 22% smaller, but the second NVIDIA
   build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion, when reusing the previous build's
@@ -152,6 +158,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
   times; stored twice) and the fontconfig caches, and rpm-ostree packs those into one ~375 MB "unpackaged
   content" layer with the initramfs and other non-RPM files, so that whole layer is re-downloaded.
+  NVIDIA with `rechunk_clear_plan` built fine 3 times in a row (2026-10-07). Measured update between two
+  testing builds: ~400 MB = layer 127 "unpackaged" 299 MB + layer 97 (a package group, cause unknown) 44 MB
+  + layer 11 (`/usr/share/rpm`) 40 MB + layer 0 (metadata) 10 MB. `files/scripts/layers.sh` tags the rpmdb
+  (both copies), font caches and initramfs with `user.component` xattrs so build-chunked-oci gives each its
+  own layer (Red Hat, "Reduce bootc system update size", 2025-11; Fedora bootc tracker #82 for the copy).
+  Measure by comparing the layer digests of two consecutive builds' manifests (GHCR registry API, anonymous
+  token; each build's image digest is in its log): the layers the new one adds are the download.
 - BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
   recipe says `blue-build-tag: none`, `cosign-version: none`; nushell is still needed during the build (dnf
   and script@v2 modules run on it), so the last module deletes it with `script@v1` (plain shell).

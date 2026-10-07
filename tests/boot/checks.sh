@@ -165,19 +165,25 @@ sysctls "wolf: io_uring, pings, SysRq, TCP timestamps off" \
     kernel.io_uring_disabled=2 net.ipv4.icmp_echo_ignore_all=1 kernel.sysrq=0 net.ipv4.tcp_timestamps=0
 check "wolf: DNS goes encrypted to Quad9" bash -c \
     'resolvectl status | grep -q "+DNSOverTLS" && resolvectl dns | grep -q "^Global: 9.9.9.9#dns.quad9.net"'
-# resolvectl dns prints "Link 2 (enp0s2): 10.0.2.3" while the network's DNS server is in use.
+# resolvectl dns prints "Link 2 (enp0s2): 10.0.2.3" while the network's DNS server is in use. (It wraps
+# long lines, so the Global line's IPv6 addresses can continue on a line of their own: only read Link lines.)
 # The pause gives NetworkManager time to hand it back to systemd-resolved, if it was going to.
+link_with_dns='^Link [0-9]+ \([^)]*\): *[0-9a-f]'
 sleep 3
-link_dns=$(resolvectl dns 2>&1 | grep -v "^Global" | grep -E ": *[0-9a-f]")
+link_dns=$(resolvectl dns 2>&1 | grep -E "$link_with_dns")
 if [[ -z $link_dns ]]; then ok "wolf: the network's DNS servers aren't used"; else bad "wolf: the network's DNS servers are still used: $(oneline "$link_dns")"; fi
 retry "wolf: names still resolve (over TLS)" resolvectl query --cache=no fedoraproject.org
 expect "wolf: USBGuard on" "active" systemctl is-active usbguard
 expect "wolf: outgoing guard on" "active" systemctl is-active opensnitch
+# A rule OpenSnitch can't read is skipped with a warning, and that program would then be asked about
+sleep 2
+osn_errors=$({ journalctl -b -u opensnitch --no-pager; cat /var/log/opensnitchd.log; } 2>/dev/null | grep -iE 'compile\(\) error|unmarshal|invalid character')
+if [[ -z $osn_errors ]]; then ok "wolf: OpenSnitch read LupiOS's rules"; else bad "wolf: OpenSnitch rule errors: $(oneline "$osn_errors")"; fi
 
 check "back to sheep, as the widget does" widget level sheep
 sysctls "sheep: io_uring, pings, SysRq (sync only), TCP timestamps on" \
     kernel.io_uring_disabled=0 net.ipv4.icmp_echo_ignore_all=0 kernel.sysrq=16 net.ipv4.tcp_timestamps=1
-retry "sheep: the network's DNS server again" bash -c 'resolvectl dns | grep -v "^Global" | grep -Eq ": *[0-9a-f]"'
+retry "sheep: the network's DNS server again" bash -c "resolvectl dns | grep -Eq '$link_with_dns'"
 retry "sheep: names resolve" resolvectl query --cache=no fedoraproject.org
 expect "sheep: USBGuard off again" "inactive" systemctl is-active usbguard
 expect "sheep: outgoing guard off again" "inactive" systemctl is-active opensnitch
@@ -255,8 +261,9 @@ fi
 # --- Nothing failed ----------------------------------------------------------------------------
 # Units that can only work on real hardware, so they fail in every VM:
 # mcelog listens for the processor's hardware error reports, which a virtual CPU doesn't send.
-vm_only="mcelog.service"
-failed=$(systemctl --failed --no-legend --plain | awk '{print $1}' | grep -v lupios-ci | grep -vxF "$vm_only" | tr '\n' ' ')
+# The NVIDIA image's driver services need an NVIDIA graphics card.
+vm_only="mcelog.service nvidia-persistenced.service nvidia-cdi-refresh.service nvidia-cdi-refresh.path"
+failed=$(systemctl --failed --no-legend --plain | awk '{print $1}' | grep -v lupios-ci | grep -vxF -f <(tr ' ' '\n' <<<"$vm_only") | tr '\n' ' ')
 if [[ -z $failed ]]; then ok "no failed units (ignoring, in a VM: $vm_only)"; else bad "failed units: $failed"; fi
 
 lupi-security-check 2>&1 | sed 's/\x1b\[[0-9;]*m//g; s/^/LUPIOS-CI info  /'

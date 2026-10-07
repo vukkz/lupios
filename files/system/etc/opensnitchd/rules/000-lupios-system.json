@@ -1,15 +1,15 @@
 {
   "created": "2026-09-28T00:00:00Z",
-  "updated": "2026-09-28T00:00:00Z",
+  "updated": "2026-10-07T00:00:00Z",
   "name": "000-lupios-system",
-  "description": "LupiOS: its own system services may connect without asking: DNS (systemd-resolved), network setup (NetworkManager), time (chronyd), system, app and firmware updates (rpm-ostree, bootc, skopeo, uupd, flatpak, fwupd) and container downloads (podman, used by lupi lab and lupi install). A deny rule of your own still wins, and you can edit or delete this rule like any other.",
+  "description": "LupiOS: its own system services may connect without asking: DNS (systemd-resolved), network setup (NetworkManager), time (chronyd), and system and firmware updates (rpm-ostree, bootc, uupd, fwupd). Programs that can download or upload anything you tell them to (skopeo, podman, flatpak) are only pre-approved for root: see 001-lupios-root-tools. A deny rule of your own still wins, and you can edit or delete this rule like any other.",
   "action": "allow",
   "duration": "always",
   "operator": {
     "type": "regexp",
     "operand": "process.path",
     "sensitive": false,
-    "data": "^(/usr/lib/systemd/systemd-resolved|/usr/s?bin/(NetworkManager|chronyd|rpm-ostree|bootc|skopeo|uupd|flatpak|podman)|/usr/libexec/fwupd/fwupd)$",
+    "data": "^(/usr/lib/systemd/systemd-resolved|/usr/s?bin/(NetworkManager|chronyd|rpm-ostree|bootc|uupd)|/usr/libexec/fwupd/fwupd)$",
     "list": []
   },
   "enabled": true,

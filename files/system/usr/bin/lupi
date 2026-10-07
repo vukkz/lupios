@@ -659,13 +659,19 @@ install_app() { # <app ID>
 }
 
 install_tool() { # <Arch package name>
-    local pkg=$1 bin names=()
+    local pkg=$1 bin names=() skipped=()
     tools_box_ready
     if ! in_box sudo pacman -Syu --noconfirm --needed "$pkg"; then
         die "'$pkg' isn't on Flathub or in Arch Linux's packages. Search with: lupi search $pkg"
     fi
     while read -r bin; do
         [[ -n $bin ]] || continue
+        # ~/.local/bin comes before /usr/bin in PATH: a link there named like a system command (sudo,
+        # ls, passwd) would replace it in every terminal. Never link those.
+        if [[ -e /usr/bin/${bin##*/} || -e /usr/sbin/${bin##*/} ]]; then
+            skipped+=("${bin##*/}")
+            continue
+        fi
         in_box distrobox-export --bin "$bin" --export-path "$HOME/.local/bin" >/dev/null
         names+=("${bin##*/}")
     done < <(tool_commands "$pkg")
@@ -674,6 +680,10 @@ install_tool() { # <Arch package name>
     fi
     ok "Installed $pkg (from Arch Linux, in the Lupi tools box)."
     if ((${#names[@]})); then echo "  Commands you can now run in the terminal: ${names[*]}"; fi
+    if ((${#skipped[@]})); then
+        note "Not linked, because LupiOS has its own: ${skipped[*]}"
+        echo "  Run the Arch version inside the box: distrobox enter $TOOLS_BOX -- <command>"
+    fi
 }
 
 cmd_install() { # <name>

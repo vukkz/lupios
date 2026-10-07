@@ -19,6 +19,20 @@ Flatpak apps. Everything below is added on top.
 | Automatic updates (Universal Blue default) | Security fixes arrive without you remembering | Updates apply on the next reboot |
 | Fedora version pinned (`image-version: 44`) | Big upgrades are a deliberate change, not a surprise | Moving to Fedora 45 is a manual edit of `recipe.yml` |
 
+### Where the software comes from
+
+You trust every source below, so here they all are:
+
+| What | From | Checked by |
+|---|---|---|
+| The operating system | Fedora's packages, in Universal Blue's base image | Fedora's package signatures; Universal Blue's image signature |
+| NVIDIA driver and extra kernel drivers | Universal Blue (`ublue-os/akmods`) | Their signature, and Secure Boot (their key, enrolled once) |
+| The terminal prompt (starship) | A COPR repository (`atim/starship`): built by Fedora's servers, but packaged by one person and not reviewed by Fedora | COPR's signature, which only proves it came from that repository |
+| OpenSnitch (`lupi outgoing`) | Its official GitHub release | A SHA-256 checksum written into LupiOS: a changed file fails the build |
+| Apps (Firefox, Flatseal, `lupi install`) | Flathub | Flathub's signature; they run in Flatpak's sandbox |
+| The Lupi Lab | Kali Linux's image and repositories, rebuilt weekly by LupiOS | LupiOS's signature on the image (podman checks it), Kali's package signatures |
+| Command-line tools (`lupi install`) | Arch Linux's repositories | Arch's package signatures |
+
 ## Firewall: `files/system/usr/lib/firewalld/zones/lupios.xml`
 
 The default zone is `lupios`: **all incoming connections are blocked** except DHCPv6
@@ -109,9 +123,14 @@ or game mod phoning home, a malicious package calling out.
 - **Installed from OpenSnitch's official release**, pinned to a version and checked against
   its published SHA-256 checksums at build time (`files/scripts/opensnitch.sh`). It isn't in
   Fedora's repos.
-- **LupiOS's own services are pre-approved** (DNS, network setup, time, system, app and firmware
-  updates, container downloads) in `/etc/opensnitchd/rules/000-lupios-system.json`, so the
-  first minutes aren't a wall of questions. A deny rule of your own still wins.
+- **LupiOS's own services are pre-approved** (DNS, network setup, time, system and firmware
+  updates) in `/etc/opensnitchd/rules/000-lupios-system.json`, so the first minutes aren't a
+  wall of questions. A deny rule of your own still wins.
+- **skopeo, podman and flatpak are only pre-approved when root runs them** (system and app
+  updates, `lupi lab root`: `001-lupios-root-tools.json`). They download or upload whatever
+  they're told to, so malware running as you could otherwise use them to send your files out
+  without a question. **Trade-off:** the first `lupi lab`, `lupi install` or app install you
+  start yourself asks once.
 - **Off by default**, because the questions take getting used to, and a friend who clicks
   Allow on everything gains nothing. The wolf level turns it on, and off again when you leave
   wolf, unless you had turned it on yourself.
@@ -226,6 +245,9 @@ Reading the current state (`lupi state`) needs no password and changes nothing.
 - **Command-line tools go into the `lupi-tools` box** (Arch Linux, packages signed by Arch).
   Their commands are linked into `~/.local/bin`. Like the Lab, the box keeps them off the
   system image, but it **is not a sandbox**: a tool in it can reach your files.
+- **A tool never replaces a system command.** `~/.local/bin` comes before `/usr/bin`, so a link
+  named `sudo` or `ls` would take over in every terminal. Commands LupiOS already has are not
+  linked (run Arch's version inside the box instead).
 - Nothing is ever installed into the system image itself. Use `rpm-ostree install` only
   if something truly has to be part of the system, such as a driver.
 

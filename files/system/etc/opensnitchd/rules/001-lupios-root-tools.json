@@ -1,0 +1,33 @@
+{
+  "created": "2026-10-07T00:00:00Z",
+  "updated": "2026-10-07T00:00:00Z",
+  "name": "001-lupios-root-tools",
+  "description": "LupiOS: skopeo, podman and flatpak may connect without asking when root runs them: system and app updates, and lupi lab root. When your own user runs them (lupi lab, lupi install), OpenSnitch asks the first time, because these programs download or upload whatever they're told to, so malware running as you could use them to send your files out. A deny rule of your own still wins.",
+  "action": "allow",
+  "duration": "always",
+  "operator": {
+    "type": "list",
+    "operand": "list",
+    "sensitive": false,
+    "data": "",
+    "list": [
+      {
+        "type": "regexp",
+        "operand": "process.path",
+        "sensitive": false,
+        "data": "^/usr/s?bin/(skopeo|podman|flatpak)$",
+        "list": []
+      },
+      {
+        "type": "simple",
+        "operand": "user.id",
+        "sensitive": false,
+        "data": "0",
+        "list": []
+      }
+    ]
+  },
+  "enabled": true,
+  "precedence": false,
+  "nolog": false
+}
