@@ -106,7 +106,9 @@ Switch with `lupi channel stable` or `lupi channel testing`, then reboot.
 **How changes ship:**
 1. New work is pushed to the `testing` branch. After each image build, GitHub boots the new image in a
    virtual machine and checks it from inside (the **Boot test**: [tests/boot/](tests/boot/)): it has to start,
-   be LupiOS, have SELinux and the firewall on, and run `lupi` and the kernel hardening without errors.
+   be LupiOS, and keep every promise in [SECURITY.md](SECURITY.md). It checks each kernel setting, blocked
+   module and firewall rule, and switches the security level, network trust and Game Mode the way the panel
+   widget does. It also checks that only a Lab image signed by LupiOS is accepted.
 2. Try it on a testing machine: `lupi update`, reboot, test.
 3. If the boot test is green and it works, promote it: `git push origin testing:main`. Stable machines get
    it with their next update.

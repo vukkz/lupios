@@ -4,6 +4,9 @@ LupiOS aims for **hardening that doesn't get in your way**. Every setting here i
 by default unless marked *opt-in*. Each one lists what it protects against, what it
 can break, and how to undo it. Run `lupi check` to see the live status.
 
+Every new build is booted in a virtual machine that checks these promises from inside
+(`tests/boot/checks.sh`), and changes only reach the stable channel after passing it.
+
 Base: Fedora Atomic 44 (KDE Plasma) via Universal Blue. That already gives you
 SELinux enforcing, a read-only `/usr`, atomic updates with rollback, and sandboxed
 Flatpak apps. Everything below is added on top.
@@ -232,17 +235,26 @@ exactly what that does and doesn't protect.
 **What it gives you:**
 - No attack tools, and none of their thousands of dependencies, installed on the host system.
 - Tools run as your user, not root. Only `lupi lab root` gets raw network access.
-- The lab has its own home folder (`~/LupiLab`), so tool configs and loot stay separate.
-- The lab image is rebuilt weekly and signed with the same key as the OS.
+- Tools start in their own home folder (`~/LupiLab`), so their configs, histories and loot don't
+  clutter yours. (Your real home folder is still reachable from the lab: see below.)
+- The lab image is rebuilt weekly and signed with the same key as the OS, and podman checks
+  that signature: a Lab image not signed by LupiOS is refused, so a hijacked registry can't hand
+  you a Lab with a backdoor (`/etc/containers/policy.json`, set by `files/scripts/lab-signature.sh`).
+  Tools you install *inside* the lab come from Kali's own signed repositories.
 
-**What it doesn't do:** it is **not a sandbox**. Distrobox shares your user account
-and can still reach your files (through `/run/host`), your display and your network.
-Treat the lab like any program you run.
-- Don't run untrusted binaries or malware samples in it.
-- Use a separate virtual machine for those.
+**What it doesn't do:** it is **not a sandbox**. Distrobox shares your user account with the
+lab on purpose, so that GUI tools and moving files around just work:
+- **Your real home folder is mounted in the lab** at its usual path, and the whole disk under
+  `/run/host`. A tool in the lab can read and change your files, `~/.ssh` included.
+- **It shares your desktop session:** display, sound and the session bus. Through the session
+  bus, a program in the lab can start programs outside it (that's how `distrobox-host-exec` works).
+- **`lupi lab root` runs as the real root, with `--privileged`:** anything in it can take over
+  the whole PC. Use it only for the tools that need it.
 
-*Planned:* make `podman` refuse unsigned lab images, and add a "strict lab" mode
-built on plain `podman` with no access to host files.
+Treat the lab like any program you run: don't run untrusted binaries, exploits you haven't
+read, or malware samples in it. Use a separate virtual machine for those.
+
+*Planned:* a "strict lab" mode built on plain `podman`, with no access to host files.
 
 ## Not included (and why)
 

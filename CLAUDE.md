@@ -31,6 +31,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   credentials (`systemd.extra-unit.*` over SMBIOS, the script over fw_cfg), pulled in by the
   `systemd.wants=` kernel argument on the test disk only, so the image itself is never changed for testing.
   `mcelog.service` always fails in a VM (no hardware machine checks) and is ignored there.
+  `checks.sh` holds every SECURITY.md promise, with the values written out (not read from the image), and
+  flips the level, network trust and Game Mode the way the widget does (`PKEXEC_UID` set): change a
+  setting and its check together. `lab-signature.sh` runs in a plain container of the image on the
+  runner (no VM): the image's podman must accept the signed Lab, and refuse it under another key.
   `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs).
 - `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
   `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
@@ -104,6 +108,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   2026-10-03: a sheep grazes calmly, a wolf is alert and hunting). `lupi level` points symlinks in `/etc`
   (sysctl.d, resolved.conf.d, NetworkManager conf.d) at `/usr/share/lupios/levels/<name>/`, so renaming
   those folders silently changes what existing installs get: check what `/etc` still points at.
+- Container signature rules (`/etc/containers/policy.json`) match whole path components: BlueBuild's
+  rule for `ghcr.io/vukkz/lupios` does **not** cover `ghcr.io/vukkz/lupios-lab`, which fell to the
+  "accept anything" default until 2026-10-07. `files/scripts/lab-signature.sh` (a `script@v1` module
+  after `signing`) copies the OS rule for the Lab; `registries.d/lupios-lab.yaml` says where its signatures
+  are. The Lab is signed by `cosign-installer@v3` (cosign 2: `sha256-<digest>.sig` tags, which podman reads).
+  If Dependabot moves it to v4 (cosign 3, a new signature format), watch the boot test's Lab step.
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.
@@ -132,8 +142,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
   recipe says `blue-build-tag: none`, `cosign-version: none`; nushell is still needed during the build (dnf
   and script@v2 modules run on it), so the last module deletes it with `script@v1` (plain shell).
-- Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode, podman signature
-  policy for the lab image.
+- Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode.
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
   customise their own terminal). LupiOS only adds defaults to it: fastfetch and the prompt.
 - `lupi outgoing` (OpenSnitch) was verified working in the VM on 2026-09-30. The installer's boot menu

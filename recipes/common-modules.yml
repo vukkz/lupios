@@ -57,9 +57,13 @@ modules:
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
 
+  # lab-signature.sh: podman only accepts a Lupi Lab image signed by LupiOS. It builds on the OS
+  # image's rule, which the signing module above writes.
   # BlueBuild copies nushell into the image because its dnf and script modules run on it. Nothing
   # needs it once the build is done, and it would ship ~190 MB (unpacked) to every user. script@v1
   # is the plain-shell version of the script module, so this doesn't delete what runs it.
   - type: script@v1
+    scripts:
+      - lab-signature.sh
     snippets:
       - rm -rf /usr/libexec/bluebuild

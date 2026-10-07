@@ -525,7 +525,8 @@ lab_enter() { # [root]
     local name=lupi-lab root=() podman=(podman) app=burpsuite
     if [[ ${1:-} == root ]]; then
         name=lupi-lab-root root=(--root) podman=(sudo podman) app=wireshark
-        echo "Root lab: tools here get raw access to your network hardware."
+        echo "Root lab: tools here run as the real root, with raw access to your network hardware"
+        echo "and full control of this PC."
         echo "Use it only when a tool needs it, and leave it when you're done."
     fi
     # The lab gets its own home folder, so tool configs, histories and loot stay out of your real one

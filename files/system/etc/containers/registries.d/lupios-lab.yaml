@@ -1,0 +1,5 @@
+# LupiOS: the Lupi Lab image's signatures are stored on GHCR next to the image (cosign's format).
+# /etc/containers/policy.json says they're required (files/scripts/lab-signature.sh).
+docker:
+  ghcr.io/vukkz/lupios-lab:
+    use-sigstore-attachments: true

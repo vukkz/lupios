@@ -49,11 +49,13 @@ What each level and setting changes, and what it can break, is all in [Security]
 | Command | What it does |
 |---|---|
 | `lupi lab` | Enters the Lupi Lab: Kali's top tools in a container. The first time downloads a few GB and sets it up: let it finish |
-| `lupi lab root` | The lab with raw network access, for scans and Wi-Fi tools that need it |
+| `lupi lab root` | The lab as the real root, with raw network access, for scans and Wi-Fi tools that need it |
 | `lupi lab reset [root]` | Starts the lab fresh from the newest image |
 
-The lab has its own home folder, `~/LupiLab`. It keeps the tools off your system, but it is **not a
-sandbox**: it can still reach your files. Use a separate virtual machine for malware.
+Tools start in their own home folder, `~/LupiLab`. The lab keeps them off your system, but it is
+**not a sandbox**: your real home folder and your desktop session are shared with it, and the root
+lab can take over the whole PC. Use a separate virtual machine for malware.
+[What the lab does and doesn't protect](../security/#lupi-lab-lupi-lab).
 
 ## Terminal
 
