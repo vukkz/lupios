@@ -10,10 +10,10 @@ _lupi() {
             kargs | usbguard | outgoing | game | fastfetch | prompt) words="on off" ;;
             setup) words="gaming" ;;
             channel) words="stable testing" ;;
-            lab) words="root reset" ;;
+            lab) words="root strict reset" ;;
         esac
     elif ((COMP_CWORD == 3)) && [[ ${COMP_WORDS[1]} == lab && ${COMP_WORDS[2]} == reset ]]; then
-        words="root"
+        words="root strict"
     fi
     mapfile -t COMPREPLY < <(compgen -W "$words" -- "$cur")
 }

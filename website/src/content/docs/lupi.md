@@ -50,12 +50,15 @@ What each level and setting changes, and what it can break, is all in [Security]
 |---|---|
 | `lupi lab` | Enters the Lupi Lab: Kali's top tools in a container. The first time downloads a few GB and sets it up: let it finish |
 | `lupi lab root` | The lab as the real root, with raw network access, for scans and Wi-Fi tools that need it |
-| `lupi lab reset [root]` | Starts the lab fresh from the newest image |
+| `lupi lab strict [command]` | The strict lab: the same tools, but it can't see your files or your desktop. Terminal tools only |
+| `lupi lab reset [root\|strict]` | Starts that lab fresh from the newest image |
 
 Tools start in their own home folder, `~/LupiLab`. The lab keeps them off your system, but it is
 **not a sandbox**: your real home folder and your desktop session are shared with it, and the root
-lab can take over the whole PC. Use a separate virtual machine for malware.
-[What the lab does and doesn't protect](../security/#lupi-lab-lupi-lab).
+lab can take over the whole PC. For tools or scripts you don't trust yet, use the **strict lab**: it
+only shares `~/LupiLab/lupi-lab-strict` (`/root/shared` inside), and SELinux keeps it away from
+everything else. For real malware, use a separate virtual machine.
+[What each lab does and doesn't protect](../security/#lupi-lab-lupi-lab).
 
 ## Terminal
 

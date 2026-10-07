@@ -546,16 +546,49 @@ lab_enter() { # [root]
     exec distrobox enter "${root[@]}" --no-workdir "$name"
 }
 
-lab_reset() { # [root]
-    if [[ ${1:-} == root ]]; then distrobox rm --root --force lupi-lab-root; else distrobox rm --force lupi-lab; fi
-    ok "Removed. Files in ~/LupiLab were kept. Run 'lupi lab' to create a fresh one."
+# The strict lab: the same Kali image, but run by plain podman instead of distrobox. Distrobox shares
+# your home folder, the whole disk (/run/host) and your desktop session with the lab, and turns SELinux
+# off for it. The strict lab gets one folder of its own and nothing else, and SELinux confines it
+# (container_t), so even a process that breaks out of the container can't read your files.
+STRICT_LAB=lupi-lab-strict
+
+lab_strict() { # [command...]
+    local shared="$HOME/LupiLab/$STRICT_LAB" tty=()
+    if ! podman container exists "$STRICT_LAB"; then
+        echo "Creating $STRICT_LAB from $LAB_IMAGE (the first time downloads a few GB)..."
+        mkdir -p "$shared"
+        # :Z gives the shared folder this lab's own SELinux label. NET_RAW (ping, raw sockets) only
+        # counts inside the lab's own network namespace. --init: stops cleanly at shutdown.
+        podman create --name "$STRICT_LAB" --hostname "$STRICT_LAB" --pull newer --init \
+            --cap-add NET_RAW --volume "$shared:/root/shared:Z" --workdir /root \
+            "$LAB_IMAGE" sleep infinity >/dev/null
+        ok "Created. Files in ~/LupiLab/$STRICT_LAB on your PC are /root/shared in the strict lab."
+    fi
+    podman start "$STRICT_LAB" >/dev/null # stopped after every restart; quick, nothing to set up
+    [[ -t 0 && -t 1 ]] && tty=(--tty)
+    if (($#)); then exec podman exec --interactive "${tty[@]}" "$STRICT_LAB" "$@"; fi
+    echo "Strict lab: no access to your files, your desktop or other apps. Shared folder: /root/shared"
+    echo "${D}Terminal tools only. For Burp Suite, Wireshark's window or Wi-Fi tools, use: lupi lab${N}"
+    # shellcheck disable=SC2016 # $(...) runs inside the lab
+    exec podman exec --interactive "${tty[@]}" "$STRICT_LAB" sh -c 'exec "$(command -v zsh || command -v bash)" -l'
+}
+
+lab_reset() { # [root|strict]
+    case ${1:-} in
+        "") distrobox rm --force lupi-lab ;;
+        root) distrobox rm --root --force lupi-lab-root ;;
+        strict) podman rm --force "$STRICT_LAB" >/dev/null ;;
+        *) die "Usage: lupi lab reset [root|strict]" ;;
+    esac
+    ok "Removed. Files in ~/LupiLab were kept. Run 'lupi lab${1:+ $1}' to create a fresh one."
 }
 
 cmd_lab() {
     case ${1:-} in
         "" | root) lab_enter "${1:-}" ;;
+        strict) shift && lab_strict "$@" ;;
         reset) lab_reset "${2:-}" ;;
-        *) die "Usage: lupi lab [root] | lupi lab reset [root]" ;;
+        *) die "Usage: lupi lab [root|strict] | lupi lab strict <command> | lupi lab reset [root|strict]" ;;
     esac
 }
 
@@ -809,7 +842,8 @@ ${B}Gaming${N}
 
 ${B}Hacking lab${N}
   ${C}lupi lab${N} [root]                  enter the Lupi Lab (Kali tools in a container)
-  ${C}lupi lab reset${N} [root]            start the lab fresh from the newest image
+  ${C}lupi lab strict${N} [command]        the lab without access to your files (terminal tools only)
+  ${C}lupi lab reset${N} [root|strict]     start the lab fresh from the newest image
 
 ${B}Terminal${N}
   ${C}lupi fastfetch${N} [on|off]          the wolf at the top of new terminals
@@ -841,7 +875,7 @@ case ${1:-help} in
     outgoing) cmd_outgoing "${2:-}" ;;
     setup) cmd_setup "${2:-}" ;;
     game) cmd_game "${2:-}" ;;
-    lab) cmd_lab "${2:-}" "${3:-}" ;;
+    lab) cmd_lab "${@:2}" ;;
     fastfetch) user_toggle fastfetch fastfetch-off "fastfetch at the top of new terminals" "${2:-}" ;;
     prompt) user_toggle prompt prompt-off "The LupiOS prompt" "${2:-}" ;;
     install) cmd_install "${2:-}" ;;

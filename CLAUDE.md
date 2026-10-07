@@ -117,6 +117,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.
+- Distrobox (1.8, `distrobox-create`) always mounts the real `$HOME` at its own path, even with `--home`
+  (that only changes `$HOME` inside), plus `/` at `/run/host`, `/tmp`, `/run/user/<uid>` (session bus,
+  Wayland), `--privileged` and `label=disable`. So the normal Lab is no boundary. `lupi lab strict`
+  (2026-10-07) is plain rootless `podman create`: one `:Z` folder (`~/LupiLab/lupi-lab-strict` →
+  `/root/shared`), SELinux `container_t`, `sleep infinity` under `--init`, then `podman exec` per use.
+  The boot test checks it as a real user (`labtest`, lingering) and downloads the Lab for that (40 GB disk).
 
 ## Open items
 - Owner hasn't reported `flatpak remotes` output or remaining "Fedora" branding yet.
@@ -142,7 +148,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
   recipe says `blue-build-tag: none`, `cosign-version: none`; nushell is still needed during the build (dnf
   and script@v2 modules run on it), so the last module deletes it with `script@v1` (plain shell).
-- Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel), strict lab mode.
+- Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel).
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
   customise their own terminal). LupiOS only adds defaults to it: fastfetch and the prompt.
 - `lupi outgoing` (OpenSnitch) was verified working in the VM on 2026-09-30. The installer's boot menu

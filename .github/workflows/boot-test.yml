@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 60
     env:
       IMAGE: ${{ inputs.image }}
-      WORK: /mnt/boot-test # the runner's second disk has the room for a 20 GB test disk
+      WORK: /mnt/boot-test # the runner's second disk has the room for a 40 GB test disk
     steps:
       - uses: actions/checkout@v7
 
@@ -54,7 +54,7 @@ jobs:
         # unit, and no Flatpak downloads (Firefox) that would slow the test down.
         run: |
           sudo podman pull "$IMAGE"
-          truncate -s 20G "$WORK/disk.raw"
+          truncate -s 40G "$WORK/disk.raw" # room for the Lab image the strict-lab check downloads
           sudo podman run --rm --privileged --pid=host \
             --security-opt label=type:unconfined_t \
             -v /var/lib/containers:/var/lib/containers -v /dev:/dev -v "$WORK:/output" \
@@ -72,7 +72,7 @@ jobs:
           cp /usr/share/OVMF/OVMF_VARS_4M.fd "$WORK/vars.fd"
           unit=$(base64 -w0 tests/boot/lupios-ci.service)
           set +e
-          timeout 1500 qemu-system-x86_64 \
+          timeout 2400 qemu-system-x86_64 \
             -machine q35,accel=kvm -cpu host -smp 2 -m 4096 \
             -drive if=pflash,format=raw,unit=0,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd \
             -drive if=pflash,format=raw,unit=1,file="$WORK/vars.fd" \

@@ -254,7 +254,26 @@ lab on purpose, so that GUI tools and moving files around just work:
 Treat the lab like any program you run: don't run untrusted binaries, exploits you haven't
 read, or malware samples in it. Use a separate virtual machine for those.
 
-*Planned:* a "strict lab" mode built on plain `podman`, with no access to host files.
+### Strict lab: `lupi lab strict`
+
+The same Kali image, run by plain `podman` instead of distrobox, for when you'd rather the tools
+couldn't see your PC: running an exploit or script you downloaded, or a tool you don't trust yet.
+
+- **It shares one folder and nothing else:** `~/LupiLab/lupi-lab-strict` on your PC is `/root/shared`
+  in the strict lab. No home folder, no `/run/host`, no desktop session, no session bus.
+- **SELinux confines it** (`container_t`; distrobox turns SELinux off for its boxes). Even a process
+  that breaks out of the container is still blocked from your files.
+- **It runs rootless:** "root" inside is your own user outside, with no extra privileges.
+- It has its own network (podman's user-mode network): it reaches the internet and your LAN like
+  any app does, and can't capture or change your PC's own network traffic.
+- Run one command with `lupi lab strict <command>`, e.g. `lupi lab strict nmap -sT 192.168.1.1`.
+  Get the newest image with `lupi lab reset strict`.
+
+**Can't do:** windowed tools (Burp Suite, Wireshark's window), Wi-Fi tools, and scans that need
+raw access to your network card (`nmap -sS`, OS detection). Use `lupi lab` or `lupi lab root` for those.
+
+**Still not a virtual machine:** it shares the Linux kernel with your PC, so an attack on the kernel
+itself could escape it. For real malware, use a separate virtual machine.
 
 ## Not included (and why)
 

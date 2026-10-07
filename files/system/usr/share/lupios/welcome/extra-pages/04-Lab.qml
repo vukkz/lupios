@@ -30,5 +30,10 @@ Welcome.Page {
             text: "The first time downloads a few GB. Later, just type: lupi lab"
             opacity: 0.7
         }
+        QQC2.Label {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Trying a tool or script you don't trust yet? lupi lab strict can't see your files."
+            opacity: 0.7
+        }
     }
 }

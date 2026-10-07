@@ -78,6 +78,7 @@ The `latest` tag will automatically point to the latest build. That build will s
 ```bash
 lupi check              # see what's protected (restart once after the "Kernel hardening added" message)
 lupi lab                # enter the Lupi Lab (first time downloads a few GB)
+lupi lab strict         # the Lab without access to your files (terminal tools only)
 lupi setup gaming       # optional: Steam, Heroic, Lutris, ProtonUp-Qt, MangoHud, gamescope
 ```
 

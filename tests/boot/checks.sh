@@ -220,6 +220,37 @@ else
     check "home: device discovery goes out again" bash -c 'echo hi >/dev/udp/224.0.0.251/5353'
 fi
 
+# --- Strict lab --------------------------------------------------------------------------------
+# Used the way a person would: as a normal user with a secret in their home folder. Lingering starts
+# that user's systemd session, which rootless podman expects.
+user=labtest
+useradd --create-home "$user"
+uid=$(id -u "$user") home=$(getent passwd "$user" | cut -d: -f6)
+loginctl enable-linger "$user"
+for _ in $(seq 30); do [[ -S /run/user/$uid/bus ]] && break; sleep 1; done
+as_user() {
+    runuser -u "$user" -- env HOME="$home" USER="$user" XDG_RUNTIME_DIR="/run/user/$uid" \
+        DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" "$@"
+}
+as_user sh -c 'echo secret >~/canary'
+# The first start downloads the Lab (a few GB) through podman's signature check: so this also shows
+# the installed system accepts the signed Lab
+if out=$(as_user timeout 1200 lupi lab strict true 2>&1); then
+    ok "strict lab: created from the signed Lab image"
+    # Commands do run in it, so the refusals below come from what it can't see
+    check "strict lab: it's Kali inside" as_user lupi lab strict grep -qi kali /etc/os-release
+    refuse "strict lab: your home folder isn't there" as_user lupi lab strict cat "$home/canary"
+    refuse "strict lab: the disk isn't there (/run/host)" as_user lupi lab strict ls /run/host
+    refuse "strict lab: your desktop session isn't there" as_user lupi lab strict test -e "/run/user/$uid/bus"
+    label=$(as_user lupi lab strict cat /proc/1/attr/current 2>&1 | tr -d '\0')
+    if [[ $label == *:container_t:* ]]; then ok "strict lab: SELinux confines it ($label)"; else bad "strict lab: not confined by SELinux: $label"; fi
+    check "strict lab: writes to its shared folder" as_user lupi lab strict sh -c 'echo hi >/root/shared/from-lab'
+    expect "strict lab: the file arrives in ~/LupiLab" "hi" cat "$home/LupiLab/lupi-lab-strict/from-lab"
+    retry "strict lab: has internet" as_user lupi lab strict getent hosts fedoraproject.org
+else
+    bad "strict lab: couldn't create it: $(oneline "$(tail -n 5 <<<"$out")")"
+fi
+
 # --- Nothing failed ----------------------------------------------------------------------------
 # Units that can only work on real hardware, so they fail in every VM:
 # mcelog listens for the processor's hardware error reports, which a virtual CPU doesn't send.
