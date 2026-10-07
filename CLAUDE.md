@@ -119,7 +119,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   pushes the Lab as a list (amd64 + provenance), so `build-lab.yml` signs with `cosign sign --recursive`.
 - NetworkManager hands every connection's DNS servers to systemd-resolved even with `dns=none`, unless
   `systemd-resolved=false` (both re-read on `systemctl reload NetworkManager`). The wolf level sets both,
-  and `level_dns` reloads NetworkManager *before* restarting resolved, which clears what NM handed over.
+  and `level_dns` reloads NetworkManager, restarts resolved, then runs `resolvectl revert` on every link: resolved
+  saves what NM handed it in `/run/systemd/resolve/netif/` and reloads that after a restart (systemd source).
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.

@@ -168,7 +168,8 @@ check "wolf: DNS goes encrypted to Quad9" bash -c \
 # resolvectl dns prints "Link 2 (enp0s2): 10.0.2.3" while the network's DNS server is in use.
 # The pause gives NetworkManager time to hand it back to systemd-resolved, if it was going to.
 sleep 3
-check "wolf: the network's DNS servers aren't used" bash -c '! resolvectl dns | grep -v "^Global" | grep -Eq ": *[0-9a-f]"'
+link_dns=$(resolvectl dns 2>&1 | grep -v "^Global" | grep -E ": *[0-9a-f]")
+if [[ -z $link_dns ]]; then ok "wolf: the network's DNS servers aren't used"; else bad "wolf: the network's DNS servers are still used: $(oneline "$link_dns")"; fi
 retry "wolf: names still resolve (over TLS)" resolvectl query --cache=no fedoraproject.org
 expect "wolf: USBGuard on" "active" systemctl is-active usbguard
 expect "wolf: outgoing guard on" "active" systemctl is-active opensnitch

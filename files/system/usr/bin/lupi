@@ -289,10 +289,18 @@ level_dns() { # on | off
     else
         as_root rm -f /etc/systemd/resolved.conf.d/95-lupios-level.conf /etc/NetworkManager/conf.d/95-lupios-level.conf
     fi
-    # NetworkManager first: on wolf it stops handing the network's DNS servers to systemd-resolved, and
-    # the restart then clears the ones it handed over before. On sheep it hands them over again.
+    # On wolf, NetworkManager stops handing each network's DNS servers to systemd-resolved; on sheep it
+    # hands them over again. The restart loads (or drops) wolf's Quad9 settings.
     as_root systemctl reload NetworkManager
     as_root systemctl restart systemd-resolved
+    if [[ $1 == on ]]; then
+        # resolved keeps what NetworkManager handed it before, even across that restart
+        # (/run/systemd/resolve/netif/): forget it, so only Quad9 is left
+        local dev
+        for dev in /sys/class/net/*; do
+            [[ ${dev##*/} == lo ]] || as_root resolvectl revert "${dev##*/}" 2>/dev/null || true
+        done
+    fi
 }
 
 describe_levels() {

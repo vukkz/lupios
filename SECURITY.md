@@ -199,6 +199,8 @@ keys can't be read by an exploit. It costs a few percent of speed. Add it with
 **Wolf breaks some things:**
 - Wi-Fi login pages (hotels, airports, trains) don't load, because DNS only goes to
   Quad9. Switch to `lupi level sheep`, log in, then switch back.
+- Names that only a VPN's or company network's own DNS knows (intranet sites) don't resolve,
+  because only Quad9 is asked.
 - A few apps that use io_uring can fail.
 - Every app asks once before it goes online, so expect questions in the first minutes and
   after installing something new.
