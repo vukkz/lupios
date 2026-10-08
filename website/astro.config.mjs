@@ -1,5 +1,5 @@
 // @ts-check
-// The LupiOS website: https://vukkz.github.io/lupios (built by .github/workflows/website.yml).
+// The LupiOS website: https://lupios.org (built by .github/workflows/website.yml, served by GitHub Pages).
 // Local preview: `npm install` once, then `npm run dev` and open the address it prints.
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
@@ -7,8 +7,7 @@ import starlight from "@astrojs/starlight";
 const repo = "https://github.com/vukkz/lupios";
 
 export default defineConfig({
-  site: "https://vukkz.github.io",
-  base: "/lupios",
+  site: "https://lupios.org",
   integrations: [
     starlight({
       title: "LupiOS",

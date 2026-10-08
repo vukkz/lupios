@@ -1,5 +1,5 @@
 name: website
-# Builds the website (website/) and publishes it on GitHub Pages: https://vukkz.github.io/lupios
+# Builds the website (website/) and publishes it on GitHub Pages: https://lupios.org (custom domain, set in the repo's Pages settings)
 # It runs on every push to `main` and `testing`, whatever changed: the "What's new" page lists the
 # branch's commits. Pull requests only when the site or a doc it copies (SECURITY.md, docs/*.md)
 # changes. Only `main` publishes; elsewhere it just checks that the site builds.

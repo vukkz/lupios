@@ -3,7 +3,7 @@
 A hardened, rollback-safe everyday desktop, with Kali's hacking tools one command away.
 Built on Fedora Atomic 44 (KDE Plasma) with [BlueBuild](https://blue-build.org).
 
-**Website, downloads and guides: https://vukkz.github.io/lupios**
+**Website, downloads and guides: https://lupios.org**
 
 ![The LupiOS desktop: the Lines wallpaper, Konsole with the wolf logo, and the LupiOS panel next to the clock](website/src/assets/screenshots/desktop.png)
 

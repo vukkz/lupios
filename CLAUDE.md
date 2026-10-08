@@ -42,10 +42,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   one black path of straight segments each, drawn in ice blue (dark backgrounds) or deep blue (light).
   `lupios-logo-small.svg` thickens the lines for 16–32 px icons. The terminal logo is the mark in Braille
   dots (needs `dejavu-sans-mono-fonts`). The owner's file is a Figma export with JPEGs inside, not vectors.
-- `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://vukkz.github.io/lupios.
+- `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://lupios.org (GitHub Pages custom domain: DNS at Cloudflare, records DNS-only, HTTPS enforced; vukkz.github.io/lupios redirects there).
   `scripts/sync.mjs` copies `SECURITY.md`, `docs/install.md` and `docs/dual-boot.md` in before every build (the copies are
   git-ignored), so those files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
-  Preview: `npm run dev` in `website/` → http://localhost:4321/lupios/.
+  Preview: `npm run dev` in `website/` → http://localhost:4321/.
 
 ## Conventions
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:
@@ -162,10 +162,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
   When ublue's 45 appears: `image-version: 45` on `testing`, and the boot test shows what broke.
   The website is live since 2026-10-03, the boot test runs since 2026-10-07.
-- Rechunking (`build_chunked_oci` in build.yml, on `testing` only): images 22% smaller, but the second NVIDIA
-  build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion, when reusing the previous build's
-  layout as baseline; NVIDIA now uses `rechunk_clear_plan`). Don't promote it until NVIDIA builds are
-  reliable. A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
+- Rechunking (`build_chunked_oci` in build.yml), on stable since 2026-10-08: images ~24% smaller (3.65 GB,
+  NVIDIA 4.57 GB). The second NVIDIA build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion,
+  when reusing the previous build's layout as baseline), so NVIDIA uses `rechunk_clear_plan`: fine in every
+  build since. Clean day-to-day update (two builds on the same base, 2026-10-08): **132 MB** = rpmdb 78 MB +
+  layer 98 45 MB (a package group that changes every build, cause still unknown) + metadata 10 MB + font
+  caches 0.1 MB. A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
+  A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
   times; stored twice) and the fontconfig caches, and rpm-ostree packs those into one ~375 MB "unpackaged
   content" layer with the initramfs and other non-RPM files, so that whole layer is re-downloaded.
