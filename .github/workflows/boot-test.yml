@@ -27,7 +27,7 @@ jobs:
       IMAGE: ${{ inputs.image }}
       WORK: /mnt/boot-test # the runner's second disk has the room for a 40 GB test disk
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Free disk space # the image unpacks to well over 10 GB
         run: |
@@ -99,7 +99,7 @@ jobs:
 
       - name: Keep the VM's console log
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: boot-test-serial-log
           path: /mnt/boot-test/serial.log

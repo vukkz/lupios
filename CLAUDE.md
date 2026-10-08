@@ -51,6 +51,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:
   `git add --chmod=+x`, and list them in `files/scripts/fix-permissions.sh`.
 - Shell: `set -euo pipefail`, must pass `shellcheck -S warning`. Comments explain *why*, briefly.
+- Outside GitHub Actions are pinned to a commit SHA with the exact version as a comment
+  (`uses: owner/action@<sha> # v1.2.3`); Dependabot updates both. Never use a bare `@v7` tag: the builds
+  hold SIGNING_SECRET and SF_SSH_KEY. Get a tag's commit with `gh api repos/<o>/<r>/git/ref/tags/<tag>`
+  (follow `git/tags/<sha>` for annotated tags).
 - Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - Ship defaults, not locks: user settings must always win (e.g. `/etc/xdg` defaults, `lupios-look`
   only touches settings still at their defaults). Every security setting is documented with its

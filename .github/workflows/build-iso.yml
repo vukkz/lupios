@@ -39,7 +39,7 @@ jobs:
 
       # The installer runs on Fedora's packages, which brand it as Fedora. Our look for it lives in
       # iso/anaconda: render its artwork here, then lupios-look.tmpl swaps it in during the build.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.WANTED == 'true'
       - name: Render the installer artwork
         if: env.WANTED == 'true'
@@ -55,7 +55,7 @@ jobs:
       - name: Build ISO
         if: env.WANTED == 'true'
         id: build
-        uses: jasonn3/build-container-installer@v1.5.0
+        uses: jasonn3/build-container-installer@bed71f841c250650a70f1ed8315ba92da1591ba6 # v1.5.0
         with:
           image_repo: ghcr.io/${{ github.repository_owner }}
           image_name: ${{ matrix.image }}
@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload ISO
         if: env.WANTED == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.image }}-iso
           path: |

@@ -18,6 +18,7 @@ Flatpak apps. Everything below is added on top.
 | Images signed with cosign (`cosign.pub`) | Your system only accepts updates signed with the LupiOS key, so a hijacked registry can't push you a malicious OS | You must rebase with `ostree-image-signed:` once (see the [README](README.md#installation)) |
 | Automatic updates (Universal Blue default) | Security fixes arrive without you remembering | Updates apply on the next reboot |
 | Fedora version pinned (`image-version: 44`) | Big upgrades are a deliberate change, not a surprise | Moving to Fedora 45 is a manual edit of `recipe.yml` |
+| Build tools pinned to exact commits (`.github/workflows/`) | Every outside GitHub Action runs at a fixed commit, not a version label its owner could move, so a hijacked action can't run in the builds that hold the signing key | Their updates come as Dependabot pull requests, which have to be merged |
 
 ### Where the software comes from
 
