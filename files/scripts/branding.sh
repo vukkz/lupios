@@ -18,7 +18,9 @@ set_field NAME "LupiOS"
 # No number in the name: LupiOS updates continuously, and 44 is the Fedora version underneath.
 # It stays in VERSION_ID, which tools read (lupi channel builds the image tag from it).
 set_field PRETTY_NAME "LupiOS"
-set_field HOME_URL "https://github.com/vukkz/lupios"
+set_field HOME_URL "https://lupios.org"
+set_field DOCUMENTATION_URL "https://lupios.org" # Fedora's pointed to the Fedora Kinoite docs
+set_field SUPPORT_URL "https://github.com/vukkz/lupios/issues" # and this to Ask Fedora
 set_field BUG_REPORT_URL "https://github.com/vukkz/lupios/issues"
 set_field DEFAULT_HOSTNAME "lupios"
 set_field LOGO "lupios-logo" # icon installed by look.sh

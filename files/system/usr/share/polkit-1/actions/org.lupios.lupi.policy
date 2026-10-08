@@ -6,7 +6,7 @@
      use it for a few minutes. `lupi` itself only accepts the widget's switches through pkexec. -->
 <policyconfig>
   <vendor>LupiOS</vendor>
-  <vendor_url>https://github.com/vukkz/lupios</vendor_url>
+  <vendor_url>https://lupios.org</vendor_url>
   <action id="org.lupios.lupi">
     <description>Change LupiOS settings</description>
     <message>LupiOS needs your password to change security, network or Game Mode settings</message>

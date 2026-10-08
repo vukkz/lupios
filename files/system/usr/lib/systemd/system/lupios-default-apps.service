@@ -1,6 +1,6 @@
 [Unit]
 Description=LupiOS: install the default apps (Firefox, Flatseal) once
-Documentation=https://github.com/vukkz/lupios
+Documentation=https://lupios.org
 Wants=network-online.target
 After=network-online.target
 # Only until it has worked once (lupi creates this file): an app the user removes stays removed
