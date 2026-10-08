@@ -149,8 +149,11 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   WolfOS distros, Wolfi). LupiOS was checked clean: no OS of that name, `lupi` clashes with no package
   (Repology), SourceForge `lupios` and lupios.org/.dev/.io/.com free. The old `wolf-os` images on GHCR are
   frozen; no compatibility code for Wolf OS installs (only the owner's VM had one; it gets reinstalled).
-- Before going public: ISO hosting (SourceForge `lupios`: waiting on SourceForge support to verify the owner's
-  phone), and the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
+- ISOs are on SourceForge since 2026-10-08 (https://sourceforge.net/projects/lupios/files): `build-iso.yml` with
+  `channel: stable` uploads `lupios[-nvidia].iso` + `-CHECKSUM` over rsync (secret `SF_SSH_KEY`, variable
+  `SF_USER`=vukkz, host key pinned), replacing the previous files, so download links never change. First
+  upload: 4.9 GB and 5.8 GB. Update the sizes in `website/src/downloads.ts` when they change a lot.
+- Before going public: the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
   no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
   When ublue's 45 appears: `image-version: 45` on `testing`, and the boot test shows what broke.
