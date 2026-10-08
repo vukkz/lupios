@@ -3,11 +3,11 @@
 # downloads the layers that changed. Files that belong to no package all share one ~300 MB layer,
 # downloaded again whenever any one of them changes. Measured on 2026-10-07, these change for
 # different reasons, so each gets a layer of its own (rpm-ostree reads the user.component attribute):
-# - the package database: changes with every build (it records install times), and rechunking stores
-#   it twice (rpm-ostree-base-db is the same file). In one layer, it's stored once.
+# - the package database (both copies: the current one, and rpm-ostree's copy of the base image's):
+#   changes with every build, since it records install times. ~78 MB compressed.
 # - the font caches: rebuilt, slightly differently, by every build
-# - the boot image (initramfs): changes only with the kernel, dracut or the boot screen
-# Runs last, after the initramfs module has made the boot image.
+# The boot image (initramfs) can't be moved: rpm-ostree always keeps it with the unpackaged files, and
+# ignores the attribute (checked 2026-10-07). It only changes with the kernel, dracut or the boot screen.
 set -euo pipefail
 
 component() { # <name> <path>: tags the path and everything in it
@@ -21,4 +21,3 @@ component rpmdb /usr/share/rpm
 component rpmdb /usr/lib/sysimage/rpm
 component rpmdb /usr/lib/sysimage/rpm-ostree-base-db
 component fontconfig-cache /usr/lib/fontconfig/cache
-for img in /usr/lib/modules/*/initramfs.img; do component initramfs "$img"; done

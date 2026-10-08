@@ -161,8 +161,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   NVIDIA with `rechunk_clear_plan` built fine 3 times in a row (2026-10-07). Measured update between two
   testing builds: ~400 MB = layer 127 "unpackaged" 299 MB + layer 97 (a package group, cause unknown) 44 MB
   + layer 11 (`/usr/share/rpm`) 40 MB + layer 0 (metadata) 10 MB. `files/scripts/layers.sh` tags the rpmdb
-  (both copies), font caches and initramfs with `user.component` xattrs so build-chunked-oci gives each its
-  own layer (Red Hat, "Reduce bootc system update size", 2025-11; Fedora bootc tracker #82 for the copy).
+  (`/usr/share/rpm` 107M and `/usr/lib/sysimage/rpm-ostree-base-db` 96M: different content, the base image's
+  db) and the font caches with `user.component` xattrs; build-chunked-oci gives each its own layer (Red Hat,
+  "Reduce bootc system update size", 2025-11). Verified 2026-10-07 (627e903): layer 1 `fontconfig-cache`,
+  layer 2 `rpmdb` 78 MB. The initramfs (229M) ignores the xattr: rpm-ostree always puts it in the last layer,
+  "initramfs (kernel …) and rpmostree-unpackaged-content" (260 MB). Changing the components reshuffles the
+  whole layout once (that build: 50 new layers, 1.3 GB). The image config's `history[].created_by` names
+  each layer's components.
   Measure by comparing the layer digests of two consecutive builds' manifests (GHCR registry API, anonymous
   token; each build's image digest is in its log): the layers the new one adds are the download.
 - BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
