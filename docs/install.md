@@ -85,6 +85,9 @@ You should see ✔ on everything, and a full score if Secure Boot is on.
 
 - **An update broke something:** restart and pick the **second entry** in the boot menu. That's the
   previous version.
+- **In VirtualBox, the screen is black with only a mouse cursor:** VirtualBox's 3D acceleration
+  can break KDE's display, especially after an update. Power off the VM, untick **Settings →
+  Display → Enable 3D Acceleration**, and start it again.
 - **`lupi lab` says `crun: ptsname: Inappropriate ioctl for device`:** the lab's first setup was
   interrupted. Run `podman stop lupi-lab`, then `lupi lab` again and let it finish.
 - **Anything else:** open an issue at https://github.com/vukkz/lupios/issues with a photo of the screen.

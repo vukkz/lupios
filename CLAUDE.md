@@ -105,6 +105,10 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   entries (OpenSnitch 1.8 `daemon/rule/operator.go`; `data` is ignored for lists).
 - QML and anything Plasma can't be tested on Windows: test in the VM. VirtualBox there runs in
   Hyper-V (NEM) mode: slow, and once hung at `boot.mount` after an update (a reboot fixed it).
+  With 3D acceleration on (VMSVGA), the 2026-10-08 update (ublue base 44.20261008, kernel 7.2.9) gave a
+  black screen with only a cursor, then a VM stuck in reset (VBox.log ends at `PDMR3Reset`). Fixed with
+  `VBoxManage controlvm LupiOS poweroff` + `modifyvm LupiOS --accelerate-3d=off`. Screenshots:
+  `VBoxManage controlvm LupiOS screenshotpng <file>`. The boot test (QEMU virtio-gpu) can't see this.
 - nmap from the Kali VM on the host-only network needs `-n` (no DNS there).
 - avahi-daemon ignores NetworkManager's per-connection `mdns`/`llmnr` and announces `<hostname>.local` on
   every network. Public networks stay quiet through the firewalld policy `lupios-public-quiet` (ingress
