@@ -32,8 +32,8 @@ for name in night lines emblem; do
     rsvg-convert -w 400 -h 225 "$art/wallpaper-$name.svg" -o "$dir/contents/screenshot.png"
 done
 # The desktop, login screen and lock screen all default to /usr/share/wallpapers/Fedora. "Default"
-# belonged to Fedora's own wallpapers (removed in common-modules.yml): anything still asking for it
-# gets ours too.
+# points at Fedora 44's own wallpaper (desktop-backgrounds-kde, which the desktop needs installed):
+# anything still asking for it gets ours too.
 ln -sfn LupiOS-Night /usr/share/wallpapers/Fedora
 ln -sfn LupiOS-Night /usr/share/wallpapers/Default
 

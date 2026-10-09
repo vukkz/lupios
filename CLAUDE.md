@@ -134,6 +134,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `systemd-resolved=false` (both re-read on `systemctl reload NetworkManager`). The wolf level sets both,
   and `level_dns` reloads NetworkManager, restarts resolved, then runs `resolvectl revert` on every link: resolved
   saves what NM handed it in `/run/systemd/resolve/netif/` and reloads that after a restart (systemd source).
+- Removing a package in the dnf module also removes everything that depends on it, including through
+  virtual provides that `rpm -q --whatrequires <name>` doesn't show. Removing Fedora's wallpapers
+  (desktop-backgrounds-kde, f44-backgrounds-*) took kde-settings-plasma, plasma-workspace, plasma-desktop
+  and plasma-login-manager with them (2026-10-09; the boot test caught "display manager inactive"). Check a
+  removal with `rpm -e --test <pkg>` in the VM, and read "Removing dependent packages" in the build log.
+  `files/scripts/desktop-intact.sh` (first in the script module) now fails such a build.
 - A distrobox's first start sets it up inside and takes minutes in the VM. Interrupting it (Ctrl+C) leaves
   a box whose `enter` fails with `crun: ptsname: Inappropriate ioctl for device` until `podman stop <box>`.
   Never hide that first start behind `>/dev/null`: `box_first_start` in `lupi` shows it.

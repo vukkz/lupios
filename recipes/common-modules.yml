@@ -35,12 +35,9 @@ modules:
         # and ISO): LupiOS ships its own, and more are one click away in "Get New Wallpapers". Nothing
         # depends on it (checked 2026-10-09).
         - plasma-workspace-wallpapers
-        # Fedora 44's own wallpapers: Fedora branding in the wallpaper settings. Only these four need
-        # each other (checked 2026-10-09); look.sh points the "Default" name they used at ours.
-        - desktop-backgrounds-kde
-        - f44-backgrounds-kde
-        - f44-backgrounds-base
-        - fedora-workstation-backgrounds
+        # NOT Fedora's own wallpapers (desktop-backgrounds-kde, f44-backgrounds-*): kde-settings-plasma
+        # needs what they provide, so dnf also removed plasma-workspace, plasma-desktop and the login
+        # manager with them (2026-10-09, caught by the boot test). desktop-intact.sh now stops such a build.
         # Amazon AWS's Python SDK (~120 MB), only recommended by sos (support reports) to upload to S3
         - python3-boto3
         - python3-botocore
@@ -51,6 +48,7 @@ modules:
 
   - type: script
     scripts:
+      - desktop-intact.sh # first: stops the build if the dnf module took part of the desktop with it
       - branding.sh
       - firewall.sh
       - opensnitch.sh # per-app firewall for `lupi outgoing`, off by default
