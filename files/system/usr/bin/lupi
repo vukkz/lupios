@@ -772,9 +772,16 @@ cmd_search() { # <name>
 }
 
 cmd_update() {
-    local t0
+    local t0 waited=""
     t0=$(date +%s)
     echo "Updating the system, your apps and your boxes. This can take a few minutes..."
+    # rpm-ostree does one job at a time: if the automatic update is already downloading, starting
+    # another fails with "Transaction in progress". Wait for it instead; it's doing the same job.
+    while rpm-ostree status --json 2>/dev/null | jq -e '.transaction != null' >/dev/null; do
+        [[ -n $waited ]] || echo "${D}An automatic update is already running. Waiting for it to finish...${N}"
+        waited=1
+        sleep 5
+    done
     if [[ -e /usr/lib/systemd/system/uupd.service ]]; then
         as_root systemctl start uupd.service # Universal Blue's updater, the same one `ujust update` uses
         as_root journalctl -u uupd.service --since "@$t0" -o cat --no-pager | tail -15
