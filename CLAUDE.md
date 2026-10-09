@@ -124,7 +124,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   "accept anything" default until 2026-10-07. `files/scripts/lab-signature.sh` (a `script@v1` module
   after `signing`) copies the OS rule for the Lab; `registries.d/lupios-lab.yaml` says where its signatures
   are. The Lab is signed by `cosign-installer@v3` (cosign 2: `sha256-<digest>.sig` tags, which podman reads).
-  If Dependabot moves it to v4 (cosign 3, a new signature format), watch the boot test's Lab step.
+  Since 2026-10-09 it's `cosign-installer@v4` (cosign 3), whose default is a new bundle format podman can't
+  find, so `build-lab.yml` signs with `--new-bundle-format=false --use-signing-config=false`. Dependabot PRs
+  never get repo secrets, so their image builds always fail at signing ("Unable to find private/public key pair").
   podman/skopeo check the signature of the **platform image** they pull, never the list around it (and
   `--multi-arch=index-only` copies skip the check entirely: containers/image `copy/single.go`). buildx
   pushes the Lab as a list (amd64 + provenance), so `build-lab.yml` signs with `cosign sign --recursive`.
