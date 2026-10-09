@@ -145,7 +145,11 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   The boot test checks it as a real user (`labtest`, lingering) and downloads the Lab for that (40 GB disk).
 
 ## Open items
-- Owner hasn't reported `flatpak remotes` output or remaining "Fedora" branding yet.
+- Branding sweep in the VM (2026-10-09, read with `VBoxManage controlvm LupiOS keyboardputstring` + screenshots):
+  only the full, unfiltered `flathub` remote (system), no menu or autostart entry mentions Fedora.
+  Biggest packages: qt6-qtwebengine 278M, plasma-workspace-wallpapers 256M (nothing needs it),
+  glibc-all-langpacks 228M, cosign 135M (ublue base; nothing needs it), python3-botocore 118M (only via
+  `sos` → boto3 weak dep), mariadb-server 79M (recommended by akonadi-server-mysql: keep).
 - Fresh install from our ISO with Secure Boot verified in the VM (2026-09-30, again as LupiOS on 2026-10-03:
   installer look, first-boot user, MOK, automatic kargs, `lupi check`, `lupi lab`). Rebuild the ISOs from
   `main` after promoting anything that changes the installer or should reach new installs.

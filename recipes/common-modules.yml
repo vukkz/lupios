@@ -31,6 +31,13 @@ modules:
         # "firefox" is the main package, "firefox-langpacks" is a dependency
         - firefox
         - firefox-langpacks
+        # KDE's wallpaper collection (256 MB, already-compressed pictures, so ~250 MB of every download
+        # and ISO): LupiOS ships its own, and more are one click away in "Get New Wallpapers". Nothing
+        # depends on it (checked 2026-10-09).
+        - plasma-workspace-wallpapers
+        # Amazon AWS's Python SDK (~120 MB), only recommended by sos (support reports) to upload to S3
+        - python3-boto3
+        - python3-botocore
 
   # Firefox and Flatseal (Flatpaks) are installed once on the first start by lupios-default-apps.timer,
   # not by BlueBuild's default-flatpaks: that one re-installs them on every boot (so removing one
