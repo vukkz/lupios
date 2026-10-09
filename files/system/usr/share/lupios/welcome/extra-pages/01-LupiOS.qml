@@ -16,7 +16,7 @@ Welcome.Page {
 
         Repeater {
             model: [
-                ["security-high", "Secure by default", "Firewall, hardened kernel, signed updates and full-disk encryption. Check your score any time: lupi check"],
+                ["security-high", "Secure by default", "Firewall, hardened kernel, signed updates, and full-disk encryption if you chose it when installing. Check your score any time: lupi check"],
                 ["network-wireless", "Networks that know who to trust", "New Wi-Fi networks start as public, so other people there can't see or probe this PC. Mark your home network trusted with one click."],
                 ["input-gaming", "Gaming and security in one OS", "Steam, Heroic and Lutris are one command away, and Game Mode opens what games need only while you play."],
                 ["utilities-terminal", "A hacking lab that stays in its box", "Kali's top tools live in a container, not on your system: lupi lab"],
