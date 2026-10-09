@@ -6,3 +6,4 @@ src/content/docs/install.md
 src/content/docs/security.md
 src/content/docs/dual-boot.md
 src/content/docs/changes.md
+public/.well-known/security.txt

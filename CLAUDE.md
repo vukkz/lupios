@@ -167,9 +167,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - Rechunking (`build_chunked_oci` in build.yml), on stable since 2026-10-08: images ~24% smaller (3.65 GB,
   NVIDIA 4.57 GB). The second NVIDIA build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion,
   when reusing the previous build's layout as baseline), so NVIDIA uses `rechunk_clear_plan`: fine in every
-  build since. Clean day-to-day update (two builds on the same base, 2026-10-08): **132 MB** = rpmdb 78 MB +
-  layer 98 45 MB (a package group that changes every build, cause still unknown) + metadata 10 MB + font
-  caches 0.1 MB. A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
+  build since. Clean day-to-day update (two builds on the same base, 2026-10-08): **132 MB** (NVIDIA 141 MB)
+  = rpmdb 78 MB + layer 98 45 MB + metadata 10 MB + font caches 0.1 MB. Layer 98's culprit (found 2026-10-09
+  by diffing the layer's tar from two builds, objects → hardlinked paths): dnf5's
+  `/usr/lib/sysimage/libdnf5/transaction_history.sqlite` (+ -wal/-shm), now tagged into `rpmdb`. And any change
+  to LupiOS's own files (files/system: no package) re-downloaded the 260 MB last layer with the initramfs
+  (the OS-links commit: 510 MB for NVIDIA), so layers.sh tags them as component `lupios` too.
+  A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
   A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
   times; stored twice) and the fontconfig caches, and rpm-ostree packs those into one ~375 MB "unpackaged
