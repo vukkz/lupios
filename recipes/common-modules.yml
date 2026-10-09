@@ -35,6 +35,12 @@ modules:
         # and ISO): LupiOS ships its own, and more are one click away in "Get New Wallpapers". Nothing
         # depends on it (checked 2026-10-09).
         - plasma-workspace-wallpapers
+        # Fedora 44's own wallpapers: Fedora branding in the wallpaper settings. Only these four need
+        # each other (checked 2026-10-09); look.sh points the "Default" name they used at ours.
+        - desktop-backgrounds-kde
+        - f44-backgrounds-kde
+        - f44-backgrounds-base
+        - fedora-workstation-backgrounds
         # Amazon AWS's Python SDK (~120 MB), only recommended by sos (support reports) to upload to S3
         - python3-boto3
         - python3-botocore
