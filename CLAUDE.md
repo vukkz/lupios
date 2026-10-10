@@ -81,6 +81,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `level sheep|wolf [--yes]`, `net home|public`, `game on|off`: anything else could give a root shell
   (security review 2026-10-07). A new widget/Welcome button that needs root must be added to that list.
 - BlueBuild tags: default branch → `latest`, `44`, date. Other branches → `br-<branch>-44`.
+- GitHub runs scheduled workflows only on the default branch. build.yml's `testing` job (schedule only)
+  starts a testing build with `gh workflow run` (workflow_dispatch is the one event GITHUB_TOKEN may start),
+  so testing also builds daily around 06:00 UTC. Pushing to testing then cancels that build (harmless).
 - ISO: `jasonn3/build-container-installer@v1.5.0`, installer product name = image name, Secure Boot key
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.
   The installer itself runs on Fedora's packages, so `fedora-logos` brands its sidebar as Fedora. Fix:
@@ -195,6 +198,7 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   origin, `lupi check` 8/9 (kargs pending). In the installer's shell (Ctrl+Alt+F2, back with Ctrl+Alt+F6)
   skopeo refused a wrong key and a non-LupiOS image. Anaconda shows no progress while it downloads (the bar
   stands still: the install guide says so). The MOK screen still times out (nobody was at the VM).
+  On SourceForge and the website since 2026-10-10. `flavour=all` builds all three ISOs.
 - Before going public: the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
   no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
@@ -209,6 +213,14 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `/usr/lib/sysimage/libdnf5/transaction_history.sqlite` (+ -wal/-shm), now tagged into `rpmdb`. And any change
   to LupiOS's own files (files/system: no package) re-downloaded the 260 MB last layer with the initramfs
   (the OS-links commit: 510 MB for NVIDIA), so layers.sh tags them as component `lupios` too.
+  2026-10-10, two stable builds on the same base with no LupiOS file change: **87 MB** (NVIDIA 88) = rpmdb
+  77 + metadata 9 + font caches 0.1; the last layer stayed the same. rpm takes install times (and the
+  transaction ID) from `SOURCE_DATE_EPOCH` when it's set (`lib/rpmts.cc`), so common-modules.yml sets it
+  as an `ARG` (visible to RUN steps, not stored in the image; buildah only dates the image itself from its
+  `--source-date-epoch` flag or that variable in its own environment). layers.sh prints a fingerprint of
+  each database dir: if `/usr/share/rpm` comes out the same in two builds on one base, split the rpmdb
+  component (rpmdb / rpmdb-base / dnf-history: dnf5's history has its own clock) for ~10 MB daily updates.
+  That split reshuffles the layout once (~1.3 GB): best done together with the Fedora 45 rebase.
   A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
   A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install

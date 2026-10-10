@@ -33,6 +33,14 @@ component rpmdb /usr/lib/sysimage/rpm-ostree-base-db
 component rpmdb /usr/lib/sysimage/libdnf5
 component fontconfig-cache /usr/lib/fontconfig/cache
 
+# Fingerprints of the package databases, to compare between two builds in their logs: with the same
+# packages and base image, which ones still come out different? (SOURCE_DATE_EPOCH: common-modules.yml)
+for d in /usr/share/rpm /usr/lib/sysimage/rpm /usr/lib/sysimage/rpm-ostree-base-db /usr/lib/sysimage/libdnf5; do
+    [[ -d $d && ! -L $d ]] || continue
+    echo "fingerprint $d: $(find "$d" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-16)"
+done
+echo "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-unset}"
+
 # Every file the files module copied from files/system (CONFIG_DIRECTORY is BlueBuild's files/ folder)
 own=()
 while IFS= read -r -d '' f; do

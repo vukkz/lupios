@@ -57,6 +57,20 @@ jobs:
           # ostree-ext's chunking.rs, October 2026), so it plans its layout from scratch instead.
           rechunk_clear_plan: ${{ matrix.recipe == 'recipe-nvidia.yml' }}
 
+  # GitHub only runs scheduled workflows on the default branch, so without this the testing channel
+  # (br-testing-44) would only get Fedora's security fixes when someone pushes to testing. The daily
+  # run starts a testing build too. workflow_dispatch is the one event GITHUB_TOKEN may start.
+  testing:
+    name: Start the testing build
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run build.yml --repo "$GITHUB_REPOSITORY" --ref testing
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   # Boot the images just pushed in a virtual machine and check them from inside (boot-test.yml).
   # The VM can't use the NVIDIA driver, but everything else in the NVIDIA image (what the owner's own
   # PC runs) is checked the same way. Both run side by side, even when a build failed, so one

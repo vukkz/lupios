@@ -3,6 +3,15 @@
 # Everything LupiOS adds on top of its base image. Shared by every flavour
 # (recipe.yml, recipe-nvidia.yml), so edit here and all of them change.
 modules:
+  # rpm records each package's install time in its database, so the database came out different in
+  # every daily build, and every update downloaded it again (~77 MB) even when no package changed. With
+  # SOURCE_DATE_EPOCH set, rpm records this fixed time instead (2026-01-01; any fixed date works). An
+  # ARG is visible to the steps below but isn't stored in the image, and it doesn't change the image's
+  # own date (buildah only uses its --source-date-epoch flag for that). layers.sh prints fingerprints.
+  - type: containerfile
+    snippets:
+      - ARG SOURCE_DATE_EPOCH=1767225600
+
   - type: files
     files:
       - source: system
