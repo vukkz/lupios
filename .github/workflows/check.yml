@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Shell scripts pass shellcheck
-        run: shellcheck -S warning files/scripts/*.sh files/system/usr/bin/* files/system/usr/libexec/* files/system/etc/profile.d/*.sh files/system/usr/lib/NetworkManager/dispatcher.d/* tests/boot/*.sh
+        run: shellcheck -S warning files/scripts/*.sh files/system/usr/bin/* files/system/usr/libexec/* files/system/etc/profile.d/*.sh files/system/usr/lib/NetworkManager/dispatcher.d/* tests/boot/*.sh iso/anaconda/online/*.sh
 
       # systemd services (lupios-kargs) and NetworkManager's dispatcher (network trust) start lupi
       # with almost no environment: no $HOME, no $USER. With `set -u`, anything at the top of the

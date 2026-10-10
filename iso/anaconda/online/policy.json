@@ -1,0 +1,13 @@
+{
+  "default": [{ "type": "reject" }],
+  "transports": {
+    "docker": {
+      "ghcr.io/vukkz/lupios": [
+        { "type": "sigstoreSigned", "keyPath": "/etc/pki/containers/lupios.pub", "signedIdentity": { "type": "matchRepository" } }
+      ],
+      "ghcr.io/vukkz/lupios-nvidia": [
+        { "type": "sigstoreSigned", "keyPath": "/etc/pki/containers/lupios.pub", "signedIdentity": { "type": "matchRepository" } }
+      ]
+    }
+  }
+}

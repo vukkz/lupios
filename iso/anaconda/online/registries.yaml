@@ -1,0 +1,6 @@
+# The online installer: LupiOS's signatures are stored on GHCR next to the images (cosign's format).
+docker:
+  ghcr.io/vukkz/lupios:
+    use-sigstore-attachments: true
+  ghcr.io/vukkz/lupios-nvidia:
+    use-sigstore-attachments: true

@@ -24,7 +24,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `files/system/`: copied to `/` verbatim. `files/scripts/`: run once at build time.
 - `files/system/usr/bin/lupi`: the control tool (bash; sections: net, game, setup, level, usbguard, kargs,
   terminal toggles, lab, software, channel, state). Runs as root via `pkexec` from the widget and Welcome.
-- `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run).
+- `lab/Containerfile` + `build-lab.yml`: the Kali Lab image. `build-iso.yml`: installer ISOs (manual run):
+  `lupios[-nvidia].iso` hold the whole OS, `lupios-online.iso` downloads it during setup.
 - `boot-test.yml` (called by `build.yml` after every build for both flavours, or run by hand for any image) + `tests/boot/`:
   `bootc install to-disk --via-loopback` makes a disk from the image, QEMU/KVM boots it, and `checks.sh`
   runs inside as root and prints `LUPIOS-CI` lines to the serial console. The checks reach the VM as systemd
@@ -35,7 +36,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   flips the level, network trust and Game Mode the way the widget does (`PKEXEC_UID` set): change a
   setting and its check together. `lab-signature.sh` runs in a plain container of the image on the
   runner (no VM): the image's podman must accept the signed Lab, and refuse it under another key.
-  `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs).
+  `iso/anaconda/`: the installer's LupiOS look (stylesheet, Lorax template, generated SVGs), and the
+  online installer (`lupios-online.tmpl` + `online/`).
 - `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
   `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
   The logo is the owner's design (2026-10-06), traced to outlines in `art/logo/lupios-{mark,wordmark}.svg`:
@@ -85,6 +87,25 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `iso/anaconda/lupios-look.tmpl`, passed as `additional_templates` (absolute path: the builder mounts
   the repo at `/github/workspace`), overwrites `/usr/share/anaconda/pixmaps/{sidebar-logo,sidebar-bg,
   topbar-bg}.png` and every `*.css` there. So build-iso.yml must check out the repo and render the PNGs first.
+  Additional templates run after the builder's own, with its template vars (`image_repo`, `image_tag`, ...).
+  The builder's kickstart is `/usr/share/anaconda/interactive-defaults.ks` in the installer: `ostreecontainer
+  --url=/run/install/repo/<image> --transport=oci`, then `%include`s of its post scripts (`bootc switch
+  --mutate-in-place --enforce-container-sigpolicy` to the registry image; MOK enrollment from the ISO's
+  `sb_pubkey.der`). The image sits on the ISO in `/<image name>` (an OCI layout of the registry's blobs, so the
+  first update after an install only downloads what changed). Its `make_target` input exists, but files built
+  inside its container are lost unless they're under `/github/workspace`.
+- The online ISO (2026-10-10): `lupios-online.tmpl` replaces the `ostreecontainer` line with `%include
+  /tmp/lupios-source.ks`, which `online/pick-image.sh` writes in `%pre` (Anaconda runs `%pre` from
+  interactive-defaults.ks too: `startup_utils.find_kickstart` → `run_pre_scripts`). build-iso.yml then removes
+  `/lupios` from the ISO with xorriso. Facts this rests on, all from the source:
+  - Fedora's KDE profile (Kinoite's base) hides `NetworkSpoke PasswordSpoke UserSpoke`, so the full ISOs have no
+    Wi-Fi screen. `/etc/anaconda/conf.d/` is read after the profile (`anaconda.py`), so a file there wins.
+  - `ostree container image deploy` (what Anaconda runs) no longer verifies signatures unless given
+    `--enforce-container-sigpolicy`, which Anaconda never passes (`--no-signature-verification` is a no-op).
+    The image proxy still applies `/etc/containers/policy.json`, so the online installer carries LupiOS's
+    policy (default reject), key and registries.d, and only a LupiOS-signed image installs.
+  - Universal Blue's `-nvidia` images use `akmods-nvidia-open`: NVIDIA's open kernel module, Turing (GTX 16xx,
+    RTX 20xx) and newer only, PCI device IDs from 0x1e00. Older NVIDIA cards belong on `lupios` (nouveau).
 - systemd services (`lupios-kargs.service`) and NetworkManager's dispatcher (`lupi _classify`) run `lupi`
   without `$HOME`/`$USER`; with `set -u`, a bare `$HOME` at the top level killed both silently for 3 days.
   The check workflow now runs `env -i ... lupi help`. Inside functions only users reach, `$HOME` is fine.
@@ -168,7 +189,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - ISOs are on SourceForge since 2026-10-08 (https://sourceforge.net/projects/lupios/files): `build-iso.yml` with
   `channel: stable` uploads `lupios[-nvidia].iso` + `-CHECKSUM` over rsync (secret `SF_SSH_KEY`, variable
   `SF_USER`=vukkz, host key pinned), replacing the previous files, so download links never change. First
-  upload: 4.9 GB and 5.8 GB. Update the sizes in `website/src/downloads.ts` when they change a lot.
+  upload: 4.9 GB and 5.8 GB; 2026-10-09: 4.59 and 5.50 GB (the installer itself is ~1.2 GB of that). Update
+  the sizes in `website/src/downloads.ts` when they change a lot. `lupios-online.iso` (~1.2 GB): built on
+  testing 2026-10-10, not yet tested in the VM, on SourceForge or on the website.
 - Before going public: the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
   no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.

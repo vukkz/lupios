@@ -1,0 +1,20 @@
+## Lorax template for lupios-online.iso only (build-iso.yml adds it after lupios-look.tmpl).
+## The online ISO carries no copy of LupiOS: the installer picks the version for the PC and
+## downloads it from GHCR during setup, checking LupiOS's signature. Files: iso/anaconda/online.
+## ${root} is the installer's file system. The repo is mounted at /github/workspace.
+<%page args="root, image_repo, image_tag"/>
+<% src = "/github/workspace/iso/anaconda/online" %>
+runcmd install -Dm755 ${src}/pick-image.sh ${root}/usr/libexec/lupios-pick-image
+## Signatures: the same rule and key an installed LupiOS has, for both versions
+runcmd install -Dm644 ${src}/policy.json ${root}/etc/containers/policy.json
+runcmd install -Dm644 ${src}/registries.yaml ${root}/etc/containers/registries.d/lupios.yaml
+runcmd install -Dm644 /github/workspace/cosign.pub ${root}/etc/pki/containers/lupios.pub
+## Show the Network & Host Name screen (Wi-Fi), which Fedora's KDE profile hides
+runcmd install -Dm644 ${src}/anaconda.conf ${root}/etc/anaconda/conf.d/90-lupios-online.conf
+## The builder's kickstart installs the copy on the ISO, then switches to a fixed image name.
+## Swap both for what pick-image.sh writes before setup starts (%pre).
+replace "^ostreecontainer .*" "%include /tmp/lupios-source.ks" usr/share/anaconda/interactive-defaults.ks
+replace "^%include /usr/share/anaconda/post-scripts/install_configure_upgrades.ks" "# (online ISO: the switch is in /tmp/lupios-source.ks)" usr/share/anaconda/interactive-defaults.ks
+append usr/share/anaconda/interactive-defaults.ks "%pre --erroronfail"
+append usr/share/anaconda/interactive-defaults.ks "/usr/libexec/lupios-pick-image ${image_repo} ${image_tag}"
+append usr/share/anaconda/interactive-defaults.ks "%end"

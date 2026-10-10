@@ -10,6 +10,8 @@ on:
       - "website/**"
       - ".github/workflows/website.yml"
       - ".github/ISSUE_TEMPLATE/**"
+      - "iso/**" # the installer's look and the online installer: build-iso.yml, not the image
+      - ".github/workflows/build-iso.yml"
 
   pull_request:
   workflow_dispatch: # allow manually triggering builds
