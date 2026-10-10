@@ -42,8 +42,8 @@ Both are the same LupiOS. The only difference is the graphics driver.
 
 | Image | For |
 |---|---|
-| `ghcr.io/vukkz/lupios` | AMD or Intel graphics, and virtual machines |
-| `ghcr.io/vukkz/lupios-nvidia` | NVIDIA graphics (GeForce/RTX). If Secure Boot is on, run `ujust enroll-secure-boot-key` after installing and reboot, or the NVIDIA driver isn't allowed to load |
+| `ghcr.io/vukkz/lupios` | AMD or Intel graphics, NVIDIA cards older than the GTX 16 series (GTX 10xx and before), and virtual machines |
+| `ghcr.io/vukkz/lupios-nvidia` | NVIDIA GeForce GTX 16xx, RTX 20xx and newer: its driver is NVIDIA's open kernel module, which doesn't support older cards. If Secure Boot is on, run `ujust enroll-secure-boot-key` after installing and reboot, or the NVIDIA driver isn't allowed to load |
 
 In the commands below, use `lupios-nvidia` instead of `lupios` if you have NVIDIA.
 

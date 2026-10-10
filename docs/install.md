@@ -20,10 +20,15 @@ About 30 minutes, most of it waiting. Read it once all the way through before yo
 
 | Your graphics card | ISO |
 |---|---|
-| NVIDIA (GeForce, RTX, GTX) | `lupios-nvidia.iso` |
+| NVIDIA GeForce **GTX 16xx, RTX 20xx or newer** (2018 on) | `lupios-nvidia.iso` |
 | AMD, Intel, or a virtual machine | `lupios.iso` |
+| Older NVIDIA: **GTX 10xx** (like the GTX 1060) **and before** | `lupios.iso` |
 
 On Windows, you can check your graphics card in Task Manager → Performance → GPU.
+
+Why older NVIDIA cards get `lupios.iso`: the NVIDIA version uses NVIDIA's open driver, which only
+supports cards from the GTX 16 series on. On `lupios.iso`, older cards run on nouveau, the
+open-source driver built into Linux: fine for the desktop and video, but much slower in games.
 
 ## 2. Put it on the USB stick
 

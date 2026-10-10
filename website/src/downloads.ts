@@ -8,8 +8,8 @@ export const downloads = {
 };
 
 export const isos = [
-  { file: "lupios.iso", name: "LupiOS", for: "AMD or Intel graphics, and virtual machines", size: "4.9 GB" },
-  { file: "lupios-nvidia.iso", name: "LupiOS for NVIDIA", for: "NVIDIA graphics: GeForce, RTX, GTX", size: "5.8 GB" },
+  { file: "lupios.iso", name: "LupiOS", for: "AMD or Intel graphics, older NVIDIA cards (GTX 10xx and before), and virtual machines", size: "4.6 GB" },
+  { file: "lupios-nvidia.iso", name: "LupiOS for NVIDIA", for: "NVIDIA GeForce GTX 16xx, RTX 20xx and newer", size: "5.5 GB" },
 ];
 
 export const fileUrl = (file: string) => `${downloads.base}/${file}/download`;

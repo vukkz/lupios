@@ -15,7 +15,8 @@ at the top of the [install guide](install.md); do these steps around it.
    the firmware's boot menu and leaves Windows' disks locked.
 4. **Find your boot menu key**: search for your motherboard or PC model and "boot menu key"
    (often F12, F11 or F8).
-5. **Note your graphics card**: Task Manager → Performance → GPU. NVIDIA means `lupios-nvidia.iso`.
+5. **Note your graphics card**: Task Manager → Performance → GPU. An NVIDIA GTX 16xx, RTX 20xx or
+   newer means `lupios-nvidia.iso`; anything else, including older NVIDIA cards, `lupios.iso`.
 
 ## Install
 

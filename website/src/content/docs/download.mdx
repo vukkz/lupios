@@ -7,7 +7,9 @@ import { LinkCard } from "@astrojs/starlight/components";
 import Downloads from "../../components/Downloads.astro";
 
 Both downloads are the same LupiOS. The only difference is the graphics driver: pick the NVIDIA one
-if your PC has an NVIDIA card. On Windows, Task Manager → Performance → GPU tells you which card you have.
+if your PC has an NVIDIA GeForce GTX 16xx, RTX 20xx or newer. Older NVIDIA cards (GTX 10xx and before)
+use the regular one, because NVIDIA's open driver doesn't support them. On Windows, Task Manager →
+Performance → GPU tells you which card you have.
 
 <Downloads />
 
