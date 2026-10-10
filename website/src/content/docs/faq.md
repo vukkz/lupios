@@ -28,13 +28,17 @@ tools with it in the [Lupi Lab](../lupi/#hacking-lab), a container you open with
 tools never touch your system. For malware samples or anything untrusted, use a separate virtual
 machine.
 
-## Why is the download 6 GB? Arch's is under 2.
+## Why is the download 5 GB? Arch's is under 2.
 
-The LupiOS ISO holds the **whole finished system**: the KDE desktop, drivers, codecs, firmware and
-the LupiOS changes. The installer copies it onto your disk in one go, without needing the internet.
+The full LupiOS ISO holds the **whole finished system**: the KDE desktop, drivers, codecs, firmware
+and the LupiOS changes, plus the installer itself (about 1.2 GB). The installer copies the system
+onto your disk in one go, without needing the internet. The NVIDIA version is bigger because it
+includes the NVIDIA driver.
+
 Arch's ISO is a small starter system that downloads most of the system while you install, so the ISO
-is only part of what you end up downloading. LupiOS does it all up front. The NVIDIA version is
-bigger because it includes the NVIDIA driver.
+is only part of what you end up downloading. LupiOS has that too: **LupiOS Online** is 1.2 GB and
+downloads the system during setup (about 3.5 GB, checked against LupiOS's signature). The total is
+about the same; it just needs internet while installing.
 
 ## Why does it ask for a password on the first boot?
 

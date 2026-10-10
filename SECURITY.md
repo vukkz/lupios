@@ -33,6 +33,7 @@ You trust every source below, so here they all are:
 | Apps (Firefox, Flatseal, `lupi install`) | Flathub | Flathub's signature; they run in Flatpak's sandbox |
 | The Lupi Lab | Kali Linux's image and repositories, rebuilt weekly by LupiOS | LupiOS's signature on the image (podman checks it), Kali's package signatures |
 | Command-line tools (`lupi install`) | Arch Linux's repositories | Arch's package signatures |
+| The installer ISOs | Built by LupiOS's GitHub Actions, hosted on SourceForge | The SHA-256 checksum next to each ISO: compare it yourself. It proves the download isn't damaged, not who made it (it's on SourceForge too). `lupios-online.iso` also checks LupiOS's signature on the system it downloads, and refuses anything else |
 
 ## Firewall: `files/system/usr/lib/firewalld/zones/lupios.xml`
 

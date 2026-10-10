@@ -190,8 +190,11 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `channel: stable` uploads `lupios[-nvidia].iso` + `-CHECKSUM` over rsync (secret `SF_SSH_KEY`, variable
   `SF_USER`=vukkz, host key pinned), replacing the previous files, so download links never change. First
   upload: 4.9 GB and 5.8 GB; 2026-10-09: 4.59 and 5.50 GB (the installer itself is ~1.2 GB of that). Update
-  the sizes in `website/src/downloads.ts` when they change a lot. `lupios-online.iso` (~1.2 GB): built on
-  testing 2026-10-10, not yet tested in the VM, on SourceForge or on the website.
+  the sizes in `website/src/downloads.ts` when they change a lot. `lupios-online.iso` (1.22 GB): installed in the
+  VM 2026-10-10 (VM `LupiOS-online`): picked `lupios`, downloaded 3.5 GB in ~13 min, `ostree-image-signed`
+  origin, `lupi check` 8/9 (kargs pending). In the installer's shell (Ctrl+Alt+F2, back with Ctrl+Alt+F6)
+  skopeo refused a wrong key and a non-LupiOS image. Anaconda shows no progress while it downloads (the bar
+  stands still: the install guide says so). The MOK screen still times out (nobody was at the VM).
 - Before going public: the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
   no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
