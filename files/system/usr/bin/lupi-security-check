@@ -26,14 +26,27 @@ status_json=$(rpm-ostree status --json 2>/dev/null || echo '{}')
 booted() { jq -r ".deployments[]? | select(.booted) | $1 // empty" <<<"$status_json"; }
 
 # --- Updates are signed -------------------------------------------------------
+# "ostree-image-signed" only says to ask the policy file, so check that the policy really requires a
+# signature for this image, and that its key is still the one LupiOS shipped (/usr/etc holds the image's
+# original /etc).
 image_ref=$(booted '."container-image-reference"')
-if [[ $image_ref == ostree-image-signed:* ]]; then
-    pass "Signed image" "updates are verified with the LupiOS signing key"
-else
+# strip the transport ("ostree-unverified-registry:" etc.) to get e.g. ghcr.io/vukkz/lupios-nvidia:latest
+image=$(sed -E 's#^[^:]+:(docker://)?##' <<<"$image_ref")
+repo=${image%%@*}
+repo=${repo%:*}
+rule=$(jq -c --arg r "$repo" '.transports.docker[$r][0] // empty' /etc/containers/policy.json 2>/dev/null)
+key=$(jq -r '.keyPath // empty' <<<"${rule:-null}" 2>/dev/null)
+if [[ $image_ref != ostree-image-signed:* ]]; then
     fail "Signed image" "${image_ref:-unknown}"
-    # strip the transport ("ostree-unverified-registry:" etc.) to get e.g. ghcr.io/vukkz/lupios-nvidia:latest
-    image=$(sed -E 's#^[^:]+:(docker://)?##' <<<"$image_ref")
     hint "sudo rpm-ostree rebase ostree-image-signed:docker://${image:-ghcr.io/vukkz/lupios:latest}"
+elif [[ $(jq -r '.type // empty' <<<"${rule:-null}" 2>/dev/null) != sigstoreSigned ]]; then
+    fail "Signed image" "/etc/containers/policy.json doesn't require a signature for $repo"
+    hint "compare it with LupiOS's: diff /usr/etc/containers/policy.json /etc/containers/policy.json"
+elif [[ $key == /etc/* && -e /usr$key ]] && ! cmp -s "$key" "/usr$key"; then
+    fail "Signed image" "the signing key $key isn't LupiOS's any more"
+    hint "restore it: sudo cp /usr$key $key"
+else
+    pass "Signed image" "updates are verified with the LupiOS signing key"
 fi
 
 # --- SELinux ------------------------------------------------------------------
@@ -67,16 +80,29 @@ else
 fi
 
 # --- Firewall -------------------------------------------------------------------
+# The default zone covers networks without a zone of their own. A connection can have its own (lupi net
+# sets lupios or lupios-public), and one set to e.g. "trusted" lets everything in, whatever the default.
+closed() { [[ $1 == lupios || $1 == lupios-public || $1 == block || $1 == drop ]]; }
 if systemctl is-active --quiet firewalld; then
     zone=$(sed -n 's/^DefaultZone=//p' /etc/firewalld/firewalld.conf 2>/dev/null)
     [[ -n $zone ]] || zone=$(firewall-cmd --get-default-zone 2>/dev/null)
-    case $zone in
-        lupios | block | drop) pass "Firewall" "on, incoming blocked (zone: $zone)" ;;
-        *)
-            fail "Firewall" "on, but zone '${zone:-unknown}' lets more traffic in"
-            hint "sudo firewall-cmd --set-default-zone=lupios"
-            ;;
-    esac
+    open_con="" open_zone=""
+    while IFS=: read -r uuid type _; do
+        [[ $type == 802-11-wireless || $type == 802-3-ethernet ]] || continue
+        con_zone=$(nmcli -g connection.zone connection show "$uuid" 2>/dev/null)
+        if [[ -n $con_zone ]] && ! closed "$con_zone"; then
+            open_con=$(nmcli -g connection.id connection show "$uuid" 2>/dev/null) open_zone=$con_zone
+        fi
+    done < <(nmcli -t -f UUID,TYPE,DEVICE connection show --active 2>/dev/null)
+    if ! closed "$zone"; then
+        fail "Firewall" "on, but the default zone '${zone:-unknown}' lets more traffic in"
+        hint "sudo firewall-cmd --set-default-zone=lupios"
+    elif [[ -n $open_zone ]]; then
+        fail "Firewall" "on, but network '$open_con' uses zone '$open_zone', which lets more traffic in"
+        hint "lupi net home (or lupi net public)"
+    else
+        pass "Firewall" "on, incoming blocked (zone: $zone)"
+    fi
 else
     fail "Firewall" "firewalld is not running"
     hint "sudo systemctl enable --now firewalld"

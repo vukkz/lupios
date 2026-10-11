@@ -50,3 +50,20 @@ done < <(find "$CONFIG_DIRECTORY/system" -type f ! -name .gitkeep -print0)
 ((${#own[@]})) || { echo "No LupiOS files found under $CONFIG_DIRECTORY/system" >&2; exit 1; }
 tag lupios "${own[@]}"
 echo "lupios: ${#own[@]} files from files/system"
+
+# What's in the boot image (initramfs): it always rides in the last, 260 MB layer, which every kernel
+# update downloads again. Sizes are uncompressed, but firmware is stored compressed (.xz) and stays as
+# big. Grouped by firmware vendor and driver type, then the biggest single files.
+img=$(find /usr/lib/modules -mindepth 2 -maxdepth 2 -name initramfs.img | head -1)
+if [[ -n $img ]] && command -v lsinitrd >/dev/null; then
+    echo "boot image: $(du -h "$img" | cut -f1) ($img)"
+    listing=$(lsinitrd "$img" 2>/dev/null | awk '$1 ~ /^-/ && $5 ~ /^[0-9]+$/ {print $5, $NF}')
+    awk '{
+        n = split($2, p, "/"); key = p[1] "/" p[2] "/" p[3]
+        if ($2 ~ /^usr\/lib\/firmware\//) key = "firmware/" p[4]
+        else for (i = 1; i < n; i++) if (p[i] == "drivers" || (p[i] == "kernel" && p[i + 1] != "drivers")) { key = p[i] "/" p[i + 1]; break }
+        s[key] += $1
+    } END { for (k in s) printf "  %7.1f MB  %s\n", s[k] / 1e6, k }' <<<"$listing" | sort -rn | head -15
+    echo "  biggest files:"
+    sort -rn <<<"$listing" | head -10 | awk '{printf "  %7.1f MB  %s\n", $1 / 1e6, $2}'
+fi

@@ -78,6 +78,9 @@ policy=/etc/containers/policy.json
 check "OS updates must be signed by LupiOS" jq -e \
     '[.transports.docker | to_entries[] | select(.key | test("^ghcr.io/vukkz/lupios(-nvidia)?$")) | .value[0].type] == ["sigstoreSigned"]' "$policy"
 check "Lab images must be signed by LupiOS" jq -e '.transports.docker["ghcr.io/vukkz/lupios-lab"][0].type == "sigstoreSigned"' "$policy"
+# lupi check compares the signing key with the image's original under /usr/etc (/etc's pristine copy)
+os_key=$(jq -r '[.transports.docker | to_entries[] | select(.key | test("^ghcr.io/vukkz/lupios(-nvidia)?$")) | .value[0].keyPath][0]' "$policy")
+check "lupi check can compare the signing key with LupiOS's original" cmp -s "$os_key" "/usr$os_key"
 update_timers() { # the automatic-update timers that are running, on one line
     local t on=()
     for t in uupd.timer ublue-update.timer rpm-ostreed-automatic.timer flatpak-system-update.timer; do
