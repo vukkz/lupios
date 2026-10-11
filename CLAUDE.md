@@ -202,7 +202,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - Before going public: the Fedora 45 rebase. Fedora 45 final is due 2026-10-20 (fallback 10-27). On 2026-10-07:
   no `ublue-os/kinoite-main:45` (nor `beta`) yet, and their 44 base was last rebuilt on 10-02; Fedora's own
   `quay.io/fedora-ostree-desktops/kinoite:45` exists; COPR `atim/starship` already builds for fedora-45.
-  When ublue's 45 appears: `image-version: 45` on `testing`, and the boot test shows what broke.
+  When ublue's 45 appears: `image-version: 45` on `testing`, and the boot test shows what broke. In the
+  same change: layers.sh's `dnf-history` component (see Rechunking below).
   The website is live since 2026-10-03, the boot test runs since 2026-10-07.
 - Rechunking (`build_chunked_oci` in build.yml), on stable since 2026-10-08: images ~24% smaller (3.65 GB,
   NVIDIA 4.57 GB). The second NVIDIA build crashed inside rpm-ostree (ostree-ext chunking.rs:423 assertion,
@@ -218,9 +219,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   transaction ID) from `SOURCE_DATE_EPOCH` when it's set (`lib/rpmts.cc`), so common-modules.yml sets it
   as an `ARG` (visible to RUN steps, not stored in the image; buildah only dates the image itself from its
   `--source-date-epoch` flag or that variable in its own environment). layers.sh prints a fingerprint of
-  each database dir: if `/usr/share/rpm` comes out the same in two builds on one base, split the rpmdb
-  component (rpmdb / rpmdb-base / dnf-history: dnf5's history has its own clock) for ~10 MB daily updates.
-  That split reshuffles the layout once (~1.3 GB): best done together with the Fedora 45 rebase.
+  each database dir. Verified 2026-10-10 (two testing builds of 4f5085d on one base): `/usr/share/rpm` and
+  `rpm-ostree-base-db` come out identical; only `/usr/lib/sysimage/libdnf5` (dnf5's history, its own clock)
+  differs, and it shares the rpmdb layer, so updates stay 87 MB. The image's own date stays the real build
+  time. One-time cost of the change: 347 MB (NVIDIA 439): dracut uses the date too, so the last layer changed
+  once. On stable since 2026-10-11. Next, **with the Fedora 45 rebase** (which re-downloads everything anyway,
+  so the layout reshuffle is free then): give libdnf5 its own component (`dnf-history`) → ~10 MB updates.
   A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
   A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
