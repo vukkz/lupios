@@ -131,6 +131,9 @@ for m in dccp sctp rds tipc n-hdlc ax25 netrom x25 rose decnet econet af_802154 
 done
 if [[ -z $loaded ]]; then ok "rare protocols, FireWire, vivid and old filesystems can't load"; else bad "these loaded:$loaded"; fi
 check "Mac drives, discs and exFAT still work" modprobe -a hfsplus udf exfat
+# dracut.conf.d/90-lupios-no-nouveau.conf: ~106 MB of nouveau's firmware left out of every kernel update
+check "the boot image leaves out nouveau and its firmware" \
+    bash -c 'l=$(lsinitrd "/usr/lib/modules/$(uname -r)/initramfs.img") && ! grep -E "drm/nouveau/|firmware/nvidia/[a-z]+[0-9]+/gsp/" <<<"$l"'
 
 # --- Network privacy ---------------------------------------------------------------------------
 nm_config=$(NetworkManager --print-config 2>&1)

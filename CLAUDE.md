@@ -53,6 +53,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:
   `git add --chmod=+x`, and list them in `files/scripts/fix-permissions.sh`.
 - Shell: `set -euo pipefail`, must pass `shellcheck -S warning`. Comments explain *why*, briefly.
+  Under pipefail, `producer | head -n` fails once the producer has more to write (SIGPIPE, exit 141): that
+  failed both image builds on 2026-10-11 (layers.sh). Use `awk 'NR <= n'`, or `find ... -print -quit`.
 - Outside GitHub Actions are pinned to a commit SHA with the exact version as a comment
   (`uses: owner/action@<sha> # v1.2.3`); Dependabot updates both. Never use a bare `@v7` tag: the builds
   hold SIGNING_SECRET and SF_SSH_KEY. Get a tag's commit with `gh api repos/<o>/<r>/git/ref/tags/<tag>`
@@ -226,6 +228,12 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   once. On stable since 2026-10-11. Next, **with the Fedora 45 rebase** (which re-downloads everything anyway,
   so the layout reshuffle is free then): give libdnf5 its own component (`dnf-history`) → ~10 MB updates.
   A new ublue base (Fedora updates, kernel) adds those packages and the 260 MB last layer.
+  What fills the boot image (layers.sh prints it; 2026-10-11): lupios 229 MB = nouveau's NVIDIA GSP firmware
+  106 MB (ga102/tu102 × r535/r570), amdgpu firmware 27, Intel microcode 17, the rest ~80; lupios-nvidia
+  316 MB adds NVIDIA's own firmware (615.x, 117 MB) for early nvidia.ko. nouveau is off in lupios-nvidia and
+  only useful in lupios for Turing+ cards (which belong on lupios-nvidia), so
+  `dracut.conf.d/90-lupios-no-nouveau.conf` omits nouveau and nova_core/nova_drm (same firmware); the boot
+  test checks with lsinitrd. Each kept deployment also stores its initramfs in /boot (1-2 GB).
   A file-by-file comparison of two no-change builds (2026-10-07) showed the initramfs is identical
   (BlueBuild runs `dracut --reproducible`). What changes every build is the rpm database (it records install
   times; stored twice) and the fontconfig caches, and rpm-ostree packs those into one ~375 MB "unpackaged
