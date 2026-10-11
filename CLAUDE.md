@@ -194,7 +194,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - ISOs are on SourceForge since 2026-10-08 (https://sourceforge.net/projects/lupios/files): `build-iso.yml` with
   `channel: stable` uploads `lupios[-nvidia].iso` + `-CHECKSUM` over rsync (secret `SF_SSH_KEY`, variable
   `SF_USER`=vukkz, host key pinned), replacing the previous files, so download links never change. First
-  upload: 4.9 GB and 5.8 GB; 2026-10-09: 4.59 and 5.50 GB (the installer itself is ~1.2 GB of that). Update
+  upload: 4.9 GB and 5.8 GB; 2026-10-09: 4.59 and 5.50 GB (the installer itself is ~1.2 GB of that);
+  2026-10-11: 4.48 and 5.39 GB (nouveau out of the boot image). Update
   the sizes in `website/src/downloads.ts` when they change a lot. `lupios-online.iso` (1.22 GB): installed in the
   VM 2026-10-10 (VM `LupiOS-online`): picked `lupios`, downloaded 3.5 GB in ~13 min, `ostree-image-signed`
   origin, `lupi check` 8/9 (kargs pending). In the installer's shell (Ctrl+Alt+F2, back with Ctrl+Alt+F6)
