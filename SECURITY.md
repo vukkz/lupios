@@ -35,6 +35,21 @@ You trust every source below, so here they all are:
 | Command-line tools (`lupi install`) | Arch Linux's repositories | Arch's package signatures |
 | The installer ISOs | Built by LupiOS's GitHub Actions, hosted on SourceForge | The SHA-256 checksum next to each ISO: compare it yourself. It proves the download isn't damaged, not who made it (it's on SourceForge too). `lupios-online.iso` also checks LupiOS's signature on the system it downloads, and refuses anything else |
 
+### If the signing key ever leaks
+
+The private half of the signing key is a GitHub Actions secret: only LupiOS's own builds can read it.
+A leaked key alone can't push you anything, because an update also has to come from LupiOS's registry
+on GitHub, which takes the project's account. If the key ever leaks anyway:
+
+1. A new key pair is made.
+2. One transition update, still signed with the old key, makes every install trust the new key
+   instead. Every update after it is signed with the new key, and the old key is worthless.
+3. The leak is announced on GitHub and on the website, with the new key's fingerprint. A PC that was
+   off the whole time should update before anything else.
+
+Until that transition update, someone holding the old key *and* able to serve updates from the
+registry could sign a bad one, so a leak is handled as an emergency.
+
 ## Firewall: `files/system/usr/lib/firewalld/zones/lupios.xml`
 
 The default zone is `lupios`: **all incoming connections are blocked** except DHCPv6

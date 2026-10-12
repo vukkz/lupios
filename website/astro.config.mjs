@@ -19,6 +19,14 @@ export default defineConfig({
         replacesTitle: true,
       },
       favicon: "/favicon.svg",
+      // The picture a shared link shows (Reddit, Discord, X...): made by scripts/og-image.mjs
+      head: [
+        ["og:image", "https://lupios.org/og.png"],
+        ["og:image:width", "1200"],
+        ["og:image:height", "630"],
+        ["og:image:alt", "The LupiOS logo above night mountains"],
+      ].map(([property, content]) => ({ tag: "meta", attrs: { property, content } }))
+        .concat({ tag: "meta", attrs: { name: "twitter:image", content: "https://lupios.org/og.png" } }),
       social: [{ icon: "github", label: "GitHub", href: repo }],
       customCss: ["./src/styles/lupios.css"],
       editLink: { baseUrl: `${repo}/edit/main/website/` },

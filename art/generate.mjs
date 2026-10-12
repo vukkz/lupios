@@ -301,6 +301,36 @@ writeFileSync(`${WEB}/hero-day.svg`, heroMountains({
   ],
 }));
 
+// The picture a shared link shows (og:image, 1200x630; also the repo's social preview). The website
+// build turns it into og.png (website/scripts/og-image.mjs). Shapes only, no text: it renders the same
+// everywhere, and the page title and description appear under the picture anyway.
+{
+  const W = 1200, H = 630, rand = rng(1312), sr = rng(77);
+  const stars = Array.from({ length: 70 }, () => {
+    const r = (sr() < 0.08 ? 1.8 : 0.7 + sr() * 0.8).toFixed(1);
+    return `<circle cx="${Math.round(sr() * W)}" cy="${Math.round(sr() * H * 0.5)}" r="${r}" fill="${C.text}" opacity="${(0.2 + sr() * 0.5).toFixed(2)}"/>`;
+  }).join("");
+  const ridges = [
+    { baseY: 520, amp: 150, peaks: 4, fill: "#12243A", snow: 0.3 },
+    { baseY: 580, amp: 110, peaks: 6, fill: "#0E1C2E", snow: 0.18 },
+    { baseY: 625, amp: 60, peaks: 8, fill: C.night, snow: 0.12 },
+  ].map((l) => {
+    const top = ridge(rand, { ...l, W });
+    return `${poly([...top, [W, H], [0, H]], l.fill)}<polyline points="${top.map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ice}" stroke-width="2" opacity="${l.snow}"/>`;
+  }).join("\n  ");
+  // The mark and the name side by side, centred above the mountains
+  const markW = 170, gap = 44, wordW = 430, x0 = (W - markW - gap - wordW) / 2, cy = 235;
+  writeFileSync(`${WEB}/og.svg`, svg(W, H, `<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.night}"/><stop offset="1" stop-color="#10233A"/></linearGradient>
+    ${glowFilter("og-glow", 14)}
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#sky)"/>
+  ${stars}
+  ${ridges}
+  ${glowing(MARK, { x: x0, y: cy - heightAt(MARK, markW) / 2, width: markW, fill: C.ice }, { id: "og-glow", opacity: 0.55 })}
+  ${place(WORD, { x: x0 + markW + gap, y: cy - heightAt(WORD, wordW) / 2, width: wordW, fill: C.frost })}`));
+}
+
 // ---- Preview page: open art/preview.html in a browser to check everything at once -------
 const uri = (f, dir = OUT) => `data:image/svg+xml;base64,${Buffer.from(readFileSync(`${dir}/${f}`)).toString("base64")}`;
 const logo = uri("lupios-logo.svg"), small = uri("lupios-logo-small.svg");

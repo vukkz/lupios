@@ -65,8 +65,9 @@ Proton. Games whose anti-cheat refuses Linux don't run on any Linux, LupiOS incl
 ## How do updates work?
 
 LupiOS updates itself in the background, and the new version starts at your next restart. If an
-update ever breaks something, choose the **second entry** in the boot menu: that's the previous
-version, exactly as it was. `lupi update` updates the system, apps and boxes right away (the new
+update ever breaks something, restart and press **Esc** as the PC starts to show the boot menu, then
+choose the **second entry**: that's the previous version, exactly as it was. `sudo rpm-ostree rollback`
+keeps it ([step by step](../install/#if-something-goes-wrong)). `lupi update` updates the system, apps and boxes right away (the new
 system version still starts at the next restart).
 
 ## Can I keep Windows?

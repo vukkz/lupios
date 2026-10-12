@@ -13,6 +13,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   rechunking), then the **Boot test** job (~15 min). Only promote a `testing` build whose boot test passed.
 - **Don't push to a branch while a build on that branch is running:** `build.yml` cancels in-progress
   builds on the same ref (`cancel-in-progress`), which also breaks anything waiting for that build.
+- A ruleset ("Protect main and testing", 2026-10-11) blocks force-pushes and deleting either branch, so
+  every push must be a fast-forward (promoting `testing:main` always is). Questions go to Discussions (Q&A).
 - A new branch created identical to another skips `paths-ignore` workflows. Start it with
   `gh workflow run build.yml --ref <branch>`.
 - The `gh` token lacks the `workflow` scope: merging a PR that touches `.github/workflows/*` fails once the
@@ -47,7 +49,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://lupios.org (GitHub Pages custom domain: DNS at Cloudflare, records DNS-only, HTTPS enforced; vukkz.github.io/lupios redirects there).
   `scripts/sync.mjs` copies `SECURITY.md`, `docs/install.md` and `docs/dual-boot.md` in before every build (the copies are
   git-ignored), so those files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
-  Preview: `npm run dev` in `website/` → http://localhost:4321/.
+  Preview: `npm run dev` in `website/` → http://localhost:4321/. The link preview picture (`og:image`) is
+  `src/assets/og.svg` from art/generate.mjs, rendered to `public/og.png` at build (`scripts/og-image.mjs`).
 
 ## Conventions
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:

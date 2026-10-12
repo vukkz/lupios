@@ -3,6 +3,9 @@ contact_links:
   - name: Report a security problem (privately)
     url: https://github.com/vukkz/lupios/security/advisories/new
     about: Security holes go here, not in a public issue, so they can be fixed before anyone else knows.
+  - name: Ask a question
+    url: https://github.com/vukkz/lupios/discussions/categories/q-a
+    about: How do I...? Questions and help go to Discussions, so bug reports stay about bugs.
   - name: Install guide, the lupi command, FAQ
     url: https://lupios.org
     about: Many questions are answered on the website.

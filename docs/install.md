@@ -101,8 +101,13 @@ You should see ✔ on everything, and a full score if Secure Boot is on.
 
 ## If something goes wrong
 
-- **An update broke something:** restart and pick the **second entry** in the boot menu. That's the
-  previous version.
+- **An update broke something:** LupiOS keeps the version before it, untouched.
+  1. Restart, and as the PC starts, press **Esc** a few times (or hold **Shift**): the boot menu is
+     normally hidden.
+  2. Pick the **second entry**. That's the previous version, exactly as it was. Your files and
+     your own settings (everything in your home folder) are the same in both.
+  3. If everything works there, make it the default with `sudo rpm-ostree rollback`, then restart.
+  4. Open an issue (link below) saying what broke, so a later update fixes it.
 - **In VirtualBox, the screen is black with only a mouse cursor:** VirtualBox's 3D acceleration
   can break KDE's display, especially after an update. Power off the VM, untick **Settings →
   Display → Enable 3D Acceleration**, and start it again.
