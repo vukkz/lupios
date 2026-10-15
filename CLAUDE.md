@@ -204,6 +204,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   file capabilities, so `strict_filecaps` in `lupi` strips them inside the strict lab once (marker
   `/etc/lupios-filecaps-dropped`) and again after `lupi update` upgrades it. The boot test runs
   `nmap -sS -p 1 127.0.0.1` there (start + raw sockets). The normal Lab (distrobox, `--privileged`) is unaffected.
+  `setcap` reads `(-r|<caps>) <file>` **pairs** (libcap `progs/setcap.c`): `setcap -r a b` strips `a`, then fails
+  parsing `b` as capability text. The first fix piped every file into one `setcap -r`, so only the first lost its
+  caps and nmap still failed; the boot test caught it. Hence `xargs -n1`.
 
 ## Open items
 - Branding sweep in the VM (2026-10-09, read with `VBoxManage controlvm LupiOS keyboardputstring` + screenshots):

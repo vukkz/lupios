@@ -588,11 +588,12 @@ lab_strict() { # [command...]
 # net_bind_service). The strict lab runs as root with fewer capabilities (no net_admin), and Linux refuses to
 # start a program whose file capabilities it can't grant: nmap failed with "Operation not permitted"
 # (2026-10-16). Root has no use for them, so the strict lab drops them: once, and again after upgrades.
+# One file per setcap (-n1): it reads its arguments in pairs, so `setcap -r a b` takes b for capability text.
 strict_filecaps() { # [--again]
     if [[ ${1:-} != --again ]] && podman exec "$STRICT_LAB" test -e /etc/lupios-filecaps-dropped; then
         return 0
     fi
-    podman exec "$STRICT_LAB" sh -c 'getcap -r /usr 2>/dev/null | cut -d" " -f1 | xargs -r setcap -r; touch /etc/lupios-filecaps-dropped' || true
+    podman exec "$STRICT_LAB" sh -c 'getcap -r /usr 2>/dev/null | cut -d" " -f1 | xargs -r -n1 setcap -r; touch /etc/lupios-filecaps-dropped' || true
 }
 
 # Updates the boxes, and the strict lab's packages. Not `distrobox upgrade --all`: distrobox counts every
