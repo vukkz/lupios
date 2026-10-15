@@ -1,0 +1,402 @@
+---
+// The home page (https://lupios.org/): LupiOS as a species in a field guide printed for night use.
+// It's its own page rather than a Starlight one, so it can be a product page; the docs stay Starlight.
+// Copy follows PRODUCT.md (early release, no invented numbers); facts come from SECURITY.md.
+import "@fontsource/alegreya/latin-500.css";
+import "@fontsource/alegreya/latin-700.css";
+import "@fontsource/alegreya/latin-500-italic.css";
+import "@fontsource/alegreya-sans/latin-400.css";
+import "@fontsource/alegreya-sans/latin-500.css";
+import "@fontsource/alegreya-sans/latin-700.css";
+import "@fontsource/alegreya-sans-sc/latin-500.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "../styles/guide.css";
+import { Image } from "astro:assets";
+import IdentificationKey from "../components/IdentificationKey.astro";
+import lockup from "../assets/lupios-lockup-dark.svg";
+import ridge from "../assets/guide-ridge.svg";
+import desktop from "../assets/screenshots/desktop.png";
+import panel from "../assets/screenshots/panel.png";
+import strictLab from "../assets/screenshots/strict-lab.png";
+
+const repo = "https://github.com/vukkz/lupios";
+const title = "LupiOS: a Linux desktop that's secure without the hassle";
+const description =
+  "Fedora Atomic with KDE Plasma, hardened by default and explained in plain words, with Kali's hacking tools in a lab of their own.";
+
+// Field marks on the panel inset: where each number sits (percent of panel.png) and what it marks.
+const marks = [
+  { y: 16, label: "Security 9/9", text: "the live score of lupi check, which tests every protection" },
+  { y: 36, label: "Security level", text: "sheep for every day, wolf for maximum caution, one click" },
+  { y: 62, label: "Network trust", text: "new Wi-Fi starts public: invisible to everyone else there" },
+  { y: 79, label: "Game Mode", text: "Remote Play ports open, updates paused while you play" },
+  { y: 94, label: "Security check, the Lab", text: "the full report, and Kali's tools, one click away" },
+];
+
+// Field marks on the strict lab's terminal (percent of strict-lab.png)
+const denMarks = [
+  { y: 40, label: "Not there", text: "your home folder is empty here, and the rest of the disk (/run/host) is missing" },
+  { y: 59, label: "Kali's tools", text: "nmap and the rest run as usual" },
+  { y: 81, label: "Raw sockets", text: "a SYN scan works, inside the lab's own network" },
+];
+
+// The same session typed out, word for word from strict-lab.png: phones show this instead of the
+// screenshot, whose terminal text would be ~5px tall there
+const transcript = [
+  { text: "┌──(root㉿lupi-lab-strict)-[~]" },
+  { text: "└─# ls /home /run/host" },
+  { text: "ls: cannot access '/run/host': No such file or directory" },
+  { text: "/home:", mark: 1 },
+  { text: "" },
+  { text: "┌──(root㉿lupi-lab-strict)-[~]" },
+  { text: "└─# nmap --version | head -1" },
+  { text: "Nmap version 7.99 ( https://nmap.org )", mark: 2 },
+  { text: "" },
+  { text: "┌──(root㉿lupi-lab-strict)-[~]" },
+  { text: "└─# nmap -sS -p 22 127.0.0.1 | grep -E 'PORT|22/'" },
+  { text: "PORT   STATE  SERVICE" },
+  { text: "22/tcp closed ssh", mark: 3 },
+];
+
+// What each security level changes (SECURITY.md, "Security levels")
+const temperament = [
+  { what: "DNS lookups", sheep: "Your network's DNS", wolf: "Always Quad9, encrypted" },
+  { what: "Replies to pings", sheep: "Yes", wolf: "No" },
+  { what: "io_uring, a kernel interface with many past exploits", sheep: "On", wolf: "Off" },
+  { what: "Magic SysRq keyboard shortcuts", sheep: "Sync only", wolf: "Off" },
+  { what: "TCP timestamps, which reveal uptime", sheep: "On", wolf: "Off" },
+  { what: "USBGuard: new USB devices wait for your OK", sheep: "Your choice", wolf: "On" },
+  { what: "Outgoing guard: apps ask before going online", sheep: "Your choice", wolf: "On" },
+];
+
+// What changes with the network's trust level (SECURITY.md, "Network trust")
+const habitat = [
+  { what: "Incoming connections", home: "Blocked, except finding devices on your network", public: "All silently dropped, pings too" },
+  { what: "Announces this PC", home: "Yes, so printers, casting and KDE Connect work", public: "Nothing: the firewall stops it on the way out" },
+  { what: "PC name sent to the router", home: "Yes", public: "No" },
+  { what: "Wi-Fi address", home: "The same every time", public: "New and random every time you connect" },
+];
+
+// How to tell LupiOS from its neighbours: facts about each, no scores
+const similar = [
+  { name: "Kali Linux", updates: "Package by package", tools: "Hundreds, on the system", made: "Security jobs you boot it for" },
+  { name: "Parrot Security", updates: "Package by package", tools: "Many, on the system", made: "Security work and privacy" },
+  { name: "secureblue", updates: "One signed image", tools: "None", made: "Hardening as far as it goes, for experts" },
+  { name: "Bazzite", updates: "One signed image", tools: "None", made: "Gaming, from desktops to handhelds" },
+  { name: "LupiOS", updates: "One signed image, booted and checked", tools: "Kali's top tools, in a container", made: "Every day: secure without the hassle" },
+];
+---
+
+<!doctype html>
+<html lang="en" class="guide-root">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href="https://lupios.org/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0B1220" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lupios.org/" />
+    <meta property="og:title" content="A Linux desktop that's secure without the hassle" />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="LupiOS" />
+    <meta property="og:image" content="https://lupios.org/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The LupiOS logo above night mountains" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://lupios.org/og.png" />
+  </head>
+  <body class="guide">
+    <a class="skip" href="#main">Skip to the content</a>
+    <header class="masthead">
+      <a class="home" href="/" aria-label="LupiOS home">
+        <img src={lockup.src} width="128" height="40" alt="LupiOS" />
+      </a>
+      <nav aria-label="Main">
+        <a href="/install/">Install</a>
+        <a href="/lupi/">The lupi command</a>
+        <a href="/security/">Security</a>
+        <a href="/faq/">FAQ</a>
+        <a href={repo}>GitHub</a>
+      </nav>
+      <a class="button" href="#key">Download</a>
+    </header>
+
+    <main id="main">
+      <section class="specimen-page" aria-labelledby="name">
+        <div class="account">
+          <h1 id="name">LupiOS</h1>
+          <p class="binomial"><i>Lupus custos</i>, the wolf that keeps watch</p>
+          <p class="promise">A Linux desktop that's secure without the hassle.</p>
+          <p class="lede">
+            Fedora Atomic with KDE Plasma, hardened before you first log in. Every setting is explained in
+            plain words and changes with one click. Kali's hacking tools live in a lab of their own, off
+            your system.
+          </p>
+          <p class="status">
+            <span class="tag">Early release</span>
+            <span>It installs and works, and every build is tested before release. It's young: it hasn't met much real hardware yet.</span>
+          </p>
+          <p class="actions">
+            <a class="button" href="#key">Download</a>
+            <a class="quiet" href="/install/">How to install</a>
+            <a class="quiet" href={repo}>Source on GitHub</a>
+          </p>
+        </div>
+
+        <figure class="plate">
+          <div class="plate-main">
+            <div class="plate-photo">
+            <Image
+              src={desktop}
+              widths={[640, 960, 1280, 1920]}
+              sizes="(min-width: 75rem) 52rem, 100vw"
+              loading="eager"
+              alt="The LupiOS desktop: night mountains, a terminal showing the wolf logo and system information, and the LupiOS panel open beside the clock."
+            />
+            <svg class="plate-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <rect x="76.4" y="47.3" width="23.2" height="46.2" />
+              <line x1="76.4" y1="62" x2="29" y2="46" />
+            </svg>
+            </div>
+            <div class="plate-inset">
+              <Image src={panel} widths={[444]} alt="The LupiOS panel, enlarged: security score 9 of 9, security level sheep, network trust home, Game Mode off, and buttons for the security check and the Lab." />
+              <ol class="marks" aria-hidden="true">
+                {marks.map((m, i) => <li style={`top: ${m.y}%`}>{i + 1}</li>)}
+              </ol>
+            </div>
+          </div>
+          <figcaption>
+            <ol class="legend">
+              {marks.map((m) => <li><span><b>{m.label}</b>: {m.text}</span></li>)}
+            </ol>
+            <p class="credit">The LupiOS panel opens from the wolf next to the clock. Photographed in a virtual machine.</p>
+          </figcaption>
+        </figure>
+
+        <img class="ridge" src={ridge.src} alt="" width="2400" height="260" />
+      </section>
+
+      <section class="temperament" aria-labelledby="temperament">
+        <div class="section-head">
+          <h2 id="temperament">Temperament</h2>
+          <p>Two security levels, one switch. It changes a bundle of settings at once, instantly, without a restart.</p>
+        </div>
+        <div class="section-body">
+        <fieldset class="switch">
+          <legend class="visually-hidden">Show a security level</legend>
+          <input type="radio" name="level" id="level-sheep" value="sheep" checked />
+          <label for="level-sheep"><b>Sheep</b> the everyday default</label>
+          <input type="radio" name="level" id="level-wolf" value="wolf" />
+          <label for="level-wolf"><b>Wolf</b> maximum caution</label>
+        </fieldset>
+        <table class="levels">
+          <caption class="visually-hidden">What each security level changes</caption>
+          <thead>
+            <tr><th scope="col">Field mark</th><th scope="col" class="sheep">Sheep</th><th scope="col" class="wolf">Wolf</th></tr>
+          </thead>
+          <tbody>
+            {
+              temperament.map((r) => (
+                <tr class:list={[{ differs: r.sheep !== r.wolf }]}>
+                  <th scope="row">{r.what}</th>
+                  <td class="sheep">{r.sheep}</td>
+                  <td class="wolf">{r.wolf}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <div class="notes">
+          <p>
+            <b>Both share the rest:</b> a firewall that blocks incoming connections, kernel hardening, signed
+            updates. Switch with <code>lupi level wolf</code>, or in the panel.
+          </p>
+          <p>
+            <b>What wolf costs:</b> Wi-Fi login pages at hotels and airports don't load (switch to sheep, log
+            in, switch back), intranet names only a company's DNS knows don't resolve, and every app asks
+            once before it goes online. <a href="/security/#security-levels-lupi-level">Every setting and its trade-off</a>
+          </p>
+        </div>
+        </div>
+      </section>
+
+      <section class="habitat" aria-labelledby="habitat">
+        <div class="section-head">
+          <h2 id="habitat">Habitat</h2>
+          <p>Every network gets a trust level. New Wi-Fi starts public, a new cable starts home, and one click changes it.</p>
+        </div>
+        <div class="section-body">
+        <table class="ranges">
+          <caption class="visually-hidden">What changes between a home and a public network</caption>
+          <thead>
+            <tr><th scope="col" class="home">Home</th><th scope="col" class="trait"><span class="visually-hidden">What</span></th><th scope="col" class="public">Public <span>invisible</span></th></tr>
+          </thead>
+          <tbody>
+            {
+              habitat.map((r) => (
+                <tr>
+                  <td class="home">{r.home}</td>
+                  <th scope="row" class="trait">{r.what}</th>
+                  <td class="public">{r.public}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <p class="aside">On a public network, casting and printers stop working. That's the point on a network you don't control.</p>
+        </div>
+      </section>
+
+      <section class="den" aria-labelledby="den">
+        <div class="section-head">
+          <h2 id="den">Den</h2>
+          <p>Kali's top hacking tools, one command away, in a container that keeps them off your system.</p>
+        </div>
+        <div class="section-body">
+        <figure class="den-plate">
+          <div class="plate-photo">
+            <Image src={strictLab} widths={[922]} sizes="(min-width: 75rem) 46rem, 100vw" alt="A terminal in the strict lab: ls /home shows nothing, /run/host doesn't exist, nmap version 7.99 starts, and a SYN scan of port 22 on 127.0.0.1 reports it closed." />
+            <ol class="marks" aria-hidden="true">
+              {denMarks.map((m, i) => <li style={`top: ${m.y}%`}>{i + 1}</li>)}
+            </ol>
+          </div>
+          <pre class="transcript" aria-hidden="true">{transcript.map((l) => (l.mark ? <span class="line">{l.text}<b class="mark">{l.mark}</b></span> : <span class="line">{l.text}</span>))}</pre>
+          <figcaption>
+            <ol class="legend">
+              {denMarks.map((m) => <li><span><b>{m.label}</b>: {m.text}</span></li>)}
+            </ol>
+            <p class="credit">lupi lab strict, in a virtual machine.</p>
+          </figcaption>
+        </figure>
+        <dl class="dens">
+          <div>
+            <dt><code>lupi lab</code></dt>
+            <dd>nmap, Metasploit, Burp Suite, Wireshark, sqlmap and more. Sees your home folder and runs the graphical tools.</dd>
+          </div>
+          <div>
+            <dt><code>lupi lab strict</code></dt>
+            <dd>Can't see your files: one shared folder, confined by SELinux. For tools you don't trust yet.</dd>
+          </div>
+        </dl>
+        <p class="aside">For malware, or anything you'd never trust, use a separate virtual machine.</p>
+        </div>
+      </section>
+
+      <section class="behaviour" aria-labelledby="behaviour">
+        <div class="section-head">
+          <h2 id="behaviour">Behaviour</h2>
+          <p>How it lives from day to day.</p>
+        </div>
+        <div class="section-body">
+        <dl class="habits">
+          <div>
+            <dt>Updates all at once</dt>
+            <dd>The whole system updates in the background and starts at your next restart. If one breaks something, the version before it is one boot-menu entry away.</dd>
+          </div>
+          <div>
+            <dt>Plays games</dt>
+            <dd><code>lupi setup gaming</code> installs Steam, Heroic and Lutris. Game Mode opens Remote Play and pauses updates while you play.</dd>
+          </div>
+          <div>
+            <dt>Installs what you need</dt>
+            <dd><code>lupi install discord</code>: apps from Flathub, command-line tools from Arch Linux, each kept in its place.</dd>
+          </div>
+        </dl>
+        </div>
+      </section>
+
+      <section class="similar" aria-labelledby="similar">
+        <div class="section-head">
+          <h2 id="similar">Similar species</h2>
+          <p>How to tell LupiOS from its neighbours.</p>
+        </div>
+        <div class="section-body">
+        <table class="species">
+          <caption class="visually-hidden">LupiOS next to similar systems</caption>
+          <thead>
+            <tr><th scope="col">Species</th><th scope="col">How it updates</th><th scope="col">Hacking tools</th><th scope="col">Made for</th></tr>
+          </thead>
+          <tbody>
+            {
+              similar.map((s) => (
+                <tr class:list={[{ self: s.name === "LupiOS" }]}>
+                  <th scope="row">{s.name}</th>
+                  <td data-label="How it updates">{s.updates}</td>
+                  <td data-label="Hacking tools">{s.tools}</td>
+                  <td data-label="Made for">{s.made}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <section class="identify" id="key" aria-labelledby="key-title">
+        <div class="section-head">
+          <h2 id="key-title">Identification key</h2>
+          <p>Which LupiOS is yours? Follow the line that fits.</p>
+        </div>
+        <div class="section-body">
+        <IdentificationKey />
+        <p class="aside">
+          <b>Range:</b> a 64-bit PC with 8 GB of RAM, an SSD with 64 GB or more, and a USB stick of 8 GB
+          (2 GB for Online). Then follow the <a href="/install/">install guide</a>: about 30 minutes.
+          Already on Fedora Atomic? <a href="/download/#already-on-fedora-atomic">Switch without reinstalling</a>.
+        </p>
+        </div>
+      </section>
+
+      <section class="notes-field" aria-labelledby="notes">
+        <div class="section-head">
+          <h2 id="notes">Field notes</h2>
+          <p>Don't take the guide's word for it.</p>
+        </div>
+        <div class="section-body">
+        <dl class="habits">
+          <div>
+            <dt>Booted before release</dt>
+            <dd>Every build starts in a virtual machine and is checked against <a href="/security/">every promise in Security</a>.</dd>
+          </div>
+          <div>
+            <dt>Signed</dt>
+            <dd>Every image is signed, and your PC refuses an update without LupiOS's signature.</dd>
+          </div>
+          <div>
+            <dt>Open</dt>
+            <dd>Free and open source under Apache-2.0. <a href={repo}>Read every line</a>.</dd>
+          </div>
+          <div>
+            <dt>Still young</dt>
+            <dd>What's left before LupiOS calls itself finished is <a href={`${repo}/issues/9`}>listed in public</a>.</dd>
+          </div>
+        </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="colophon">
+      <p class="basis">
+        LupiOS is built on <a href="https://fedoraproject.org/atomic-desktops/">Fedora Atomic</a> and KDE Plasma,
+        through <a href="https://universal-blue.org">Universal Blue</a> and <a href="https://blue-build.org">BlueBuild</a>.
+        Fedora's security team patches the base.
+      </p>
+      <nav aria-label="Everything else">
+        <a href="/download/">Download</a>
+        <a href="/install/">Install</a>
+        <a href="/dual-boot/">Keeping Windows</a>
+        <a href="/lupi/">The lupi command</a>
+        <a href="/security/">Security</a>
+        <a href="/changes/">What's new</a>
+        <a href="/faq/">FAQ</a>
+        <a href={`${repo}/discussions`}>Questions</a>
+        <a href={`${repo}/security/advisories/new`}>Report a security problem</a>
+      </nav>
+    </footer>
+  </body>
+</html>

@@ -5,3 +5,10 @@ cosign.private
 *.iso-CHECKSUM
 /iso/anaconda/build/
 /.claude/
+
+# Impeccable (the website design tool): its screenshots, build state and decision pages are scratch.
+# The page brief (.impeccable/surfaces/) and PRODUCT.md/DESIGN.md are kept.
+/.impeccable/review/
+/.impeccable/build/
+/.impeccable/questions/
+/.impeccable/config.local.json

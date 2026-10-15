@@ -1,0 +1,224 @@
+---
+// Which ISO is yours, as a field guide's identification key: pick the line that fits, follow it to
+// the next couplet or to your LupiOS. Plain links (no script), so it works everywhere. Used on the
+// home page and the download page; the ISO list and sizes live in src/downloads.ts.
+import { Icon } from "@astrojs/starlight/components";
+import { downloads, isos, fileUrl } from "../downloads";
+
+const iso = Object.fromEntries(isos.map((i) => [i.file, i]));
+const specimens = [
+  { id: "iso-online", ...iso["lupios-online.iso"] },
+  { id: "iso-nvidia", ...iso["lupios-nvidia.iso"] },
+  { id: "iso-lupios", ...iso["lupios.iso"] },
+];
+---
+
+<div class="key not-content">
+  <ol class="couplets">
+    <li id="key-1">
+      <span class="num">1</span>
+      <a class="lead" href="#iso-online">
+        <span class="text">This PC can be online while you install (a cable, or Wi-Fi without a login page), and you want the smallest download</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span class="to">LupiOS Online</span>
+      </a>
+      <a class="lead" href="#key-2">
+        <span class="text">You'd rather download everything first, or install without internet</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span class="to">go to 2</span>
+      </a>
+    </li>
+    <li id="key-2">
+      <span class="num">2</span>
+      <a class="lead" href="#iso-nvidia">
+        <span class="text">An NVIDIA GeForce GTX 16xx, RTX 20xx or newer</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span class="to">LupiOS for NVIDIA</span>
+      </a>
+      <a class="lead" href="#iso-lupios">
+        <span class="text">AMD or Intel graphics, an older NVIDIA card (GTX 10xx and before), or a virtual machine</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span class="to">LupiOS</span>
+      </a>
+    </li>
+  </ol>
+
+  <ul class="specimens">
+    {
+      specimens.map((s) => (
+        <li id={s.id} class="specimen">
+          <p class="name">{s.name}</p>
+          <p class="for">{s.for}</p>
+          {downloads.ready ? (
+            <p class="get">
+              <a class="button" href={fileUrl(s.file)}>
+                <Icon name="download" size="1.1em" />
+                {s.file}
+              </a>
+              <span class="meta">
+                {s.size} · <a href={fileUrl(`${s.file}-CHECKSUM`)}>checksum</a>
+              </span>
+            </p>
+          ) : (
+            <p class="meta">
+              {s.size} · {s.file} · coming soon
+            </p>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  /* Colours come from the page around it: the home page sets --guide-*, the docs pages fall back to
+     Starlight's own theme (light or dark). */
+  .key {
+    --k-ink: var(--guide-ink, var(--sl-color-white));
+    --k-dim: var(--guide-dim, var(--sl-color-gray-2));
+    --k-line: var(--guide-line, var(--sl-color-gray-5));
+    --k-accent: var(--guide-ice, var(--sl-color-accent));
+    --k-mark: var(--guide-ochre, var(--sl-color-accent-high));
+    --k-on-accent: var(--guide-night, var(--sl-color-black));
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+    color: var(--k-ink);
+  }
+  .couplets,
+  .specimens {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .couplets > li {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    column-gap: 0.75rem;
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--k-line);
+    scroll-margin-top: 6rem;
+  }
+  .couplets > li:last-child {
+    border-bottom: 1px solid var(--k-line);
+  }
+  .num {
+    grid-row: span 2;
+    font-family: var(--guide-display, inherit);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1.35rem;
+    line-height: 2rem;
+    color: var(--guide-frost, var(--k-accent));
+  }
+  .key .lead {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+    color: var(--k-ink);
+    text-decoration: none;
+  }
+  .lead .text {
+    flex: 0 1 auto;
+    max-width: 52ch;
+  }
+  /* the dotted leader of a printed key, from the description to where it leads */
+  .lead .dots {
+    flex: 1 1 2rem;
+    min-width: 2rem;
+    border-bottom: 2px dotted color-mix(in srgb, var(--k-dim) 55%, transparent);
+    transform: translateY(-0.3em);
+  }
+  .lead .to {
+    flex: none;
+    font-weight: 700;
+    color: var(--k-accent);
+    white-space: nowrap;
+  }
+  .lead:hover .text,
+  .lead:focus-visible .text {
+    text-decoration: underline;
+    text-decoration-color: var(--k-accent);
+    text-underline-offset: 0.2em;
+  }
+  .lead:hover .dots {
+    border-bottom-color: var(--k-accent);
+  }
+
+  .specimens {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+    gap: 0 2rem;
+  }
+  .specimen {
+    padding: 1.1rem 0 1.25rem;
+    border-top: 2px solid var(--k-line);
+    scroll-margin-top: 6rem;
+    transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* followed the key here: the matching specimen gets the field-mark colour */
+  .specimen:target {
+    border-top-color: var(--k-mark);
+  }
+  .specimen:target .name {
+    color: var(--k-mark);
+  }
+  .specimen p {
+    margin: 0;
+  }
+  .name {
+    font-family: var(--guide-display, inherit);
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--guide-frost, var(--k-ink));
+  }
+  .for {
+    margin-top: 0.3rem !important;
+    color: var(--k-dim);
+  }
+  .get {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 1rem !important;
+  }
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 2px;
+    background: var(--k-accent);
+    color: var(--k-on-accent);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  .button:hover {
+    background: color-mix(in srgb, var(--k-accent) 80%, white);
+    color: var(--k-on-accent);
+  }
+  .meta {
+    color: var(--k-dim);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .meta a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  @media (max-width: 40rem) {
+    .lead {
+      flex-wrap: wrap;
+    }
+    .lead .dots {
+      display: none;
+    }
+    .lead .to {
+      flex-basis: 100%;
+    }
+  }
+</style>

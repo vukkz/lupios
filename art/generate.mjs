@@ -301,6 +301,18 @@ writeFileSync(`${WEB}/hero-day.svg`, heroMountains({
   ],
 }));
 
+// The home page's ridge linework (website/src/pages/index.astro): the same mountains as the hero,
+// drawn only as their ice-blue outlines, like the hairlines of a field guide's plates.
+{
+  const W = 2400, H = 260, rand = rng(1312);
+  const lines = [
+    { baseY: 170, amp: 150, peaks: 5, opacity: 0.38 },
+    { baseY: 215, amp: 110, peaks: 7, opacity: 0.22 },
+    { baseY: 250, amp: 70, peaks: 9, opacity: 0.12 },
+  ].map((l) => `<polyline points="${ridge(rand, { ...l, W }).map((p) => p.join(",")).join(" ")}" fill="none" stroke="${C.ice}" stroke-width="2" stroke-linejoin="round" opacity="${l.opacity}"/>`);
+  writeFileSync(`${WEB}/guide-ridge.svg`, svg(W, H, lines.join("\n  "), ` preserveAspectRatio="xMidYMax slice"`));
+}
+
 // The picture a shared link shows (og:image, 1200x630; also the repo's social preview). The website
 // build turns it into og.png (website/scripts/og-image.mjs). Shapes only, no text: it renders the same
 // everywhere, and the page title and description appear under the picture anyway.
