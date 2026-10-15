@@ -4,9 +4,11 @@
 # the boot image, downloaded again whenever any one of them changes. These change for their own
 # reasons, so each group gets a layer of its own (rpm-ostree reads the user.component attribute):
 # - the package database (both copies: the current one, and rpm-ostree's copy of the base image's):
-#   changes with every build, since it records install times. ~78 MB compressed.
-#   dnf's transaction history (/usr/lib/sysimage/libdnf5) joins it: it records every build's installs
-#   with their time, and otherwise kept a 45 MB layer of dnf's own packages changing (found 2026-10-09).
+#   ~78 MB compressed. With SOURCE_DATE_EPOCH (common-modules.yml) it comes out the same in every
+#   build on the same base, so it only changes when Fedora's packages do.
+# - dnf's transaction history (/usr/lib/sysimage/libdnf5): it records every build's installs with dnf's
+#   own clock, so it differs every build. In the rpmdb layer it made that whole layer download daily
+#   (2026-10-10); in a layer of its own it's small. Before 2026-10-09 it sat in a 45 MB layer of dnf's packages.
 # - the font caches: rebuilt, slightly differently, by every build
 # - LupiOS's own files (files/system, copied to / by the files module): they change with LupiOS
 #   updates, and in the shared layer a one-line change to lupi re-downloaded the boot image too.
@@ -30,7 +32,7 @@ component() { # <name> <path>
 component rpmdb /usr/share/rpm
 component rpmdb /usr/lib/sysimage/rpm
 component rpmdb /usr/lib/sysimage/rpm-ostree-base-db
-component rpmdb /usr/lib/sysimage/libdnf5
+component dnf-history /usr/lib/sysimage/libdnf5
 component fontconfig-cache /usr/lib/fontconfig/cache
 
 # Fingerprints of the package databases, to compare between two builds in their logs: with the same
