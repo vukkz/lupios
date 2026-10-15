@@ -583,6 +583,27 @@ lab_strict() { # [command...]
     exec podman exec --interactive "${tty[@]}" "$STRICT_LAB" sh -c 'exec "$(command -v zsh || command -v bash)" -l'
 }
 
+# Updates the boxes, and the strict lab's packages. Not `distrobox upgrade --all`: distrobox counts every
+# container whose labels mention "distrobox" as its own, the Lab image's did until 2026-10, so it took
+# the strict lab for a box, and `distrobox enter` then waited forever for a setup the strict lab never
+# runs. A strict lab made before then keeps that label until `lupi lab reset strict`.
+upgrade_boxes() {
+    local boxes=() running
+    mapfile -t boxes < <(distrobox list --no-color 2>/dev/null |
+        awk -F'|' -v strict="$STRICT_LAB" 'NR > 1 { gsub(/ /, "", $2); if ($2 != "" && $2 != strict) print $2 }')
+    if ((${#boxes[@]})); then
+        distrobox upgrade "${boxes[@]}" || true
+    fi
+    podman container exists "$STRICT_LAB" || return 0
+    echo "Upgrading $STRICT_LAB..."
+    running=$(podman container inspect --format '{{.State.Running}}' "$STRICT_LAB")
+    podman start "$STRICT_LAB" >/dev/null
+    podman exec "$STRICT_LAB" sh -c 'apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -q' ||
+        echo "Couldn't update $STRICT_LAB. It still works; lupi lab reset strict starts it fresh from the newest image."
+    # left as it was: someone may have it open in another terminal
+    [[ $running == true ]] || podman stop "$STRICT_LAB" >/dev/null
+}
+
 lab_reset() { # [root|strict]
     case ${1:-} in
         "") distrobox rm --force lupi-lab ;;
@@ -788,7 +809,7 @@ cmd_update() {
     else
         as_root rpm-ostree upgrade
         flatpak update --noninteractive
-        distrobox upgrade --all || true
+        upgrade_boxes
     fi
     if rpm-ostree status --json | jq -e '.deployments[] | select(.staged == true)' >/dev/null 2>&1; then
         ok "Update downloaded. ${B}Reboot to finish:${N} systemctl reboot"

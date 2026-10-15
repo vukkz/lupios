@@ -2,8 +2,11 @@
 # Built and signed by .github/workflows/build-lab.yml, entered with `lupi lab`.
 FROM docker.io/kalilinux/kali-rolling:latest
 
+# No "distrobox" anywhere in the labels: distrobox counts every container whose labels mention it as one
+# of its boxes (distrobox-list), and that included the strict lab, a plain podman container made from
+# this image. `distrobox upgrade --all` then waited forever on it (2026-10-15).
 LABEL org.opencontainers.image.source="https://github.com/vukkz/lupios" \
-      org.opencontainers.image.description="LupiOS Lab: Kali Linux tools for distrobox" \
+      org.opencontainers.image.description="LupiOS Lab: Kali Linux tools, opened with lupi lab" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 ARG DEBIAN_FRONTEND=noninteractive

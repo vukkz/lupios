@@ -184,6 +184,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   (2026-10-07) is plain rootless `podman create`: one `:Z` folder (`~/LupiLab/lupi-lab-strict` →
   `/root/shared`), SELinux `container_t`, `sleep infinity` under `--init`, then `podman exec` per use.
   The boot test checks it as a real user (`labtest`, lingering) and downloads the Lab for that (40 GB disk).
+- distrobox counts **any** container whose ID, image, name, status, labels or mounts contain the word
+  "distrobox" as one of its boxes (`distrobox-list`: `[ -z "${container##*distrobox*}" ]`). The Lab image's
+  description said "for distrobox", so the strict lab (plain podman, same image) was listed too, and
+  `distrobox upgrade --all` in `lupi update` hung forever at "Starting container..." on it (2026-10-15).
+  Never put "distrobox" in the Lab's labels; `lupi update` upgrades boxes by name and the strict lab
+  with `podman exec ... apt-get full-upgrade`. Strict labs made before the fix keep the old label until
+  `lupi lab reset strict`.
 
 ## Open items
 - Branding sweep in the VM (2026-10-09, read with `VBoxManage controlvm LupiOS keyboardputstring` + screenshots):
