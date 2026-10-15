@@ -252,6 +252,9 @@ if out=$(as_user timeout 1200 lupi lab strict true 2>&1); then
     ok "strict lab: created from the signed Lab image"
     # Commands do run in it, so the refusals below come from what it can't see
     check "strict lab: it's Kali inside" as_user lupi lab strict grep -qi kali /etc/os-release
+    # Kali's nmap carries file capabilities the strict lab can't grant, which once stopped it from
+    # starting at all ("Operation not permitted"). A SYN scan also needs raw sockets (NET_RAW).
+    check "strict lab: nmap starts and scans with raw sockets" as_user lupi lab strict nmap -sS -p 1 127.0.0.1
     refuse "strict lab: your home folder isn't there" as_user lupi lab strict cat "$home/canary"
     refuse "strict lab: the disk isn't there (/run/host)" as_user lupi lab strict ls /run/host
     refuse "strict lab: your desktop session isn't there" as_user lupi lab strict test -e "/run/user/$uid/bus"

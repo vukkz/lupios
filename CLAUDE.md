@@ -191,6 +191,13 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   Never put "distrobox" in the Lab's labels; `lupi update` upgrades boxes by name and the strict lab
   with `podman exec ... apt-get full-upgrade`. Strict labs made before the fix keep the old label until
   `lupi lab reset strict`.
+- Kali gives some tools **file capabilities** (nmap: `cap_net_bind_service,cap_net_admin,cap_net_raw=eip`) so users
+  can run them unprivileged. The strict lab's capability set (`800425fb`: podman's default plus NET_RAW, no
+  NET_ADMIN) can't grant them all, and Linux then refuses to start the program at all: nmap failed with
+  "exec: /usr/lib/nmap/nmap: Operation not permitted" (found by the owner in the VM, 2026-10-16). Root needs no
+  file capabilities, so `strict_filecaps` in `lupi` strips them inside the strict lab once (marker
+  `/etc/lupios-filecaps-dropped`) and again after `lupi update` upgrades it. The boot test runs
+  `nmap -sS -p 1 127.0.0.1` there (start + raw sockets). The normal Lab (distrobox, `--privileged`) is unaffected.
 
 ## Open items
 - Branding sweep in the VM (2026-10-09, read with `VBoxManage controlvm LupiOS keyboardputstring` + screenshots):

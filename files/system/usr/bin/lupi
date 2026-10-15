@@ -575,12 +575,24 @@ lab_strict() { # [command...]
         ok "Created. Files in ~/LupiLab/$STRICT_LAB on your PC are /root/shared in the strict lab."
     fi
     podman start "$STRICT_LAB" >/dev/null # stopped after every restart; quick, nothing to set up
+    strict_filecaps
     [[ -t 0 && -t 1 ]] && tty=(--tty)
     if (($#)); then exec podman exec --interactive "${tty[@]}" "$STRICT_LAB" "$@"; fi
     echo "Strict lab: no access to your files, your desktop or other apps. Shared folder: /root/shared"
     echo "${D}Terminal tools only. For Burp Suite, Wireshark's window or Wi-Fi tools, use: lupi lab${N}"
     # shellcheck disable=SC2016 # $(...) runs inside the lab
     exec podman exec --interactive "${tty[@]}" "$STRICT_LAB" sh -c 'exec "$(command -v zsh || command -v bash)" -l'
+}
+
+# Kali gives some tools file capabilities so a normal user can run them (nmap: net_admin, net_raw,
+# net_bind_service). The strict lab runs as root with fewer capabilities (no net_admin), and Linux refuses to
+# start a program whose file capabilities it can't grant: nmap failed with "Operation not permitted"
+# (2026-10-16). Root has no use for them, so the strict lab drops them: once, and again after upgrades.
+strict_filecaps() { # [--again]
+    if [[ ${1:-} != --again ]] && podman exec "$STRICT_LAB" test -e /etc/lupios-filecaps-dropped; then
+        return 0
+    fi
+    podman exec "$STRICT_LAB" sh -c 'getcap -r /usr 2>/dev/null | cut -d" " -f1 | xargs -r setcap -r; touch /etc/lupios-filecaps-dropped' || true
 }
 
 # Updates the boxes, and the strict lab's packages. Not `distrobox upgrade --all`: distrobox counts every
@@ -598,8 +610,11 @@ upgrade_boxes() {
     echo "Upgrading $STRICT_LAB..."
     running=$(podman container inspect --format '{{.State.Running}}' "$STRICT_LAB")
     podman start "$STRICT_LAB" >/dev/null
-    podman exec "$STRICT_LAB" sh -c 'apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -q' ||
+    if podman exec "$STRICT_LAB" sh -c 'apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -q'; then
+        strict_filecaps --again # upgraded tools come with their file capabilities back
+    else
         echo "Couldn't update $STRICT_LAB. It still works; lupi lab reset strict starts it fresh from the newest image."
+    fi
     # left as it was: someone may have it open in another terminal
     [[ $running == true ]] || podman stop "$STRICT_LAB" >/dev/null
 }
