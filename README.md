@@ -100,7 +100,7 @@ Run `lupi help` to see every command.
 | Channel | Image tag | Built from | For |
 |---|---|---|---|
 | **stable** | `latest` | the `main` branch, plus a daily rebuild for Fedora security updates | everyone |
-| **testing** | `br-testing-44` | the `testing` branch | trying new changes in a VM first |
+| **testing** | `testing` | the `testing` branch, plus a daily rebuild; the tag only moves once the boot test passed | trying new changes in a VM first |
 
 Switch with `lupi channel stable` or `lupi channel testing`, then reboot.
 

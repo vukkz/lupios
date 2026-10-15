@@ -35,7 +35,6 @@ jobs:
           - { iso: lupios-online, image: lupios, online: true }
     env:
       WANTED: ${{ inputs.flavour == 'all' || inputs.flavour == matrix.iso }}
-      FEDORA_VERSION: 44 # keep in sync with image-version in recipes/
     steps:
       - name: Free disk space # the ISO holds the whole OS image
         if: env.WANTED == 'true'
@@ -48,6 +47,12 @@ jobs:
       # iso/anaconda: render its artwork here, then lupios-look.tmpl swaps it in during the build.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.WANTED == 'true'
+      - name: Read the Fedora version # the installer must match it; the recipe is the one place it's set
+        if: env.WANTED == 'true'
+        run: |
+          v=$(sed -n 's/^image-version: *\([0-9][0-9]*\).*/\1/p' recipes/recipe.yml)
+          [[ -n $v ]] || { echo "No image-version in recipes/recipe.yml" >&2; exit 1; }
+          echo "FEDORA_VERSION=$v" >> "$GITHUB_ENV"
       - name: Render the installer artwork
         if: env.WANTED == 'true'
         run: |
@@ -67,7 +72,7 @@ jobs:
           image_repo: ghcr.io/${{ github.repository_owner }}
           image_name: ${{ matrix.image }}
           # an install from a testing ISO stays on the testing channel (lupi channel stable switches)
-          image_tag: ${{ inputs.channel == 'testing' && format('br-testing-{0}', env.FEDORA_VERSION) || 'latest' }}
+          image_tag: ${{ inputs.channel == 'testing' && 'testing' || 'latest' }}
           version: ${{ env.FEDORA_VERSION }}
           variant: Kinoite
           iso_name: ${{ matrix.iso }}.iso # lupios.iso: no Fedora version in the name, the OS updates continuously

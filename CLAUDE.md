@@ -6,8 +6,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 
 ## Workflow rules
 - **Ask before every commit or push.** The owner says "push" when ready.
-- **New work goes to the `testing` branch first** (image tag `br-testing-44`). Promote to stable only
-  when the owner approves: `git push origin testing:main` (tag `latest`, what users get).
+- **New work goes to the `testing` branch first** (image tag `br-testing-<Fedora>`; the testing channel
+  follows the tag `testing`, which build.yml's `channel-tag` job moves there only after both boot tests
+  passed). Promote to stable only when the owner approves: `git push origin testing:main` (tag `latest`).
 - After pushing, watch the builds with `gh run list/watch -R vukkz/lupios` and read the build log
   for evidence that the change landed, not just a green tick. Image builds take about 15 min (longer with
   rechunking), then the **Boot test** job (~15 min). Only promote a `testing` build whose boot test passed.
@@ -85,10 +86,15 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   (`auth_admin`: password every time). Started through pkexec (`PKEXEC_UID` set), `lupi` only accepts
   `level sheep|wolf [--yes]`, `net home|public`, `game on|off`: anything else could give a root shell
   (security review 2026-10-07). A new widget/Welcome button that needs root must be added to that list.
-- BlueBuild tags: default branch → `latest`, `44`, date. Other branches → `br-<branch>-44`.
+- BlueBuild tags: default branch → `latest`, `<Fedora>`, date. Other branches → `br-<branch>-<Fedora>`,
+  always with the version (alt-tags too: blue-build/cli `github_driver.rs` `generate_tags`). So the testing
+  channel's version-free `testing` tag is ours (skopeo copy in `channel-tag`; the signature is stored by
+  digest, so it covers the new tag). The Fedora version lives only in the recipes' `image-version`: build.yml's
+  `version` job and build-iso.yml read it from there (and fail if the two recipes differ).
 - GitHub runs scheduled workflows only on the default branch. build.yml's `testing` job (schedule only)
   starts a testing build with `gh workflow run` (workflow_dispatch is the one event GITHUB_TOKEN may start),
-  so testing also builds daily around 06:00 UTC. Pushing to testing then cancels that build (harmless).
+  so testing builds daily too. GitHub starts the 06:00 schedule hours late (13:48 UTC on 2026-10-12, the first
+  run). Pushing to testing while that build runs cancels it (harmless).
 - ISO: `jasonn3/build-container-installer@v1.5.0`, installer product name = image name, Secure Boot key
   from `ublue-os/akmods` (enroll password `universalblue`). Artifacts expire after 14 days.
   The installer itself runs on Fedora's packages, so `fedora-logos` brands its sidebar as Fedora. Fix:

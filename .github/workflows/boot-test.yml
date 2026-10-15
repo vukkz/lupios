@@ -13,7 +13,7 @@ on:
     inputs:
       image:
         description: Image to test
-        default: ghcr.io/vukkz/lupios:br-testing-44
+        default: ghcr.io/vukkz/lupios:testing
 
 permissions:
   contents: read

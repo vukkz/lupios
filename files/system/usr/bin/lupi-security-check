@@ -180,7 +180,7 @@ fi
 # --- Optional extras -----------------------------------------------------------
 level=$(cat /etc/lupios/security-level 2>/dev/null || echo sheep)
 opt_off "Security level" "$level (change: lupi level)"
-if [[ $image_ref == *:br-testing-* ]]; then
+if [[ $image_ref == *:testing || $image_ref == *:br-testing-* ]]; then
     opt_off "Update channel" "testing: new changes arrive here first (lupi channel stable)"
 fi
 

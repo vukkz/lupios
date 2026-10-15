@@ -58,8 +58,8 @@ jobs:
           rechunk_clear_plan: ${{ matrix.recipe == 'recipe-nvidia.yml' }}
 
   # GitHub only runs scheduled workflows on the default branch, so without this the testing channel
-  # (br-testing-44) would only get Fedora's security fixes when someone pushes to testing. The daily
-  # run starts a testing build too. workflow_dispatch is the one event GITHUB_TOKEN may start.
+  # would only get Fedora's security fixes when someone pushes to testing. The daily run starts a
+  # testing build too. workflow_dispatch is the one event GITHUB_TOKEN may start.
   testing:
     name: Start the testing build
     if: github.event_name == 'schedule'
@@ -71,6 +71,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+  # The Fedora version, read from the recipe: BlueBuild names branch images br-<branch>-<version>, so
+  # the boot test and the testing tag below need it. image-version stays the one place to change it.
+  version:
+    name: Read the Fedora version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      fedora: ${{ steps.read.outputs.fedora }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: read
+        run: |
+          v=$(sed -n 's/^image-version: *\([0-9][0-9]*\).*/\1/p' recipes/recipe.yml)
+          n=$(sed -n 's/^image-version: *\([0-9][0-9]*\).*/\1/p' recipes/recipe-nvidia.yml)
+          [[ -n $v ]] || { echo "No image-version in recipes/recipe.yml" >&2; exit 1; }
+          [[ $v == "$n" ]] || { echo "recipe.yml builds Fedora $v, recipe-nvidia.yml Fedora $n: make them match" >&2; exit 1; }
+          echo "fedora=$v" >> "$GITHUB_OUTPUT"
+
   # Boot the images just pushed in a virtual machine and check them from inside (boot-test.yml).
   # The VM can't use the NVIDIA driver, but everything else in the NVIDIA image (what the owner's own
   # PC runs) is checked the same way. Both run side by side, even when a build failed, so one
@@ -78,7 +97,7 @@ jobs:
   # Pull requests push no image: skipped.
   boot-test:
     name: Boot test
-    needs: bluebuild
+    needs: [bluebuild, version]
     if: ${{ !cancelled() && github.event_name != 'pull_request' }}
     strategy:
       fail-fast: false
@@ -88,4 +107,34 @@ jobs:
       contents: read
     uses: ./.github/workflows/boot-test.yml
     with:
-      image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ github.ref_name == 'main' && 'latest' || format('br-{0}-44', github.ref_name) }}
+      image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ github.ref_name == 'main' && 'latest' || format('br-{0}-{1}', github.ref_name, needs.version.outputs.fedora) }}
+
+  # The testing channel (lupi channel testing) follows the tag `testing`, which has no Fedora version
+  # in it: installs keep getting updates when testing moves to the next Fedora. It only moves after
+  # both images passed the boot test, so the testing channel never gets a build that didn't boot. A
+  # newer testing build can't have replaced br-testing-<version> in the meantime: starting one
+  # cancels this run (concurrency above).
+  channel-tag:
+    name: Move the testing tag
+    needs: [version, boot-test]
+    if: github.ref_name == 'testing' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        image: [lupios, lupios-nvidia]
+    steps:
+      - env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          VERSION: ${{ needs.version.outputs.fedora }}
+          ACTOR: ${{ github.actor }}
+          TOKEN: ${{ github.token }}
+        run: |
+          skopeo login ghcr.io -u "$ACTOR" --password-stdin <<<"$TOKEN"
+          # Same manifest, new name: the signature is stored by digest, so it covers the new tag too
+          skopeo copy --all --preserve-digests "docker://$IMAGE:br-testing-$VERSION" "docker://$IMAGE:testing"
+          a=$(skopeo inspect --raw "docker://$IMAGE:br-testing-$VERSION" | sha256sum)
+          b=$(skopeo inspect --raw "docker://$IMAGE:testing" | sha256sum)
+          [[ $a == "$b" ]] || { echo "testing doesn't point at br-testing-$VERSION" >&2; exit 1; }
+          echo "$IMAGE:testing = br-testing-$VERSION (sha256:${a%% *})"
