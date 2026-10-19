@@ -1,0 +1,16 @@
+---
+// A command to type or paste, with a Copy button (the layout's script shows it where copying works)
+interface Props {
+  code: string;
+  label?: string; // where to run it, e.g. "Windows PowerShell"
+}
+const { code, label } = Astro.props;
+---
+
+<figure class="cmd">
+  {label && <figcaption>{label}</figcaption>}
+  <div class="cmd-box">
+    <pre><code>{code}</code></pre>
+    <button type="button" class="copy" data-code={code} hidden aria-live="polite">Copy</button>
+  </div>
+</figure>

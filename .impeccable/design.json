@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-16T00:00:00Z",
+  "generatedAt": "2026-10-19T00:00:00Z",
   "title": "Design System: LupiOS",
   "extensions": {
     "colorMeta": {
@@ -14,22 +14,26 @@
       "hairline-strong": { "role": "neutral", "displayName": "Strong Hairline", "canonical": "rgb(139 224 255 / 0.45)", "tonalRamp": ["rgb(139 224 255 / 0.06)", "rgb(139 224 255 / 0.1)", "rgb(139 224 255 / 0.15)", "rgb(139 224 255 / 0.2)", "rgb(139 224 255 / 0.3)", "rgb(139 224 255 / 0.45)", "rgb(139 224 255 / 0.65)", "rgb(139 224 255 / 0.85)"] }
     },
     "typographyMeta": {
-      "display": { "displayName": "Species name", "purpose": "The name LupiOS in the first viewport only. Frost, balanced." },
-      "headline": { "displayName": "Account head", "purpose": "Section heads in the left column of each species account." },
-      "title": { "displayName": "Entry head", "purpose": "Ruled-grid entry heads, switch option names, key specimen names (1.45rem), Habitat column heads (1.6rem)." },
-      "name-latin": { "displayName": "Name, italic", "purpose": "Set in italic: the binomial, neighbour species names, plate credits (0.95rem)." },
-      "body": { "displayName": "Body", "purpose": "Running text. Ledes 44ch, section descriptions 34ch, asides 66ch." },
-      "body-small": { "displayName": "Body small", "purpose": "Tables, legends, asides, colophon." },
-      "label": { "displayName": "Plate label", "purpose": "Real small caps (Alegreya Sans SC): table heads, trait column, nav, status tag, field-mark numerals." },
-      "code": { "displayName": "Command", "purpose": "Inline commands in frost; command names in ruled grids at 1.15rem in ice." }
+      "display": { "displayName": "Species name", "purpose": "The name in the first viewport, set like the wordmark: \"Lupi\" 700, \"OS\" 400, -0.04em, frost. The download page title uses it up to 5rem." },
+      "headline": { "displayName": "Account head", "purpose": "Section heads on top of each species account (up to 3.4rem, -0.035em); up to 2.75rem beside commands on the download page." },
+      "title": { "displayName": "Entry head", "purpose": "Ruled-grid entry heads and switch option names (1.2rem), key specimen names (1.45rem), Habitat column heads (1.45rem)." },
+      "name-latin": { "displayName": "Name, italic", "purpose": "Set in italic: the binomial (1.25rem, ice), neighbour species names (1.15rem), plate credits (0.92rem)." },
+      "body": { "displayName": "Body", "purpose": "Running text at 1.0625rem. Section intros 1.125rem at 54ch, ledes 46ch (download page 56ch), asides 66ch." },
+      "body-small": { "displayName": "Body small", "purpose": "Tables, legends, side notes, asides, colophon." },
+      "label": { "displayName": "Label", "purpose": "Bold sentence case (Arimo 700, 0.85-0.9rem): table heads, command labels, phone row labels, the trait column. The status tag is the one uppercase label." },
+      "code": { "displayName": "Command", "purpose": "Inline commands in frost; command names in ruled grids at 1.1rem in ice; command plates at 0.9rem." }
     },
     "shadows": [],
     "motion": [
       { "name": "ease", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The only easing: soft exponential out, for every transition and the load moment." },
+      { "name": "rule-in", "value": "clip-path inset(0 100% 0 0) to inset(0) over 1.8s, 0.1s delay", "purpose": "The ridge draws left to right on load." },
       { "name": "draw", "value": "clip-path inset(0 0 0 100%) to inset(0) over 1.1s, 0.25s delay", "purpose": "The plate's leader lines reveal on load." },
-      { "name": "land", "value": "opacity 0 and scale(0.6) to rest over 0.6s, 80ms stagger from 0.9s", "purpose": "Field marks land in sequence after the lines draw." },
+      { "name": "land", "value": "opacity 0 and scale(0.6) to rest over 0.6s, 80ms stagger from 0.9s", "purpose": "Field marks land in sequence after the lines draw (the Den's when it comes into view)." },
+      { "name": "rule", "value": "scaleX(0) to 1 from the left, 1.1s; rows by background-size, 0.8s, 70ms stagger capped at 7; entry rules 0.9s, 90ms stagger", "purpose": "Each account rules its lines in once it scrolls into view (.motion + .drawn). Only lines and marks start hidden, never text." },
+      { "name": "leader", "value": "clip-path inset(0 100% 0 0) to inset(0), 0.5s", "purpose": "The key's dotted leader runs out to its answer on hover or focus." },
+      { "name": "page", "value": "@view-transition navigation: auto; html scroll-behavior: smooth", "purpose": "Pages crossfade (the masthead stays put); in-page links scroll smoothly." },
       { "name": "state", "value": "0.45s colour / background ease", "purpose": "Temperament switch re-inking; button hover 0.25s." },
-      { "name": "reduced", "value": "prefers-reduced-motion: reduce removes all animation and transition", "purpose": "The load moment runs only under no-preference." }
+      { "name": "reduced", "value": "prefers-reduced-motion: reduce: no .motion, no animation, no smooth scroll, no view transition", "purpose": "Colour transitions stay, because they carry state." }
     ],
     "breakpoints": [
       { "name": "first-viewport-stack", "value": "64rem" },
@@ -43,8 +47,8 @@
       "kind": "button",
       "refersTo": "button-primary",
       "description": "Solid ice stamp for Download; one per region.",
-      "html": "<a class=\"ds-button\" href=\"#key\">Download</a>",
-      "css": ".ds-button { display: inline-flex; align-items: center; padding: 0.65rem 1.15rem; border-radius: 2px; background: #8be0ff; color: #0b1220; font: 700 1rem/1.2 'Alegreya Sans', system-ui, sans-serif; text-decoration: none; transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1); } .ds-button:hover { background: #cff3ff; } .ds-button:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
+      "html": "<a class=\"ds-button\" href=\"/download/\">Download</a>",
+      "css": ".ds-button { display: inline-flex; align-items: center; padding: 0.65rem 1.15rem; border-radius: 2px; background: #8be0ff; color: #0b1220; font: 700 1rem/1.2 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; text-decoration: none; transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1); } .ds-button:hover { background: #cff3ff; } .ds-button:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
     },
     {
       "name": "Quiet Link",
@@ -52,15 +56,15 @@
       "refersTo": "link-quiet",
       "description": "Secondary actions beside the button: underlined ink text, no ghost button.",
       "html": "<span class=\"ds-quiet-wrap\"><a class=\"ds-quiet\" href=\"#\">How to install</a></span>",
-      "css": ".ds-quiet-wrap { background: #0b1220; padding: 1rem; display: inline-block; } .ds-quiet { color: #ddf4ff; font: 500 1.125rem/1.6 'Alegreya Sans', system-ui, sans-serif; text-decoration-thickness: 1px; text-underline-offset: 0.22em; } .ds-quiet:hover { color: #cff3ff; } .ds-quiet:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
+      "css": ".ds-quiet-wrap { background: #0b1220; padding: 1rem; display: inline-block; } .ds-quiet { color: #ddf4ff; font: 400 1.125rem/1.6 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; text-decoration-thickness: 1px; text-underline-offset: 0.22em; } .ds-quiet:hover { color: #cff3ff; } .ds-quiet:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
     },
     {
       "name": "Masthead Navigation",
       "kind": "nav",
       "refersTo": "nav-link",
-      "description": "Small-caps dim links over one hairline, Download at the end.",
+      "description": "Dim links over one hairline, Download at the end.",
       "html": "<nav class=\"ds-nav\"><a href=\"#\">Install</a><a href=\"#\">The lupi command</a><a href=\"#\">Security</a><a href=\"#\">FAQ</a><a class=\"ds-nav-btn\" href=\"#\">Download</a></nav>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem 1rem; background: #0b1220; border-bottom: 1px solid rgb(139 224 255 / 0.2); } .ds-nav a { color: #a3bbcc; font: 500 1.05rem 'Alegreya Sans SC', 'Alegreya Sans', system-ui, sans-serif; letter-spacing: 0.03em; text-decoration: none; } .ds-nav a:hover { color: #cff3ff; } .ds-nav .ds-nav-btn { margin-left: auto; padding: 0.65rem 1.15rem; border-radius: 2px; background: #8be0ff; color: #0b1220; font: 700 1rem/1.2 'Alegreya Sans', system-ui, sans-serif; letter-spacing: 0; }"
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem 1rem; background: #0b1220; border-bottom: 1px solid rgb(139 224 255 / 0.2); } .ds-nav a { color: #a3bbcc; font: 400 1.05rem Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; letter-spacing: 0.03em; text-decoration: none; } .ds-nav a:hover { color: #cff3ff; } .ds-nav .ds-nav-btn { margin-left: auto; padding: 0.65rem 1.15rem; border-radius: 2px; background: #8be0ff; color: #0b1220; font: 700 1rem/1.2 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; letter-spacing: 0; }"
     },
     {
       "name": "Status Tag",
@@ -68,7 +72,7 @@
       "refersTo": "tag-status",
       "description": "The single ochre outline tag stating release status, followed by plain words.",
       "html": "<p class=\"ds-status\"><span class=\"ds-tag\">Early release</span><span>It installs and works, and every build is tested before release.</span></p>",
-      "css": ".ds-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.75rem; margin: 0; padding: 1rem; background: #0b1220; color: #a3bbcc; font: 400 0.98rem/1.5 'Alegreya Sans', system-ui, sans-serif; } .ds-tag { padding: 0.05rem 0.55rem 0.15rem; border: 1px solid #d9b26a; color: #d9b26a; font: 500 0.95rem/1.4 'Alegreya Sans SC', 'Alegreya Sans', sans-serif; letter-spacing: 0.06em; }"
+      "css": ".ds-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.75rem; margin: 0; padding: 1rem; background: #0b1220; color: #a3bbcc; font: 400 0.98rem/1.5 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-tag { padding: 0.05rem 0.55rem 0.15rem; border: 1px solid #d9b26a; color: #d9b26a; font: 400 0.95rem/1.4 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; letter-spacing: 0.06em; }"
     },
     {
       "name": "Field Mark Legend",
@@ -76,7 +80,7 @@
       "refersTo": "field-mark",
       "description": "Numbered circular marks with ice rings, keyed to a legend under a plate.",
       "html": "<ol class=\"ds-legend\"><li><b>Security 9/9</b>: the live score of lupi check</li><li><b>Security level</b>: sheep for every day, wolf for maximum caution</li></ol>",
-      "css": ".ds-legend { display: grid; gap: 0.45rem; margin: 0; padding: 1rem; list-style: none; counter-reset: mark; background: #0b1220; color: #a3bbcc; font: 400 0.98rem/1.45 'Alegreya Sans', system-ui, sans-serif; } .ds-legend li { display: grid; grid-template-columns: 1.85rem 1fr; gap: 0.7rem; align-items: start; counter-increment: mark; } .ds-legend li::before { content: counter(mark); display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid #8be0ff; border-radius: 50%; color: #cff3ff; font: 500 0.85rem/1 'Alegreya Sans SC', sans-serif; } .ds-legend b { color: #ddf4ff; }"
+      "css": ".ds-legend { display: grid; gap: 0.45rem; margin: 0; padding: 1rem; list-style: none; counter-reset: mark; background: #0b1220; color: #a3bbcc; font: 400 0.98rem/1.45 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-legend li { display: grid; grid-template-columns: 1.85rem 1fr; gap: 0.7rem; align-items: start; counter-increment: mark; } .ds-legend li::before { content: counter(mark); display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid #8be0ff; border-radius: 50%; color: #cff3ff; font: 400 0.85rem/1 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-legend b { color: #ddf4ff; }"
     },
     {
       "name": "Temperament Switch",
@@ -84,56 +88,58 @@
       "refersTo": "switch-option",
       "description": "Pure-CSS radio pair; the checked option fills with the accent, wolf re-inks ice to ochre.",
       "html": "<div class=\"ds-switch-wrap\"><fieldset class=\"ds-switch\"><input type=\"radio\" name=\"ds-level\" id=\"ds-sheep\" checked><label for=\"ds-sheep\"><b>Sheep</b>the everyday default</label><input type=\"radio\" name=\"ds-level\" id=\"ds-wolf\"><label for=\"ds-wolf\"><b>Wolf</b>maximum caution</label></fieldset></div>",
-      "css": ".ds-switch-wrap { --accent: #8be0ff; background: #0b1220; padding: 1rem; } .ds-switch-wrap:has(#ds-wolf:checked) { --accent: #d9b26a; } .ds-switch { display: inline-flex; margin: 0; padding: 0; border: 1px solid var(--accent); transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1); } .ds-switch input { position: absolute; opacity: 0; } .ds-switch label { display: grid; gap: 0.05rem; padding: 0.6rem 1.25rem 0.7rem; color: #a3bbcc; font: 400 0.95rem/1.3 'Alegreya Sans', sans-serif; cursor: pointer; transition: background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1), color 0.45s cubic-bezier(0.16, 1, 0.3, 1); } .ds-switch label b { color: #cff3ff; font: 700 1.3rem/1.2 Alegreya, Georgia, serif; } .ds-switch input:checked + label { background: var(--accent); color: #0b1220; } .ds-switch input:checked + label b { color: #0b1220; } .ds-switch input:focus-visible + label { outline: 2px solid #d9b26a; outline-offset: 3px; }"
+      "css": ".ds-switch-wrap { --accent: #8be0ff; background: #0b1220; padding: 1rem; } .ds-switch-wrap:has(#ds-wolf:checked) { --accent: #d9b26a; } .ds-switch { display: inline-flex; margin: 0; padding: 0; border: 1px solid var(--accent); transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1); } .ds-switch input { position: absolute; opacity: 0; } .ds-switch label { display: grid; gap: 0.05rem; padding: 0.6rem 1.25rem 0.7rem; color: #a3bbcc; font: 400 0.95rem/1.3 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; cursor: pointer; transition: background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1), color 0.45s cubic-bezier(0.16, 1, 0.3, 1); } .ds-switch label b { color: #cff3ff; font: 700 1.3rem/1.2 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-switch input:checked + label { background: var(--accent); color: #0b1220; } .ds-switch input:checked + label b { color: #0b1220; } .ds-switch input:focus-visible + label { outline: 2px solid #d9b26a; outline-offset: 3px; }"
     },
     {
       "name": "Similar Species Table",
       "kind": "custom",
       "description": "Hairline-ruled comparison with small-caps heads, italic neighbour names, LupiOS's row ruled in ochre.",
       "html": "<table class=\"ds-species\"><thead><tr><th>Species</th><th>How it updates</th></tr></thead><tbody><tr><th>Bazzite</th><td>One signed image</td></tr><tr class=\"self\"><th>LupiOS</th><td>One signed image, booted and checked</td></tr></tbody></table>",
-      "css": ".ds-species { width: 100%; border-collapse: collapse; background: #0b1220; font: 400 1rem/1.45 'Alegreya Sans', sans-serif; } .ds-species th, .ds-species td { padding: 0.75rem 1rem 0.75rem 0; border-bottom: 1px solid rgb(139 224 255 / 0.2); text-align: left; vertical-align: top; } .ds-species thead th { color: #a3bbcc; font: 500 0.98rem 'Alegreya Sans SC', sans-serif; letter-spacing: 0.04em; } .ds-species tbody th { color: #cff3ff; font: italic 500 1.3rem/1.25 Alegreya, Georgia, serif; } .ds-species td { color: #a3bbcc; } .ds-species tr.self th, .ds-species tr.self td { border-top: 1px solid #d9b26a; border-bottom-color: #d9b26a; color: #ddf4ff; } .ds-species tr.self th { color: #d9b26a; font-style: normal; font-weight: 700; }"
+      "css": ".ds-species { width: 100%; border-collapse: collapse; background: #0b1220; font: 400 1rem/1.45 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-species th, .ds-species td { padding: 0.75rem 1rem 0.75rem 0; border-bottom: 1px solid rgb(139 224 255 / 0.2); text-align: left; vertical-align: top; } .ds-species thead th { color: #a3bbcc; font: 400 0.98rem Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; letter-spacing: 0.04em; } .ds-species tbody th { color: #cff3ff; font: italic 500 1.3rem/1.25 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-species td { color: #a3bbcc; } .ds-species tr.self th, .ds-species tr.self td { border-top: 1px solid #d9b26a; border-bottom-color: #d9b26a; color: #ddf4ff; } .ds-species tr.self th { color: #d9b26a; font-style: normal; font-weight: 700; }"
     },
     {
       "name": "Identification Key Couplet",
       "kind": "custom",
       "description": "Numbered couplet; each lead runs a dotted leader to a bold ice destination.",
       "html": "<ol class=\"ds-key\"><li><span class=\"num\">2</span><a class=\"lead\" href=\"#\"><span>An NVIDIA GeForce GTX 16xx, RTX 20xx or newer</span><span class=\"dots\"></span><span class=\"to\">LupiOS for NVIDIA</span></a><a class=\"lead\" href=\"#\"><span>AMD or Intel graphics, or a virtual machine</span><span class=\"dots\"></span><span class=\"to\">LupiOS</span></a></li></ol>",
-      "css": ".ds-key { margin: 0; padding: 1rem; list-style: none; background: #0b1220; font: 400 1.125rem/1.6 'Alegreya Sans', sans-serif; } .ds-key li { display: grid; grid-template-columns: 2.25rem 1fr; column-gap: 0.75rem; padding: 0.85rem 0; border-block: 1px solid rgb(139 224 255 / 0.2); } .ds-key .num { grid-row: span 2; color: #cff3ff; font: 700 1.35rem/2rem Alegreya, Georgia, serif; } .ds-key .lead { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.35rem 0; color: #ddf4ff; text-decoration: none; } .ds-key .dots { flex: 1 1 2rem; min-width: 2rem; border-bottom: 2px dotted color-mix(in srgb, #a3bbcc 55%, transparent); transform: translateY(-0.3em); } .ds-key .to { flex: none; font-weight: 700; color: #8be0ff; white-space: nowrap; } .ds-key .lead:hover span:first-child, .ds-key .lead:focus-visible span:first-child { text-decoration: underline; text-decoration-color: #8be0ff; } .ds-key .lead:hover .dots { border-bottom-color: #8be0ff; } .ds-key .lead:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
+      "css": ".ds-key { margin: 0; padding: 1rem; list-style: none; background: #0b1220; font: 400 1.125rem/1.6 Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-key li { display: grid; grid-template-columns: 2.25rem 1fr; column-gap: 0.75rem; padding: 0.85rem 0; border-block: 1px solid rgb(139 224 255 / 0.2); } .ds-key .num { grid-row: span 2; color: #cff3ff; font: 700 1.35rem/2rem Arimo, 'Helvetica Neue', Helvetica, Arial, sans-serif; } .ds-key .lead { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.35rem 0; color: #ddf4ff; text-decoration: none; } .ds-key .dots { flex: 1 1 2rem; min-width: 2rem; border-bottom: 2px dotted color-mix(in srgb, #a3bbcc 55%, transparent); transform: translateY(-0.3em); } .ds-key .to { flex: none; font-weight: 700; color: #8be0ff; white-space: nowrap; } .ds-key .lead:hover span:first-child, .ds-key .lead:focus-visible span:first-child { text-decoration: underline; text-decoration-color: #8be0ff; } .ds-key .lead:hover .dots { border-bottom-color: #8be0ff; } .ds-key .lead:focus-visible { outline: 2px solid #d9b26a; outline-offset: 3px; }"
     }
   ],
   "narrative": {
     "northStar": "The Night Field Guide",
-    "overview": "LupiOS is shown as a species in a field guide printed for night use: total navy plates, ice-blue hairlines, numbered leader-line callouts on real photographs (VM screenshots), frost serif names with italic Latin, and small-caps labels. It continues the OS's own night identity (ice-blue wolf mark on deep navy, mountain ridges, the palette in `art/generate.mjs`), so the website, wallpapers, installer and link preview read as one brand.\n\nHierarchy comes from type and ink, never from boxes or light. Content is set as \"species accounts\": a heading column on the left, the account on the right, each separated by one hairline rule. Comparisons are ruled tables, explanations are ruled heading-and-text grids, and evidence is a plate with numbered marks. Density is that of a reference book: generous section breaks, tight ruled rows inside.\n\nThe world is dark only by design: the brand is night. The home page sets `color-scheme: dark` on its root and offers no light variant. The docs pages stay on Starlight's own theme (lupios.css) and are outside this world, except where they host the shared identification key, which falls back to Starlight's colours there.",
+    "overview": "LupiOS is shown as a species in a field guide printed for night use: total navy plates, ice-blue hairlines, numbered leader-line callouts on real photographs (VM screenshots), names in the logo's own Helvetica letter shapes (Arimo) with italic Latin, and bold labels. It continues the OS's own night identity (ice-blue wolf mark on deep navy, mountain ridges, the palette in `art/generate.mjs`), so the website, wallpapers, installer and link preview read as one brand.\n\nHierarchy comes from type and ink, never from boxes or light. Content is set as \"species accounts\": the heading and its intro on top, the account across the full width below, each account opened by one hairline rule; side notes sit beside the table, plate or key they explain. Comparisons are ruled tables, explanations are ruled heading-and-text grids, and evidence is a plate with numbered marks. Density is that of a reference book: generous section breaks, tight ruled rows inside.\n\nThe world is dark only by design: the brand is night. The field-guide pages (the home page and the download page, framed by `src/layouts/GuideLayout.astro`) set `color-scheme: dark` on their root and offer no light variant. The docs pages stay on Starlight's own theme (lupios.css), outside this world, but share its typeface (Arimo, tight headings) and its page-to-page crossfade, so moving between them feels like one site.",
     "keyCharacteristics": [
       "Navy plate background, edge to edge, with ice hairlines as the only structure.",
-      "Alegreya (display, names, italic Latin) over Alegreya Sans (body) and Alegreya Sans SC (labels), JetBrains Mono for commands.",
+      "Arimo throughout (the Helvetica letter shapes of the logo): bold display set like the wordmark, regular body, italic for names. JetBrains Mono for commands.",
       "One ochre, reserved for what the reader is pointed at.",
       "Real screenshots as plates, annotated with numbered circular field marks and leader lines.",
       "Flat: no cards, no glow, no gradients.",
-      "One authored motion moment; everything else is a quiet state transition."
+      "Motion is ink being drawn: the first viewport draws itself on load, and each account rules its lines in as it comes into view."
     ],
     "rules": [
       { "name": "The Pointed-At Rule", "body": "Ochre marks only what the reader is being pointed at: a status, a focus, a chosen state, the answer to the key, LupiOS among its neighbours. Never decoration, never a second brand colour, never more than one pointed-at thing per view in normal reading.", "section": "colors" },
       { "name": "The Ink-Not-Box Rule", "body": "Emphasis is done by moving text up the ink ladder (dim, ink, frost, ice, ochre), not by putting it in a filled container.", "section": "colors" },
-      { "name": "The Real Small Caps Rule", "body": "Labels use the Alegreya Sans SC face with light tracking (0.03 to 0.06em). No `text-transform: uppercase`, no synthesized caps.", "section": "typography" },
-      { "name": "The Italic Is a Name Rule", "body": "Alegreya italic is reserved for names (species, Latin) and photo credits.", "section": "typography" },
+      { "name": "The Wordmark Rule", "body": "Type follows the logo: one neo-grotesque (Arimo) for everything but code, headings tight (-0.015 to -0.04em) like the wordmark, and the name in the first viewport set exactly as the logo is (bold \"Lupi\", regular \"OS\"). No second display family.", "section": "typography" },
+      { "name": "The One Stamp Rule", "body": "Capitals appear once per page: the ochre status tag (700, 0.78rem, 0.08em). Every other label is bold sentence case.", "section": "typography" },
+      { "name": "The Italic Is a Name Rule", "body": "Italic is reserved for names (species, Latin) and photo credits.", "section": "typography" },
       { "name": "The Flat Plate Rule", "body": "Surfaces are the night plate itself. A thing is set apart by a hairline, never by a fill or a glow.", "section": "elevation" }
     ],
     "dos": [
       "Do keep every page of this world on the night plate (night) edge to edge, dark only.",
       "Do structure with hairlines (hairline between sections and rows, hairline-strong above grid entries and around inset plates).",
-      "Do set content as accounts: heading column 4fr left, body 8fr right.",
+      "Do set content as accounts: the heading and intro on top, the account across the full width, side notes beside what they explain.",
       "Do prove features with real screenshots as plates, annotated with numbered circular field marks, a legend and a provenance credit.",
       "Do hold ochre for the pointed-at thing: status, focus ring, chosen state, key answer, LupiOS's own row.",
-      "Do use the Alegreya Sans SC face for labels and Alegreya italic for names and Latin.",
+      "Do use Arimo for everything but code, with tight headings and LupiOS set like the wordmark; italic only for names and Latin.",
       "Do make comparison tables collapse to labelled blocks per row below 52rem."
     ],
     "donts": [
       "Don't wrap content in cards: no filled or shadowed boxes around text groups. Bordered plates around photographs and the terminal transcript are the world's own material and stay.",
       "Don't add glow, gradients or a gradient hero over an icon-card grid.",
       "Don't introduce a second warm accent or use ochre decoratively.",
-      "Don't fake small caps with uppercase transforms or wide tracking.",
-      "Don't add motion beyond the plate's line draw and mark landing; state changes only ease colour.",
+      "Don't bring back a second display family, or uppercase labels beyond the one status tag.",
+      "Don't leave a column empty for symmetry: an account's side column holds real notes or nothing.",
+      "Don't add motion that isn't a line being drawn or a mark landing (no fade-and-rise sections, no parallax); state changes only ease colour.",
       "Don't invent screenshots, users, numbers or testimonials for plates or marks."
     ]
   }

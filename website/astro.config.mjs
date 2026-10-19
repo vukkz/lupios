@@ -28,10 +28,17 @@ export default defineConfig({
       ].map(([property, content]) => ({ tag: "meta", attrs: { property, content } }))
         .concat({ tag: "meta", attrs: { name: "twitter:image", content: "https://lupios.org/og.png" } }),
       social: [{ icon: "github", label: "GitHub", href: repo }],
-      customCss: ["./src/styles/lupios.css"],
+      // Arimo: the Helvetica letter shapes of the logo, the same font as the home and download pages
+      customCss: [
+        "@fontsource/arimo/latin-400.css",
+        "@fontsource/arimo/latin-700.css",
+        "@fontsource/arimo/latin-400-italic.css",
+        "./src/styles/lupios.css",
+      ],
       editLink: { baseUrl: `${repo}/edit/main/website/` },
       sidebar: [
-        { label: "Get LupiOS", items: ["download", "install", "dual-boot"] },
+        // the download page is its own Astro page (src/pages/download.astro), not a docs page
+        { label: "Get LupiOS", items: [{ label: "Download", link: "/download/" }, "install", "dual-boot"] },
         { label: "Use it", items: ["lupi"] },
         { label: "Learn more", items: ["security", "changes", "faq"] },
       ],

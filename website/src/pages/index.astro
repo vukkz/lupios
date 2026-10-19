@@ -2,24 +2,17 @@
 // The home page (https://lupios.org/): LupiOS as a species in a field guide printed for night use.
 // It's its own page rather than a Starlight one, so it can be a product page; the docs stay Starlight.
 // Copy follows PRODUCT.md (early release, no invented numbers); facts come from SECURITY.md.
-import "@fontsource/alegreya/latin-500.css";
-import "@fontsource/alegreya/latin-700.css";
-import "@fontsource/alegreya/latin-500-italic.css";
-import "@fontsource/alegreya-sans/latin-400.css";
-import "@fontsource/alegreya-sans/latin-500.css";
-import "@fontsource/alegreya-sans/latin-700.css";
-import "@fontsource/alegreya-sans-sc/latin-500.css";
-import "@fontsource/jetbrains-mono/latin-400.css";
-import "../styles/guide.css";
 import { Image } from "astro:assets";
-import IdentificationKey from "../components/IdentificationKey.astro";
-import lockup from "../assets/lupios-lockup-dark.svg";
+import GuideLayout from "../layouts/GuideLayout.astro";
+import { isos } from "../downloads";
 import ridge from "../assets/guide-ridge.svg";
 import desktop from "../assets/screenshots/desktop.png";
 import panel from "../assets/screenshots/panel.png";
 import strictLab from "../assets/screenshots/strict-lab.png";
 
 const repo = "https://github.com/vukkz/lupios";
+// each ISO's entry in the download page's key: lupios.iso -> #iso-lupios, lupios-nvidia.iso -> #iso-nvidia
+const isoId = (file: string) => `iso-${file.replace(/^lupios-?|\.iso$/g, "") || "lupios"}`;
 const title = "LupiOS: a Linux desktop that's secure without the hassle";
 const description =
   "Fedora Atomic with KDE Plasma, hardened by default and explained in plain words, with Kali's hacking tools in a lab of their own.";
@@ -87,49 +80,10 @@ const similar = [
 ];
 ---
 
-<!doctype html>
-<html lang="en" class="guide-root">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href="https://lupios.org/" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#0B1220" />
-    <meta name="color-scheme" content="dark" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://lupios.org/" />
-    <meta property="og:title" content="A Linux desktop that's secure without the hassle" />
-    <meta property="og:description" content={description} />
-    <meta property="og:site_name" content="LupiOS" />
-    <meta property="og:image" content="https://lupios.org/og.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="The LupiOS logo above night mountains" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://lupios.org/og.png" />
-  </head>
-  <body class="guide">
-    <a class="skip" href="#main">Skip to the content</a>
-    <header class="masthead">
-      <a class="home" href="/" aria-label="LupiOS home">
-        <img src={lockup.src} width="128" height="40" alt="LupiOS" />
-      </a>
-      <nav aria-label="Main">
-        <a href="/install/">Install</a>
-        <a href="/lupi/">The lupi command</a>
-        <a href="/security/">Security</a>
-        <a href="/faq/">FAQ</a>
-        <a href={repo}>GitHub</a>
-      </nav>
-      <a class="button" href="#key">Download</a>
-    </header>
-
-    <main id="main">
+<GuideLayout title={title} description={description} path="/" shareTitle="A Linux desktop that's secure without the hassle">
       <section class="specimen-page" aria-labelledby="name">
         <div class="account">
-          <h1 id="name">LupiOS</h1>
+          <h1 id="name"><span>Lupi</span><span class="os">OS</span></h1>
           <p class="binomial"><i>Lupus custos</i>, the wolf that keeps watch</p>
           <p class="promise">A Linux desktop that's secure without the hassle.</p>
           <p class="lede">
@@ -142,7 +96,7 @@ const similar = [
             <span>It installs and works, and every build is tested before release. It's young: it hasn't met much real hardware yet.</span>
           </p>
           <p class="actions">
-            <a class="button" href="#key">Download</a>
+            <a class="button" href="/download/">Download</a>
             <a class="quiet" href="/install/">How to install</a>
             <a class="quiet" href={repo}>Source on GitHub</a>
           </p>
@@ -181,7 +135,7 @@ const similar = [
         <img class="ridge" src={ridge.src} alt="" width="2400" height="260" />
       </section>
 
-      <section class="temperament" aria-labelledby="temperament">
+      <section class="temperament" aria-labelledby="temperament" data-draw>
         <div class="section-head">
           <h2 id="temperament">Temperament</h2>
           <p>Two security levels, one switch. It changes a bundle of settings at once, instantly, without a restart.</p>
@@ -201,8 +155,8 @@ const similar = [
           </thead>
           <tbody>
             {
-              temperament.map((r) => (
-                <tr class:list={[{ differs: r.sheep !== r.wolf }]}>
+              temperament.map((r, i) => (
+                <tr class:list={[{ differs: r.sheep !== r.wolf }]} style={`--r: ${i}`}>
                   <th scope="row">{r.what}</th>
                   <td class="sheep">{r.sheep}</td>
                   <td class="wolf">{r.wolf}</td>
@@ -225,7 +179,7 @@ const similar = [
         </div>
       </section>
 
-      <section class="habitat" aria-labelledby="habitat">
+      <section class="habitat" aria-labelledby="habitat" data-draw>
         <div class="section-head">
           <h2 id="habitat">Habitat</h2>
           <p>Every network gets a trust level. New Wi-Fi starts public, a new cable starts home, and one click changes it.</p>
@@ -238,8 +192,8 @@ const similar = [
           </thead>
           <tbody>
             {
-              habitat.map((r) => (
-                <tr>
+              habitat.map((r, i) => (
+                <tr style={`--r: ${i}`}>
                   <td class="home">{r.home}</td>
                   <th scope="row" class="trait">{r.what}</th>
                   <td class="public">{r.public}</td>
@@ -252,7 +206,7 @@ const similar = [
         </div>
       </section>
 
-      <section class="den" aria-labelledby="den">
+      <section class="den" aria-labelledby="den" data-draw>
         <div class="section-head">
           <h2 id="den">Den</h2>
           <p>Kali's top hacking tools, one command away, in a container that keeps them off your system.</p>
@@ -262,7 +216,7 @@ const similar = [
           <div class="plate-photo">
             <Image src={strictLab} widths={[922]} sizes="(min-width: 75rem) 46rem, 100vw" alt="A terminal in the strict lab: ls /home shows nothing, /run/host doesn't exist, nmap version 7.99 starts, and a SYN scan of port 22 on 127.0.0.1 reports it closed." />
             <ol class="marks" aria-hidden="true">
-              {denMarks.map((m, i) => <li style={`top: ${m.y}%`}>{i + 1}</li>)}
+              {denMarks.map((m, i) => <li style={`top: ${m.y}%; --m: ${i}`}>{i + 1}</li>)}
             </ol>
           </div>
           <pre class="transcript" aria-hidden="true">{transcript.map((l) => (l.mark ? <span class="line">{l.text}<b class="mark">{l.mark}</b></span> : <span class="line">{l.text}</span>))}</pre>
@@ -287,7 +241,7 @@ const similar = [
         </div>
       </section>
 
-      <section class="behaviour" aria-labelledby="behaviour">
+      <section class="behaviour" aria-labelledby="behaviour" data-draw>
         <div class="section-head">
           <h2 id="behaviour">Behaviour</h2>
           <p>How it lives from day to day.</p>
@@ -310,7 +264,7 @@ const similar = [
         </div>
       </section>
 
-      <section class="similar" aria-labelledby="similar">
+      <section class="similar" aria-labelledby="similar" data-draw>
         <div class="section-head">
           <h2 id="similar">Similar species</h2>
           <p>How to tell LupiOS from its neighbours.</p>
@@ -323,8 +277,8 @@ const similar = [
           </thead>
           <tbody>
             {
-              similar.map((s) => (
-                <tr class:list={[{ self: s.name === "LupiOS" }]}>
+              similar.map((s, i) => (
+                <tr class:list={[{ self: s.name === "LupiOS" }]} style={`--r: ${i}`}>
                   <th scope="row">{s.name}</th>
                   <td data-label="How it updates">{s.updates}</td>
                   <td data-label="Hacking tools">{s.tools}</td>
@@ -337,22 +291,36 @@ const similar = [
         </div>
       </section>
 
-      <section class="identify" id="key" aria-labelledby="key-title">
+      <section class="get" aria-labelledby="get" data-draw>
         <div class="section-head">
-          <h2 id="key-title">Identification key</h2>
-          <p>Which LupiOS is yours? Follow the line that fits.</p>
+          <h2 id="get">Get LupiOS</h2>
+          <p>Three installers, one LupiOS. Two questions on the download page tell you which one is yours.</p>
         </div>
         <div class="section-body">
-        <IdentificationKey />
+        <dl class="habits isos">
+          {
+            isos.map((iso) => (
+              <div>
+                <dt><a href={`/download/#${isoId(iso.file)}`}>{iso.name}</a></dt>
+                <dd>{iso.for}</dd>
+                <dd class="size">{iso.size}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="actions">
+          <a class="button" href="/download/">Choose your download</a>
+          <a class="quiet" href="/install/">How to install</a>
+          <a class="quiet" href="/download/#already-on-fedora-atomic">Already on Fedora Atomic?</a>
+        </p>
         <p class="aside">
           <b>Range:</b> a 64-bit PC with 8 GB of RAM, an SSD with 64 GB or more, and a USB stick of 8 GB
-          (2 GB for Online). Then follow the <a href="/install/">install guide</a>: about 30 minutes.
-          Already on Fedora Atomic? <a href="/download/#already-on-fedora-atomic">Switch without reinstalling</a>.
+          (2 GB for Online). Installing takes about 30 minutes.
         </p>
         </div>
       </section>
 
-      <section class="notes-field" aria-labelledby="notes">
+      <section class="notes-field" aria-labelledby="notes" data-draw>
         <div class="section-head">
           <h2 id="notes">Field notes</h2>
           <p>Don't take the guide's word for it.</p>
@@ -378,25 +346,4 @@ const similar = [
         </dl>
         </div>
       </section>
-    </main>
-
-    <footer class="colophon">
-      <p class="basis">
-        LupiOS is built on <a href="https://fedoraproject.org/atomic-desktops/">Fedora Atomic</a> and KDE Plasma,
-        through <a href="https://universal-blue.org">Universal Blue</a> and <a href="https://blue-build.org">BlueBuild</a>.
-        Fedora's security team patches the base.
-      </p>
-      <nav aria-label="Everything else">
-        <a href="/download/">Download</a>
-        <a href="/install/">Install</a>
-        <a href="/dual-boot/">Keeping Windows</a>
-        <a href="/lupi/">The lupi command</a>
-        <a href="/security/">Security</a>
-        <a href="/changes/">What's new</a>
-        <a href="/faq/">FAQ</a>
-        <a href={`${repo}/discussions`}>Questions</a>
-        <a href={`${repo}/security/advisories/new`}>Report a security problem</a>
-      </nav>
-    </footer>
-  </body>
-</html>
+</GuideLayout>
