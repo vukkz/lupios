@@ -15,3 +15,9 @@ export const isos = [
 ];
 
 export const fileUrl = (file: string) => `${downloads.base}/${file}/download`;
+
+// The order the download page's key leads to them (couplet 1, then 2); the home page lists them the same way
+export const keyOrder = ["lupios-online.iso", "lupios-nvidia.iso", "lupios.iso"];
+
+// Each ISO's place in the key: lupios.iso -> #iso-lupios, lupios-nvidia.iso -> #iso-nvidia
+export const isoId = (file: string) => `iso-${file.replace(/^lupios-?|\.iso$/g, "") || "lupios"}`;

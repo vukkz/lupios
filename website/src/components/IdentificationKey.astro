@@ -1,16 +1,11 @@
 ---
 // Which ISO is yours, as a field guide's identification key: pick the line that fits, follow it to
 // the next couplet or to your LupiOS. Plain links (no script), so it works everywhere. Used on the
-// download page (src/pages/download.astro); the ISO list and sizes live in src/downloads.ts.
+// download page (src/pages/download.astro); the ISO list, sizes and order live in src/downloads.ts.
 import { Icon } from "@astrojs/starlight/components";
-import { downloads, isos, fileUrl } from "../downloads";
+import { downloads, isos, fileUrl, keyOrder, isoId } from "../downloads";
 
-const iso = Object.fromEntries(isos.map((i) => [i.file, i]));
-const specimens = [
-  { id: "iso-online", ...iso["lupios-online.iso"] },
-  { id: "iso-nvidia", ...iso["lupios-nvidia.iso"] },
-  { id: "iso-lupios", ...iso["lupios.iso"] },
-];
+const specimens = keyOrder.map((file) => ({ id: isoId(file), ...isos.find((i) => i.file === file)! }));
 ---
 
 <div class="key not-content">
@@ -27,6 +22,7 @@ const specimens = [
         <span class="dots" aria-hidden="true"></span>
         <span class="to">go to 2</span>
       </a>
+      <p class="hint">Not sure about your graphics card? LupiOS Online works that out for you while it installs.</p>
     </li>
     <li id="key-2">
       <span class="num">2</span>
@@ -40,6 +36,7 @@ const specimens = [
         <span class="dots" aria-hidden="true"></span>
         <span class="to">LupiOS</span>
       </a>
+      <p class="hint">Which card do you have? On Windows: Task Manager, then Performance, then GPU.</p>
     </li>
   </ol>
 
@@ -47,7 +44,7 @@ const specimens = [
     {
       specimens.map((s) => (
         <li id={s.id} class="specimen">
-          <p class="name">{s.name}</p>
+          <h3 class="name">{s.name}</h3>
           <p class="for">{s.for}</p>
           {downloads.ready ? (
             <p class="get">
@@ -56,7 +53,7 @@ const specimens = [
                 {s.file}
               </a>
               <span class="meta">
-                {s.size} · <a href={fileUrl(`${s.file}-CHECKSUM`)}>checksum</a>
+                {s.size} from SourceForge · <a href={fileUrl(`${s.file}-CHECKSUM`)}>checksum</a>
               </span>
             </p>
           ) : (
@@ -68,6 +65,7 @@ const specimens = [
       ))
     }
   </ul>
+  <p class="restart"><a href="#key-1">Back to the questions</a></p>
 </div>
 
 <style>
@@ -103,7 +101,7 @@ const specimens = [
     border-bottom: 1px solid var(--k-line);
   }
   .num {
-    grid-row: span 2;
+    grid-row: span 3;
     font-family: var(--guide-display, inherit);
     font-variant-numeric: tabular-nums;
     font-weight: 700;
@@ -155,6 +153,13 @@ const specimens = [
   .lead:is(:hover, :focus-visible) .dots::after {
     clip-path: inset(0 0 0 0);
   }
+  /* the reassurance at the point of the question, not in a side note */
+  .hint {
+    grid-column: 2;
+    margin: 0.35rem 0 0.1rem;
+    color: var(--k-dim);
+    font-size: 0.92rem;
+  }
   @media (prefers-reduced-motion: reduce) {
     .lead .dots::after {
       transition: none;
@@ -166,7 +171,10 @@ const specimens = [
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
     gap: 0 2rem;
   }
+  /* a column each; the download buttons line up along the bottom however long the text above is */
   .specimen {
+    display: flex;
+    flex-direction: column;
     padding: 1.1rem 0 1.25rem;
     border-top: 2px solid var(--k-line);
     scroll-margin-top: 6rem;
@@ -179,7 +187,8 @@ const specimens = [
   .specimen:target .name {
     color: var(--k-mark);
   }
-  .specimen p {
+  .specimen p,
+  .specimen h3 {
     margin: 0;
   }
   .name {
@@ -187,6 +196,7 @@ const specimens = [
     font-size: 1.45rem;
     font-weight: 700;
     line-height: 1.3;
+    letter-spacing: -0.015em;
     color: var(--guide-frost, var(--k-ink));
   }
   .for {
@@ -198,7 +208,8 @@ const specimens = [
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem 1rem;
-    margin-top: 1rem !important;
+    margin-top: auto !important;
+    padding-top: 1rem;
   }
   .button {
     display: inline-flex;
@@ -208,12 +219,12 @@ const specimens = [
     border-radius: 2px;
     background: var(--k-accent);
     color: var(--k-on-accent);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
-    transition: background-color 0.2s;
+    transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .button:hover {
-    background: color-mix(in srgb, var(--k-accent) 80%, white);
+    background: var(--guide-frost, color-mix(in srgb, var(--k-accent) 80%, white));
     color: var(--k-on-accent);
   }
   .meta {
@@ -221,9 +232,23 @@ const specimens = [
     font-size: 0.9rem;
     font-variant-numeric: tabular-nums;
   }
-  .meta a {
+  .meta a,
+  .restart a {
     color: inherit;
     text-underline-offset: 0.2em;
+  }
+  /* fingers need more than a line of small text to hit */
+  @media (pointer: coarse) {
+    .meta a,
+    .restart a {
+      display: inline-block;
+      padding-block: 0.65rem;
+    }
+  }
+  .restart {
+    margin: -1.5rem 0 0;
+    color: var(--k-dim);
+    font-size: 0.92rem;
   }
   @media (max-width: 40rem) {
     .lead {

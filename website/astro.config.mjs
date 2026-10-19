@@ -33,6 +33,7 @@ export default defineConfig({
         "@fontsource/arimo/latin-400.css",
         "@fontsource/arimo/latin-700.css",
         "@fontsource/arimo/latin-400-italic.css",
+        "@fontsource/jetbrains-mono/latin-400.css",
         "./src/styles/lupios.css",
       ],
       editLink: { baseUrl: `${repo}/edit/main/website/` },

@@ -4,33 +4,34 @@
 // Copy follows PRODUCT.md (early release, no invented numbers); facts come from SECURITY.md.
 import { Image } from "astro:assets";
 import GuideLayout from "../layouts/GuideLayout.astro";
-import { isos } from "../downloads";
+import { isos, keyOrder, isoId } from "../downloads";
 import ridge from "../assets/guide-ridge.svg";
 import desktop from "../assets/screenshots/desktop.png";
 import panel from "../assets/screenshots/panel.png";
 import strictLab from "../assets/screenshots/strict-lab.png";
 
 const repo = "https://github.com/vukkz/lupios";
-// each ISO's entry in the download page's key: lupios.iso -> #iso-lupios, lupios-nvidia.iso -> #iso-nvidia
-const isoId = (file: string) => `iso-${file.replace(/^lupios-?|\.iso$/g, "") || "lupios"}`;
+// the three installers in the order the download page's key leads to them
+const installers = keyOrder.map((file) => isos.find((i) => i.file === file)!);
 const title = "LupiOS: a Linux desktop that's secure without the hassle";
 const description =
   "Fedora Atomic with KDE Plasma, hardened by default and explained in plain words, with Kali's hacking tools in a lab of their own.";
 
-// Field marks on the panel inset: where each number sits (percent of panel.png) and what it marks.
+// Field marks on the panel: where each number sits beside it on the desktop picture (photoY, percent of
+// desktop.png) and on the enlarged panel phones show instead (y, percent of panel.png), and what it marks
 const marks = [
-  { y: 16, label: "Security 9/9", text: "the live score of lupi check, which tests every protection" },
-  { y: 36, label: "Security level", text: "sheep for every day, wolf for maximum caution, one click" },
-  { y: 62, label: "Network trust", text: "new Wi-Fi starts public: invisible to everyone else there" },
-  { y: 79, label: "Game Mode", text: "Remote Play ports open, updates paused while you play" },
-  { y: 94, label: "Security check, the Lab", text: "the full report, and Kali's tools, one click away" },
+  { photoY: 45.6, y: 15.2, label: "Security 9/9", text: "The live score of lupi check, which tests every protection" },
+  { photoY: 56.9, y: 35.7, label: "Security level", text: "Sheep for every day, wolf for maximum caution" },
+  { photoY: 71.4, y: 62, label: "Network trust", text: "New Wi-Fi starts public: invisible to everyone else" },
+  { photoY: 80, y: 77.7, label: "Game Mode", text: "Remote Play ports open, updates paused while you play" },
+  { photoY: 88.9, y: 93.9, label: "Security check, the Lab", text: "The full report, and Kali's tools, one click away" },
 ];
 
 // Field marks on the strict lab's terminal (percent of strict-lab.png)
 const denMarks = [
-  { y: 40, label: "Not there", text: "your home folder is empty here, and the rest of the disk (/run/host) is missing" },
-  { y: 59, label: "Kali's tools", text: "nmap and the rest run as usual" },
-  { y: 81, label: "Raw sockets", text: "a SYN scan works, inside the lab's own network" },
+  { y: 37, label: "Not there", text: "your home folder is empty here, and the rest of the disk (/run/host) is missing" },
+  { y: 56.2, label: "Kali's tools", text: "nmap and the rest run as usual" },
+  { y: 80.2, label: "Raw sockets", text: "a SYN scan works, inside the lab's own network" },
 ];
 
 // The same session typed out, word for word from strict-lab.png: phones show this instead of the
@@ -70,13 +71,17 @@ const habitat = [
   { what: "Wi-Fi address", home: "The same every time", public: "New and random every time you connect" },
 ];
 
-// How to tell LupiOS from its neighbours: facts about each, no scores
+// How to tell LupiOS from its neighbours: facts about each, no scores. The hardening column is what each
+// project says about itself (checked 2026-10-19): secureblue.dev/features, kali.org "Should I Use Kali
+// Linux?", parrotsec.org "What is Parrot", Universal Blue's docs; LupiOS's from SECURITY.md.
 const similar = [
-  { name: "Kali Linux", updates: "Package by package", tools: "Hundreds, on the system", made: "Security jobs you boot it for" },
-  { name: "Parrot Security", updates: "Package by package", tools: "Many, on the system", made: "Security work and privacy" },
-  { name: "secureblue", updates: "One signed image", tools: "None", made: "Hardening as far as it goes, for experts" },
-  { name: "Bazzite", updates: "One signed image", tools: "None", made: "Gaming, from desktops to handhelds" },
-  { name: "LupiOS", updates: "One signed image, booted and checked", tools: "Kali's top tools, in a container", made: "Every day: secure without the hassle" },
+  { name: "Fedora Kinoite", updates: "One image", tools: "None", hardened: "Fedora's defaults, SELinux on", made: "Fedora's own KDE desktop, which LupiOS builds on" },
+  { name: "Aurora", updates: "One signed image", tools: "None", hardened: "Fedora's defaults", made: "A polished KDE desktop, with a developer edition" },
+  { name: "Bazzite", updates: "One signed image", tools: "None", hardened: "Fedora's defaults", made: "Gaming, from desktops to handhelds" },
+  { name: "secureblue", updates: "One signed image", tools: "None", hardened: "Further than LupiOS: a hardened memory allocator, its own hardened browser, user namespaces locked down", made: "Hardening as far as it goes, for experts" },
+  { name: "Kali Linux", updates: "Package by package", tools: "Hundreds, on the system", hardened: "Not its aim; network services start off", made: "Security jobs you boot it for" },
+  { name: "Parrot Security", updates: "Package by package", tools: "Many, on the system", hardened: "AppArmor profiles", made: "Security work and privacy" },
+  { name: "LupiOS", updates: "One signed image, booted and checked", tools: "Kali's top tools, in a container", hardened: "Firewall closed to incoming, kernel hardening, two security levels", made: "Every day: secure without the hassle" },
 ];
 ---
 
@@ -107,37 +112,38 @@ const similar = [
             <div class="plate-photo">
             <Image
               src={desktop}
-              widths={[640, 960, 1280, 1920]}
-              sizes="(min-width: 75rem) 52rem, 100vw"
+              widths={[640, 960, 1280, 1920, 2560]}
+              sizes="(min-width: 80rem) calc(50vw + 7rem), (min-width: 56rem) 62vw, 100vw"
+              quality={90}
               loading="eager"
-              alt="The LupiOS desktop: night mountains, a terminal showing the wolf logo and system information, and the LupiOS panel open beside the clock."
+              alt="The LupiOS desktop under a night sky with a moon: Konsole showing the wolf logo and system information, and the LupiOS panel open beside the clock, with security score 9 of 9, security level sheep, network trust home, Game Mode off, and buttons for the security check and the Lab."
             />
-            <svg class="plate-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <rect x="76.4" y="47.3" width="23.2" height="46.2" />
-              <line x1="76.4" y1="62" x2="29" y2="46" />
-            </svg>
+            <!-- the numbers stand in the gap between the terminal and the panel, each pointing at its row -->
+            <ol class="marks on-photo" aria-hidden="true">
+              {marks.map((m, i) => <li style={`top: ${m.photoY}%`}>{i + 1}</li>)}
+            </ol>
             </div>
+            <!-- phones: the panel enlarged under the picture, where the desktop is too small to read -->
             <div class="plate-inset">
-              <Image src={panel} widths={[444]} alt="The LupiOS panel, enlarged: security score 9 of 9, security level sheep, network trust home, Game Mode off, and buttons for the security check and the Lab." />
+              <Image src={panel} widths={[444, 880]} sizes="min(100vw - 5rem, 26rem)" quality={90} alt="The LupiOS panel, enlarged: security score 9 of 9, security level sheep, network trust home, Game Mode off, and buttons for the security check and the Lab." />
               <ol class="marks" aria-hidden="true">
                 {marks.map((m, i) => <li style={`top: ${m.y}%`}>{i + 1}</li>)}
               </ol>
             </div>
           </div>
-          <figcaption>
-            <ol class="legend">
-              {marks.map((m) => <li><span><b>{m.label}</b>: {m.text}</span></li>)}
-            </ol>
-            <p class="credit">The LupiOS panel opens from the wolf next to the clock. Photographed in a virtual machine.</p>
-          </figcaption>
+          <figcaption class="credit">The LupiOS panel opens from the wolf next to the clock. Photographed in a virtual machine.</figcaption>
         </figure>
 
-        <img class="ridge" src={ridge.src} alt="" width="2400" height="260" />
+        <ol class="field-marks" aria-label="What the numbers on the picture point at">
+          {marks.map((m) => <li><b>{m.label}</b><span>{m.text}</span></li>)}
+        </ol>
+
+        <img class="ridge" src={ridge.src} alt="" width="2400" height="260" data-draw />
       </section>
 
       <section class="temperament" aria-labelledby="temperament" data-draw>
         <div class="section-head">
-          <h2 id="temperament">Temperament</h2>
+          <h2 id="temperament">Temperament <span class="plain">two security levels</span></h2>
           <p>Two security levels, one switch. It changes a bundle of settings at once, instantly, without a restart.</p>
         </div>
         <div class="section-body">
@@ -151,7 +157,7 @@ const similar = [
         <table class="levels">
           <caption class="visually-hidden">What each security level changes</caption>
           <thead>
-            <tr><th scope="col">Field mark</th><th scope="col" class="sheep">Sheep</th><th scope="col" class="wolf">Wolf</th></tr>
+            <tr><th scope="col">Setting</th><th scope="col" class="sheep">Sheep</th><th scope="col" class="wolf">Wolf</th></tr>
           </thead>
           <tbody>
             {
@@ -181,7 +187,7 @@ const similar = [
 
       <section class="habitat" aria-labelledby="habitat" data-draw>
         <div class="section-head">
-          <h2 id="habitat">Habitat</h2>
+          <h2 id="habitat">Habitat <span class="plain">network trust</span></h2>
           <p>Every network gets a trust level. New Wi-Fi starts public, a new cable starts home, and one click changes it.</p>
         </div>
         <div class="section-body">
@@ -208,18 +214,18 @@ const similar = [
 
       <section class="den" aria-labelledby="den" data-draw>
         <div class="section-head">
-          <h2 id="den">Den</h2>
+          <h2 id="den">Den <span class="plain">the hacking lab</span></h2>
           <p>Kali's top hacking tools, one command away, in a container that keeps them off your system.</p>
         </div>
         <div class="section-body">
         <figure class="den-plate">
           <div class="plate-photo">
-            <Image src={strictLab} widths={[922]} sizes="(min-width: 75rem) 46rem, 100vw" alt="A terminal in the strict lab: ls /home shows nothing, /run/host doesn't exist, nmap version 7.99 starts, and a SYN scan of port 22 on 127.0.0.1 reports it closed." />
+            <Image src={strictLab} widths={[922, 1626]} quality={90} sizes="(min-width: 75rem) 42rem, 100vw" alt="A terminal in the strict lab: ls /home shows nothing, /run/host doesn't exist, nmap version 7.99 starts, and a SYN scan of port 22 on 127.0.0.1 reports it closed." />
             <ol class="marks" aria-hidden="true">
               {denMarks.map((m, i) => <li style={`top: ${m.y}%; --m: ${i}`}>{i + 1}</li>)}
             </ol>
           </div>
-          <pre class="transcript" aria-hidden="true">{transcript.map((l) => (l.mark ? <span class="line">{l.text}<b class="mark">{l.mark}</b></span> : <span class="line">{l.text}</span>))}</pre>
+          <pre class="transcript">{transcript.map((l) => (l.mark ? <span class="line">{l.text}<b class="mark">{l.mark}</b></span> : <span class="line">{l.text}</span>))}</pre>
           <figcaption>
             <ol class="legend">
               {denMarks.map((m) => <li><span><b>{m.label}</b>: {m.text}</span></li>)}
@@ -243,7 +249,7 @@ const similar = [
 
       <section class="behaviour" aria-labelledby="behaviour" data-draw>
         <div class="section-head">
-          <h2 id="behaviour">Behaviour</h2>
+          <h2 id="behaviour">Behaviour <span class="plain">updates, games, apps</span></h2>
           <p>How it lives from day to day.</p>
         </div>
         <div class="section-body">
@@ -266,14 +272,14 @@ const similar = [
 
       <section class="similar" aria-labelledby="similar" data-draw>
         <div class="section-head">
-          <h2 id="similar">Similar species</h2>
+          <h2 id="similar">Similar species <span class="plain">next to other distros</span></h2>
           <p>How to tell LupiOS from its neighbours.</p>
         </div>
         <div class="section-body">
         <table class="species">
           <caption class="visually-hidden">LupiOS next to similar systems</caption>
           <thead>
-            <tr><th scope="col">Species</th><th scope="col">How it updates</th><th scope="col">Hacking tools</th><th scope="col">Made for</th></tr>
+            <tr><th scope="col">Species</th><th scope="col">How it updates</th><th scope="col">Hacking tools</th><th scope="col">Hardened by default</th><th scope="col">Made for</th></tr>
           </thead>
           <tbody>
             {
@@ -282,12 +288,18 @@ const similar = [
                   <th scope="row">{s.name}</th>
                   <td data-label="How it updates">{s.updates}</td>
                   <td data-label="Hacking tools">{s.tools}</td>
+                  <td data-label="Hardened by default">{s.hardened}</td>
                   <td data-label="Made for">{s.made}</td>
                 </tr>
               ))
             }
           </tbody>
         </table>
+        <p class="aside">
+          Each project as it describes itself, October 2026. LupiOS leaves out the hardened memory allocator
+          secureblue uses, because it crashes apps like Discord and VS Code. Here is
+          <a href="/security/">every setting and its trade-off</a>.
+        </p>
         </div>
       </section>
 
@@ -299,7 +311,7 @@ const similar = [
         <div class="section-body">
         <dl class="habits isos">
           {
-            isos.map((iso) => (
+            installers.map((iso) => (
               <div>
                 <dt><a href={`/download/#${isoId(iso.file)}`}>{iso.name}</a></dt>
                 <dd>{iso.for}</dd>
@@ -314,7 +326,7 @@ const similar = [
           <a class="quiet" href="/download/#already-on-fedora-atomic">Already on Fedora Atomic?</a>
         </p>
         <p class="aside">
-          <b>Range:</b> a 64-bit PC with 8 GB of RAM, an SSD with 64 GB or more, and a USB stick of 8 GB
+          <b>What it needs:</b> a 64-bit PC with 8 GB of RAM, an SSD with 64 GB or more, and a USB stick of 8 GB
           (2 GB for Online). Installing takes about 30 minutes.
         </p>
         </div>
@@ -322,7 +334,7 @@ const similar = [
 
       <section class="notes-field" aria-labelledby="notes" data-draw>
         <div class="section-head">
-          <h2 id="notes">Field notes</h2>
+          <h2 id="notes">Field notes <span class="plain">what you can check</span></h2>
           <p>Don't take the guide's word for it.</p>
         </div>
         <div class="section-body">
@@ -344,6 +356,10 @@ const similar = [
             <dd>What's left before LupiOS calls itself finished is <a href={`${repo}/issues/9`}>listed in public</a>.</dd>
           </div>
         </dl>
+        <p class="actions">
+          <a class="button" href="/download/">Download LupiOS</a>
+          <a class="quiet" href="/install/">Read the install guide</a>
+        </p>
         </div>
       </section>
 </GuideLayout>

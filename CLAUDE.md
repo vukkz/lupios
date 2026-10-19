@@ -59,7 +59,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   `.impeccable/surfaces/`. The type is Arimo everywhere, docs included (self-hosted with @fontsource): the logo's
   wordmark is Helvetica, bold "Lupi" + regular "OS", and Arimo has the same letter shapes. The Starlight sidebar
   links to /download/ (`link:`), since it isn't a docs page. `src/components/IdentificationKey.astro` is the ISO
-  key, `Command.astro` a command with a Copy button. Sections with `data-draw` rule their lines in when they
+  key, `Command.astro` a command with a Copy button. `download.astro` reads the Fedora version from
+  `recipes/recipe.yml` at build time ("now Fedora 44"). The home page's Similar species table says what each
+  neighbour claims about itself (sources in a comment in index.astro, checked 2026-10-19): recheck it now and then. Sections with `data-draw` rule their lines in when they
   scroll into view (GuideLayout's script); only lines and marks start hidden, never text. Screenshots in
   `src/assets/screenshots/` carry their origin in the PNG (`embed-prompt.mjs --read`).
 

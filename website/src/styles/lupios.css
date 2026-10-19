@@ -1,21 +1,40 @@
-/* LupiOS colours for the site, from the OS palette in art/generate.mjs:
-   night #0B1220, trench #0A2F4F, abyss #0F4C7A, deep #1D7FC0, accent #33B5F0, ice #8BE0FF, frost #CFF3FF */
+/* LupiOS colours for the docs pages (Starlight), from the OS palette in art/generate.mjs:
+   night #0B1220, trench #0A2F4F, abyss #0F4C7A, deep #1D7FC0, accent #33B5F0, ice #8BE0FF, frost #CFF3FF.
+   The dark theme follows the field guide of the home and download pages (DESIGN.md): one night plate,
+   hairlines instead of panels and boxes, frost headings, ice links, ochre focus. The light theme keeps
+   the same structure in deep blue on white. Starlight keeps its own styles in cascade layers, so these
+   plain rules always win over them. */
 
 :root {
   /* Arimo: the Helvetica letter shapes the logo is set in, as on the home and download pages */
   --sl-font: "Arimo", "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+  --sl-font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --sl-color-accent-low: #0a2f4f;
   --sl-color-accent: #33b5f0;
   --sl-color-accent-high: #8be0ff;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #e6f1fb;
+  --sl-color-white: #cff3ff; /* headings and bold text: frost */
+  --sl-color-gray-1: #ddf4ff;
   --sl-color-gray-2: #c3d3e4;
-  --sl-color-gray-3: #8397b0;
+  --sl-color-gray-3: #a3bbcc;
   --sl-color-gray-4: #3d5069;
   --sl-color-gray-5: #1d2b42;
   --sl-color-gray-6: #111b2d;
   --sl-color-black: #0b1220;
+
+  /* one plate: header and sidebar on the page's own night, set apart by hairlines */
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-hairline: rgb(139 224 255 / 0.2);
+  --sl-color-hairline-light: rgb(139 224 255 / 0.2);
+  --sl-color-hairline-shade: var(--sl-color-black);
+  --sl-color-bg-inline-code: transparent;
+
+  --lupios-line-strong: rgb(139 224 255 / 0.45);
+  --lupios-code: #cff3ff;
+  --lupios-focus: #d9b26a; /* ochre, as on the home page */
+  --lupios-selection-bg: #8be0ff;
+  --lupios-selection-text: #0b1220;
 }
 
 :root[data-theme="light"] {
@@ -31,16 +50,28 @@
   --sl-color-gray-6: #e8f1f9;
   --sl-color-gray-7: #f0f7fc;
   --sl-color-black: #f7fbfe;
+
+  --sl-color-hairline: rgb(15 76 122 / 0.16);
+  --sl-color-hairline-light: rgb(15 76 122 / 0.16);
+
+  --lupios-line-strong: rgb(15 76 122 / 0.4);
+  --lupios-code: #0f4c7a;
+  --lupios-focus: #8a6416; /* ochre dark enough to see on white (5:1) */
+  --lupios-selection-bg: #0f4c7a;
+  --lupios-selection-text: #f7fbfe;
 }
 
-.sl-markdown-content kbd {
-  padding: 0.1em 0.45em;
-  border: 1px solid var(--sl-color-gray-4);
-  border-bottom-width: 2px;
-  border-radius: 0.3em;
-  background: var(--sl-color-gray-6);
-  font-family: var(--sl-font);
-  font-size: 0.85em;
+::selection {
+  background: var(--lupios-selection-bg);
+  color: var(--lupios-selection-text);
+}
+:root {
+  scrollbar-color: var(--lupios-line-strong) var(--sl-color-black);
+  caret-color: var(--sl-color-text-accent);
+}
+:focus-visible {
+  outline: 2px solid var(--lupios-focus);
+  outline-offset: 3px;
 }
 
 /* Headings tight like the logo's lettering */
@@ -48,6 +79,64 @@
 h1#_top {
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+
+/* Commands are ink, not boxes: frost mono (deep blue in the light theme) */
+.sl-markdown-content code:not(:where(.not-content *)) {
+  padding: 0;
+  color: var(--lupios-code);
+}
+.sl-markdown-content kbd {
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--lupios-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 2px;
+  font-family: var(--sl-font);
+  font-size: 0.85em;
+}
+
+/* Tables: small bold heads in the muted ink, like the field guide's */
+.sl-markdown-content thead th:not(:where(.not-content *)) {
+  color: var(--sl-color-gray-3);
+  font-size: 0.88em;
+  font-weight: 700;
+}
+
+.sl-markdown-content blockquote:not(:where(.not-content *)) {
+  border-inline-start-color: var(--lupios-line-strong);
+}
+
+/* The current page in the sidebar: bold accent ink and a hairline beside it, not a filled box */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  background: none;
+  color: var(--sl-color-text-accent);
+  font-weight: 700;
+  box-shadow: inset 1px 0 0 var(--sl-color-text-accent);
+  border-radius: 0;
+}
+
+/* Search and previous/next: hairline outlines, square corners, no shadow */
+@media (min-width: 50rem) {
+  site-search button[data-open-modal] {
+    border-color: var(--sl-color-hairline-light);
+    border-radius: 2px;
+    background: transparent;
+  }
+}
+.pagination-links a {
+  border-color: var(--sl-color-hairline-light);
+  border-radius: 2px;
+  box-shadow: none;
+}
+.pagination-links a:hover {
+  border-color: var(--sl-color-text-accent);
 }
 
 /* From page to page: a quick crossfade (the home and download pages opt in too, in guide.css), with

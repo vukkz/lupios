@@ -133,6 +133,7 @@
 
 /* ---- Masthead ------------------------------------------------------------------------ */
 .masthead {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -147,19 +148,74 @@
   height: 2.25rem;
   width: auto;
 }
-.masthead nav {
+.masthead .main-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1.5rem;
   margin-left: auto;
 }
-.masthead nav a {
+.masthead .main-nav a {
   color: var(--guide-dim);
   font: 400 1rem var(--f-body);
   text-decoration: none;
 }
-.masthead nav a:hover {
+.masthead .main-nav a:hover {
   color: var(--guide-frost);
+}
+/* on the download page itself, Download is where you are: ink, not a button to press again */
+.guide .masthead .button[aria-current="page"],
+.guide .masthead .button[aria-current="page"]:hover {
+  padding-inline: 0;
+  background: none;
+  color: var(--guide-ice);
+}
+/* narrow screens: the nav folds into a Menu toggle that opens a ruled list under the masthead */
+.menu {
+  display: none;
+}
+.menu summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  color: var(--guide-ink);
+  font: 700 1rem/1.2 var(--f-body);
+  list-style: none;
+  cursor: pointer;
+}
+.menu summary:hover {
+  color: var(--guide-frost);
+}
+.menu summary::-webkit-details-marker {
+  display: none;
+}
+.menu .close-label,
+.menu[open] .open-label {
+  display: none;
+}
+.menu[open] .close-label {
+  display: inline;
+}
+.menu nav {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: grid;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--guide-line);
+  background: var(--guide-night);
+}
+.menu nav a {
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--guide-line);
+  color: var(--guide-ink);
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+.menu nav a:first-child {
+  border-top: 0;
 }
 
 /* ---- The specimen page: the home page's first viewport ---------------------------------- */
@@ -167,8 +223,8 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
-  gap: clamp(2rem, 4vw, 4.5rem);
-  align-items: start;
+  gap: clamp(2.5rem, 4vw, 3.5rem) clamp(2rem, 4vw, 4.5rem);
+  align-items: center;
   width: var(--measure);
   margin: 0 auto;
   padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(6.5rem, 12vw, 10.5rem);
@@ -237,9 +293,20 @@
   margin-top: 0.75rem !important;
 }
 
-/* The plate: the real desktop, the panel enlarged beside it, numbered field marks */
+/* The plate: the real desktop (2560x1600 at 200%, so its panel is large and sharp), numbered field
+   marks beside the panel; phones get the panel enlarged under it */
 .plate {
   margin: 0;
+}
+/* the proof gets the room: the screenshot runs from its column out to the window's right edge (the
+   legend stays in the column). The measure is written out here: inside the grid, 100% is the column. */
+@media (min-width: 56rem) {
+  .specimen-page {
+    --bleed: calc((100vw - min(78rem, 100vw - 2 * var(--gutter))) / 2);
+  }
+  .specimen-page .plate-main {
+    margin-right: calc(-1 * var(--bleed));
+  }
 }
 .plate-main,
 .plate-photo {
@@ -251,33 +318,15 @@
   height: auto;
   border: 1px solid var(--guide-line);
 }
-.plate-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-.plate-lines * {
-  fill: none;
-  stroke: var(--guide-ice);
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
-}
-/* the enlargement overlaps the plate's lower left, like a field guide's detail inset */
+/* the enlargement is for phones only: on wider screens the panel in the picture reads by itself */
 .plate-inset {
-  position: absolute;
-  left: -5%;
-  top: 46%;
-  width: 34%;
+  display: none;
 }
 .plate-inset > img {
   display: block;
   width: 100%;
   height: auto;
   border: 1px solid var(--guide-line-strong);
-  box-shadow: 0 1.5rem 2.5rem -0.75rem rgb(2 6 14 / 0.75);
 }
 .marks {
   margin: 0;
@@ -286,6 +335,7 @@
 }
 .marks li,
 .legend li::before,
+.field-marks li::before,
 .steps > li::before {
   display: grid;
   place-items: center;
@@ -313,10 +363,60 @@
   border-top: 1.5px solid var(--guide-ice);
   transform-origin: right center;
 }
-/* room for the inset hanging below the plate */
+/* on the picture: the numbers stand in the gap between the terminal and the panel (which starts at
+   65% of the picture), each with its tick pointing right, at its row */
+.marks.on-photo li {
+  left: auto;
+  right: calc(35% + 0.55rem);
+  width: 1.7rem;
+  height: 1.7rem;
+  font-size: 0.85rem;
+}
+.marks.on-photo li::before {
+  right: auto;
+  left: 100%;
+  width: 0.55rem;
+  transform-origin: left center;
+}
 .plate figcaption {
-  padding-top: calc(7% + 1.75rem);
-  padding-left: 33%;
+  padding-top: 1rem;
+}
+/* What the numbers point at: one ruled row across the page, a label and a line each */
+.legend + .credit {
+  margin-top: 0.9rem;
+}
+.field-marks {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.5rem 1.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: mark;
+}
+.field-marks li {
+  display: grid;
+  grid-template-columns: 1.85rem minmax(0, 1fr);
+  align-content: start;
+  gap: 0.3rem 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--guide-line-strong);
+  counter-increment: mark;
+}
+.field-marks li::before {
+  content: counter(mark);
+  grid-row: span 2;
+}
+.field-marks b {
+  color: var(--guide-frost);
+  font: 700 1.05rem/1.3 var(--f-display);
+  letter-spacing: -0.01em;
+}
+.field-marks span {
+  color: var(--guide-dim);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 .legend {
   display: grid;
@@ -349,7 +449,7 @@
   font-weight: 700;
 }
 .credit {
-  margin-top: 0.9rem !important;
+  margin-top: 0;
   color: var(--guide-dim);
   font-size: 0.92rem;
   font-style: italic;
@@ -381,6 +481,9 @@ main > section:not(.specimen-page, .page-head) {
 :is(.specimen-page, .page-head) + section {
   margin-top: clamp(2.5rem, 5vw, 4rem) !important;
 }
+.page-head + section {
+  margin-top: clamp(1.75rem, 3.5vw, 2.75rem) !important;
+}
 /* the hairline above each account (drawn in as it comes into view, see Motion) */
 main > section:not(.specimen-page, .page-head)::before {
   content: "";
@@ -401,6 +504,13 @@ main > section:not(.specimen-page, .page-head)::before {
   font-size: clamp(2.25rem, 4.4vw, 3.4rem);
   line-height: 1.02;
   letter-spacing: -0.035em;
+}
+.section-head h2 .plain {
+  margin-left: 0.35em;
+  color: var(--guide-dim);
+  font: 400 1.125rem/1.3 var(--f-body);
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 .section-head p {
   max-width: 54ch;
@@ -738,10 +848,9 @@ main > section:not(.specimen-page, .page-head)::before {
 /* Get LupiOS: the three installers, each name leading to its place in the download page's key */
 .isos dt a {
   color: var(--guide-frost);
-  text-decoration: none;
+  text-decoration-color: var(--guide-line-strong);
 }
 .isos dt a:hover {
-  text-decoration: underline;
   text-decoration-color: var(--guide-ice);
 }
 .isos dd.size {
@@ -753,13 +862,11 @@ main > section:not(.specimen-page, .page-head)::before {
 
 /* ---- The download page ------------------------------------------------------------------- */
 .page-head {
-  position: relative;
   display: grid;
-  gap: 1.1rem;
+  gap: 1rem;
   width: var(--measure);
   margin: 0 auto;
-  padding: clamp(2.5rem, 6vh, 4.5rem) 0 clamp(6.5rem, 12vw, 10rem);
-  isolation: isolate;
+  padding: clamp(2rem, 5vh, 3.5rem) 0 0;
 }
 .page-head h1 {
   font-size: clamp(3rem, 6.5vw, 5rem);
@@ -779,6 +886,13 @@ main > section:not(.specimen-page, .page-head)::before {
 .guide .which .key {
   margin-top: 0;
 }
+/* the key's own top rule opens this account: no second hairline above it */
+main > section.which {
+  padding-top: 0;
+}
+main > section.which::before {
+  display: none;
+}
 /* the explanation on the left, the commands on the right */
 main > section.pair {
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -790,6 +904,16 @@ main > section.pair {
 }
 .pair .section-head p {
   font-size: 1.0625rem;
+}
+.switch.gpu label {
+  font-size: 0.88rem;
+}
+.switch.gpu label b {
+  font-size: 1.05rem;
+}
+.rebase:has(#gpu-lupios:checked) .for-nvidia,
+.rebase:has(#gpu-nvidia:checked) .for-lupios {
+  display: none;
 }
 .steps {
   display: grid;
@@ -839,6 +963,7 @@ main > section.pair {
   margin: 0;
   padding: 0.85rem 1rem;
   overflow-x: auto;
+  mask-image: linear-gradient(to left, transparent, #000 1.25rem);
   color: var(--guide-frost);
   font: 400 0.9rem/1.65 var(--f-code);
 }
@@ -866,14 +991,30 @@ main > section.pair {
 
 /* ---- Colophon ------------------------------------------------------------------------ */
 .colophon {
+  --ridge-h: clamp(5rem, 10vw, 8.5rem);
+  position: relative;
   display: grid;
   gap: 1.25rem;
   width: var(--measure);
-  margin: clamp(5rem, 9vw, 7.5rem) auto 0;
-  padding: 2rem 0 3rem;
-  border-top: 1px solid var(--guide-line);
+  margin: clamp(4rem, 7vw, 6rem) auto 0;
+  padding: calc(var(--ridge-h) + 2rem) 0 3rem;
   color: var(--guide-dim);
   font-size: 1rem;
+  isolation: isolate;
+}
+.colophon .ridge {
+  top: 0;
+  bottom: auto;
+  height: var(--ridge-h);
+}
+.colophon::before {
+  content: "";
+  position: absolute;
+  top: var(--ridge-h);
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--guide-line);
 }
 .colophon .basis {
   max-width: 70ch;
@@ -892,18 +1033,12 @@ main > section.pair {
 }
 
 /* ---- Motion: ink being drawn ------------------------------------------------------------- */
-/* On load, the first viewport draws itself: the ridge from left to right, the plate's leader lines
-   from the panel, then the field marks land. Further down, each account rules its lines in as it
+/* On load, the first viewport's field marks land beside the panel one after another; the ridges draw
+   from left to right when they come into view. Further down, each account rules its lines in as it
    comes into view (GuideLayout.astro adds .drawn): the hairline above it, its table rows one after
    another, its entry rules, and the Den's marks. Only lines and marks start hidden, never text, and
    only when the page set .motion (motion wanted, and the browser can watch the scrolling). */
 @media (prefers-reduced-motion: no-preference) {
-  .ridge {
-    animation: rule-in 1.8s var(--ease) 0.1s backwards;
-  }
-  .plate-lines {
-    animation: draw 1.1s var(--ease) 0.25s backwards;
-  }
   .plate .marks li {
     animation: land 0.6s var(--ease) backwards;
   }
@@ -912,22 +1047,6 @@ main > section.pair {
   .plate .marks li:nth-child(3) { animation-delay: 1.06s; }
   .plate .marks li:nth-child(4) { animation-delay: 1.14s; }
   .plate .marks li:nth-child(5) { animation-delay: 1.22s; }
-}
-@keyframes rule-in {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@keyframes draw {
-  from {
-    clip-path: inset(0 0 0 100%);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
 }
 @keyframes land {
   from {
@@ -955,6 +1074,12 @@ main > section.pair {
 .motion [data-draw] tbody tr {
   transition: background-size 0.8s var(--ease) calc(min(var(--r, 0), 7) * 0.07s + 0.3s);
 }
+.motion .ridge[data-draw] {
+  transition: clip-path 1.8s var(--ease) 0.1s;
+}
+.motion .ridge[data-draw]:not(.drawn) {
+  clip-path: inset(0 100% 0 0);
+}
 .motion [data-draw] .marks li {
   transition:
     opacity 0.5s var(--ease) calc(var(--m, 0) * 0.09s + 0.45s),
@@ -973,7 +1098,18 @@ main > section.pair {
 }
 
 /* ---- Narrow screens ---------------------------------------------------------------------- */
+/* five entries break as three and two, then one column on phones */
 @media (max-width: 64rem) {
+  .field-marks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 40rem) {
+  .field-marks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 56rem) {
   .specimen-page {
     grid-template-columns: 1fr;
   }
@@ -982,10 +1118,11 @@ main > section.pair {
   }
 }
 @media (max-width: 52rem) {
-  .masthead nav {
+  .masthead .main-nav {
     display: none;
   }
-  .masthead .button {
+  .masthead .menu {
+    display: block;
     margin-left: auto;
   }
   /* side by side becomes one after the other */
@@ -1002,15 +1139,14 @@ main > section.pair {
     grid-column: auto;
     grid-row: auto;
   }
-  /* the enlargement leaves the plate and sits under it */
-  .plate-lines line {
+  /* the desktop is too small to read here: its numbers go, and the panel comes enlarged under it,
+     narrower than the screen so its numbers stay outside it and cover nothing */
+  .marks.on-photo {
     display: none;
   }
-  /* narrower than the screen, so the numbers stay outside it and cover nothing */
   .plate-inset {
+    display: block;
     position: relative;
-    left: auto;
-    top: auto;
     width: min(100% - 2.9rem, 26rem);
     margin-top: 1.25rem;
   }
@@ -1067,6 +1203,41 @@ main > section.pair {
   }
   .levels tbody th {
     width: auto;
+  }
+}
+/* fingers: every control at least 44px tall, the quiet links and Copy given room to hit */
+@media (pointer: coarse) {
+  .guide .button {
+    min-height: 2.75rem;
+  }
+  .guide .actions .quiet {
+    display: inline-block;
+    padding-block: 0.6rem;
+  }
+  .cmd .copy {
+    min-height: 2.75rem;
+    margin: 0;
+    padding-inline: 0.75rem;
+  }
+}
+/* the smallest phones (320px): logo, Menu and Download still fit on one line */
+@media (max-width: 22.5rem) {
+  .masthead {
+    gap: 0.5rem;
+  }
+  .masthead .home img {
+    height: 1.9rem;
+  }
+  .guide .masthead .button {
+    padding-inline: 0.8rem;
+  }
+}
+/* phones: the plain words go under the heading, as a subtitle */
+@media (max-width: 40rem) {
+  .section-head h2 .plain {
+    display: block;
+    margin: 0.4rem 0 0;
+    white-space: normal;
   }
 }
 @media (prefers-reduced-motion: reduce) {

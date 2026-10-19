@@ -1,49 +1,82 @@
 ---
 // The download page (https://lupios.org/download/), in the home page's field-guide look: the key that
-// tells you which ISO is yours, what you need, checking the download, and switching from Fedora Atomic.
-// The ISO list and sizes live in src/downloads.ts.
+// tells you which ISO is yours, checking the download, what you need, and switching from Fedora
+// Atomic. The ISO list and sizes live in src/downloads.ts.
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import GuideLayout from "../layouts/GuideLayout.astro";
 import IdentificationKey from "../components/IdentificationKey.astro";
 import Command from "../components/Command.astro";
-import ridge from "../assets/guide-ridge.svg";
 
 const repo = "https://github.com/vukkz/lupios";
 const title = "Download LupiOS";
 const description =
   "Get the LupiOS installer for your PC, check it, or switch an existing Fedora Atomic install.";
+
+// The Fedora version LupiOS is built on: written down only in the recipe (the build runs in website/)
+let fedora: string | undefined;
+try {
+  fedora = readFileSync(resolve("../recipes/recipe.yml"), "utf8").match(/^image-version:\s*(\d+)/m)?.[1];
+} catch {
+  fedora = undefined;
+}
+
+// Switching from Fedora Atomic: the same two steps for both images, NVIDIA's only for cards its open driver supports
+const images = [
+  { id: "lupios", image: "lupios" },
+  { id: "nvidia", image: "lupios-nvidia" },
+];
 ---
 
 <GuideLayout title={title} description={description} path="/download/">
   <section class="page-head" aria-labelledby="title">
     <h1 id="title">Download LupiOS</h1>
     <p class="lede">
-      All three installers put the same LupiOS on your PC. Answer two questions to find yours, write it to
-      a USB stick, and follow the <a href="/install/">install guide</a>: about 30 minutes.
+      All three installers put the same LupiOS on your PC. Answer two questions to find yours, check the
+      download, and follow the <a href="/install/">install guide</a>: about 30 minutes.
     </p>
-    <img class="ridge" src={ridge.src} alt="" width="2400" height="260" />
   </section>
 
   <section class="which" aria-labelledby="which" data-draw>
-    <div class="section-head">
-      <h2 id="which">Which one is yours?</h2>
-      <p>Follow the line that fits.</p>
-    </div>
+    <!-- the page's title and lede already say it: the key starts right away, so its buttons come up sooner -->
+    <h2 id="which" class="visually-hidden">Which one is yours?</h2>
     <div class="section-body">
       <IdentificationKey />
       <div class="notes">
         <p>
           <b>Only the graphics driver differs.</b> The NVIDIA installer is for an NVIDIA GeForce GTX 16xx, RTX
           20xx or newer. Older NVIDIA cards (GTX 10xx and before) use the regular one, because NVIDIA's open
-          driver doesn't support them. On Windows, Task Manager, then Performance, then GPU tells you which
-          card you have.
+          driver doesn't support them.
         </p>
         <p>
           <b>LupiOS Online</b> is just the installer. During setup it picks the right version for your
           graphics card and downloads it (about 3.5 GB, checked against LupiOS's signature), so it needs
           internet while installing: a cable, or Wi-Fi under <b>Network &amp; Host Name</b>. A Wi-Fi network
-          with a login page, like at hotels, won't work.
+          with a login page, like at hotels, won't work. The progress bar stands still while it downloads:
+          that's normal, let it finish.
+        </p>
+        <p>
+          <b>Where the files come from.</b> The buttons download from SourceForge, which mirrors LupiOS around
+          the world for free (the files are too big for GitHub). Its page waits a few seconds, then starts the
+          download.
         </p>
       </div>
+    </div>
+  </section>
+
+  <section class="pair" aria-labelledby="check-the-download" data-draw>
+    <div class="section-head">
+      <h2 id="check-the-download">Check the download</h2>
+      <p>
+        Every ISO has a <code>-CHECKSUM</code> file next to it on SourceForge. Run the line for your system
+        and compare the long number it prints with the one in that file.
+      </p>
+      <p>If they don't match, the file got damaged on the way: delete it and download it again.</p>
+    </div>
+    <div class="section-body">
+      <Command label="Windows PowerShell" code="Get-FileHash $HOME\Downloads\lupios*.iso -Algorithm SHA256" />
+      <Command label="Linux" code="sha256sum ~/Downloads/lupios*.iso" />
+      <Command label="Mac" code="shasum -a 256 ~/Downloads/lupios*.iso" />
     </div>
   </section>
 
@@ -74,40 +107,42 @@ const description =
     </div>
   </section>
 
-  <section class="pair" aria-labelledby="check-the-download" data-draw>
-    <div class="section-head">
-      <h2 id="check-the-download">Check the download</h2>
-      <p>
-        Every ISO comes with a <code>-CHECKSUM</code> file. To make sure your download isn't damaged, run one
-        of these and compare the result with the number in that file.
-      </p>
-    </div>
-    <div class="section-body">
-      <Command label="Windows PowerShell" code="Get-FileHash .\lupios.iso -Algorithm SHA256" />
-      <Command label="Linux" code="sha256sum lupios.iso" />
-      <Command label="Mac" code="shasum -a 256 lupios.iso" />
-    </div>
-  </section>
-
-  <section class="pair" aria-labelledby="already-on-fedora-atomic" data-draw>
+  <section class="pair rebase" aria-labelledby="already-on-fedora-atomic" data-draw>
     <div class="section-head">
       <h2 id="already-on-fedora-atomic">Already on Fedora Atomic?</h2>
       <p>
         If you run Fedora Silverblue, Kinoite or another Fedora Atomic desktop, you can switch it to LupiOS
-        without reinstalling. Use <code>lupios-nvidia</code> instead of <code>lupios</code> if you have an NVIDIA
-        card.
+        without reinstalling. Pick your graphics card, then run the two steps.
       </p>
-      <p>Your Fedora version stays the one LupiOS is built on, so you're never upgraded to the next one by surprise.</p>
+      <p>
+        Your Fedora version stays the one LupiOS is built on{fedora && ` (now Fedora ${fedora})`}, so you're
+        never upgraded to the next one by surprise.
+      </p>
     </div>
     <div class="section-body">
+      <fieldset class="switch gpu">
+        <legend class="visually-hidden">Your graphics card</legend>
+        <input type="radio" name="gpu" id="gpu-lupios" checked />
+        <label for="gpu-lupios"><b>AMD or Intel</b> or NVIDIA GTX 10xx and older</label>
+        <input type="radio" name="gpu" id="gpu-nvidia" />
+        <label for="gpu-nvidia"><b>NVIDIA</b> GTX 16xx, RTX 20xx or newer</label>
+      </fieldset>
       <ol class="steps">
         <li>
           <p>Switch to the unsigned image first. That installs LupiOS's signing key and policy:</p>
-          <Command code={"rpm-ostree rebase ostree-unverified-registry:ghcr.io/vukkz/lupios:latest\nsystemctl reboot"} />
+          {images.map((i) => (
+            <div class={`for-${i.id}`}>
+              <Command code={`rpm-ostree rebase ostree-unverified-registry:ghcr.io/vukkz/${i.image}:latest\nsystemctl reboot`} />
+            </div>
+          ))}
         </li>
         <li>
           <p>Then switch to the signed image. From now on, your PC only accepts updates signed with the LupiOS key:</p>
-          <Command code={"rpm-ostree rebase ostree-image-signed:docker://ghcr.io/vukkz/lupios:latest\nsystemctl reboot"} />
+          {images.map((i) => (
+            <div class={`for-${i.id}`}>
+              <Command code={`rpm-ostree rebase ostree-image-signed:docker://ghcr.io/vukkz/${i.image}:latest\nsystemctl reboot`} />
+            </div>
+          ))}
         </li>
       </ol>
     </div>
@@ -115,14 +150,16 @@ const description =
 
   <section class="pair" aria-labelledby="check-the-signature-yourself" data-draw>
     <div class="section-head">
-      <h2 id="check-the-signature-yourself">Check the signature yourself</h2>
+      <h2 id="check-the-signature-yourself">Check the system image's signature</h2>
       <p>
-        Every LupiOS image is signed with <a href="https://github.com/sigstore/cosign">cosign</a>.
+        This checks the system image your PC installs and updates from, not the ISO file. Every LupiOS image
+        is signed with <a href="https://github.com/sigstore/cosign">cosign</a>.
         With <a href={`${repo}/blob/main/cosign.pub`}><code>cosign.pub</code></a> from the repository:
       </p>
     </div>
     <div class="section-body">
       <Command code="cosign verify --key cosign.pub ghcr.io/vukkz/lupios" />
+      <Command code="cosign verify --key cosign.pub ghcr.io/vukkz/lupios-nvidia" />
     </div>
   </section>
 </GuideLayout>
