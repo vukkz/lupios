@@ -26,7 +26,8 @@ THESIS: LupiOS as a species in a night field guide: field marks on the real desk
 temperaments, similar species, and a key to your ISO. Refuses the gradient hero over an icon-card grid.
 
 OWN-WORLD: Total navy plate pages, ice-blue hairlines and numbered leader-line callouts, frost
-Alegreya names with italic Latin, Alegreya Sans SC labels, one ochre status tag. No cards, no glow.
+names in Arimo (the logo's Helvetica letter shapes) with italic Latin, bold labels, one ochre status
+tag. No cards, no glow.
 
 STORY: A distro hopper sees what LupiOS is, believes it from the annotated desktop and honest
 comparisons, keys out the right ISO and downloads it.
@@ -38,3 +39,13 @@ linework along the foot.
 FORM: Night field guide, seventh on my ordered list, seed cfb0dc7b.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Refinement, 2026-10-19 (owner)
+
+The type didn't match the logo (Alegreya next to a Helvetica wordmark), the 4fr/8fr accounts left the
+heading column empty, Download jumped to the foot of the page, and nothing moved but the first viewport.
+Chosen: Arimo throughout (over Inter Tight and Geist), the heading and intro on top with the account
+across the full width and side notes beside what they explain, the key on its own page
+(`src/pages/download.astro`, same world, framed with the home page by `src/layouts/GuideLayout.astro`),
+and "ink being drawn": lines rule themselves in as accounts come into view, smooth in-page scrolling,
+crossfades between pages. DESIGN.md records the result.

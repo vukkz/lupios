@@ -2,7 +2,8 @@
    night #0B1220, trench #0A2F4F, abyss #0F4C7A, deep #1D7FC0, accent #33B5F0, ice #8BE0FF, frost #CFF3FF */
 
 :root {
-  --sl-font: "Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; /* KDE's font first */
+  /* Arimo: the Helvetica letter shapes the logo is set in, as on the home and download pages */
+  --sl-font: "Arimo", "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
 
   --sl-color-accent-low: #0a2f4f;
   --sl-color-accent: #33b5f0;
@@ -40,4 +41,22 @@
   background: var(--sl-color-gray-6);
   font-family: var(--sl-font);
   font-size: 0.85em;
+}
+
+/* Headings tight like the logo's lettering */
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* From page to page: a quick crossfade (the home and download pages opt in too, in guide.css), with
+   the header kept still between docs pages */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  header.header {
+    view-transition-name: docs-header;
+  }
 }

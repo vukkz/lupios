@@ -1,7 +1,7 @@
 ---
 // Which ISO is yours, as a field guide's identification key: pick the line that fits, follow it to
 // the next couplet or to your LupiOS. Plain links (no script), so it works everywhere. Used on the
-// home page and the download page; the ISO list and sizes live in src/downloads.ts.
+// download page (src/pages/download.astro); the ISO list and sizes live in src/downloads.ts.
 import { Icon } from "@astrojs/starlight/components";
 import { downloads, isos, fileUrl } from "../downloads";
 
@@ -71,8 +71,8 @@ const specimens = [
 </div>
 
 <style>
-  /* Colours come from the page around it: the home page sets --guide-*, the docs pages fall back to
-     Starlight's own theme (light or dark). */
+  /* Colours come from the page around it: the field-guide pages set --guide-*; anywhere else it
+     falls back to Starlight's own theme (light or dark). */
   .key {
     --k-ink: var(--guide-ink, var(--sl-color-white));
     --k-dim: var(--guide-dim, var(--sl-color-gray-2));
@@ -123,12 +123,22 @@ const specimens = [
     flex: 0 1 auto;
     max-width: 52ch;
   }
-  /* the dotted leader of a printed key, from the description to where it leads */
+  /* the dotted leader of a printed key, from the description to where it leads. Pointing at a line
+     runs the dots out to its answer in the accent. */
   .lead .dots {
+    position: relative;
     flex: 1 1 2rem;
     min-width: 2rem;
     border-bottom: 2px dotted color-mix(in srgb, var(--k-dim) 55%, transparent);
     transform: translateY(-0.3em);
+  }
+  .lead .dots::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -2px 0;
+    border-bottom: 2px dotted var(--k-accent);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .lead .to {
     flex: none;
@@ -142,8 +152,13 @@ const specimens = [
     text-decoration-color: var(--k-accent);
     text-underline-offset: 0.2em;
   }
-  .lead:hover .dots {
-    border-bottom-color: var(--k-accent);
+  .lead:is(:hover, :focus-visible) .dots::after {
+    clip-path: inset(0 0 0 0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lead .dots::after {
+      transition: none;
+    }
   }
 
   .specimens {

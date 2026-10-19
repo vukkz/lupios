@@ -1,0 +1,128 @@
+---
+// The download page (https://lupios.org/download/), in the home page's field-guide look: the key that
+// tells you which ISO is yours, what you need, checking the download, and switching from Fedora Atomic.
+// The ISO list and sizes live in src/downloads.ts.
+import GuideLayout from "../layouts/GuideLayout.astro";
+import IdentificationKey from "../components/IdentificationKey.astro";
+import Command from "../components/Command.astro";
+import ridge from "../assets/guide-ridge.svg";
+
+const repo = "https://github.com/vukkz/lupios";
+const title = "Download LupiOS";
+const description =
+  "Get the LupiOS installer for your PC, check it, or switch an existing Fedora Atomic install.";
+---
+
+<GuideLayout title={title} description={description} path="/download/">
+  <section class="page-head" aria-labelledby="title">
+    <h1 id="title">Download LupiOS</h1>
+    <p class="lede">
+      All three installers put the same LupiOS on your PC. Answer two questions to find yours, write it to
+      a USB stick, and follow the <a href="/install/">install guide</a>: about 30 minutes.
+    </p>
+    <img class="ridge" src={ridge.src} alt="" width="2400" height="260" />
+  </section>
+
+  <section class="which" aria-labelledby="which" data-draw>
+    <div class="section-head">
+      <h2 id="which">Which one is yours?</h2>
+      <p>Follow the line that fits.</p>
+    </div>
+    <div class="section-body">
+      <IdentificationKey />
+      <div class="notes">
+        <p>
+          <b>Only the graphics driver differs.</b> The NVIDIA installer is for an NVIDIA GeForce GTX 16xx, RTX
+          20xx or newer. Older NVIDIA cards (GTX 10xx and before) use the regular one, because NVIDIA's open
+          driver doesn't support them. On Windows, Task Manager, then Performance, then GPU tells you which
+          card you have.
+        </p>
+        <p>
+          <b>LupiOS Online</b> is just the installer. During setup it picks the right version for your
+          graphics card and downloads it (about 3.5 GB, checked against LupiOS's signature), so it needs
+          internet while installing: a cable, or Wi-Fi under <b>Network &amp; Host Name</b>. A Wi-Fi network
+          with a login page, like at hotels, won't work.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="need" aria-labelledby="what-you-need" data-draw>
+    <div class="section-head">
+      <h2 id="what-you-need">What you need</h2>
+      <p>Check these before you start.</p>
+    </div>
+    <div class="section-body">
+      <dl class="habits">
+        <div>
+          <dt>A USB stick of 8 GB or more</dt>
+          <dd>2 GB is enough for LupiOS Online. Everything on the stick gets erased.</dd>
+        </div>
+        <div>
+          <dt>A 64-bit PC with 8 GB of RAM</dt>
+          <dd>And an SSD with 64 GB or more for LupiOS.</dd>
+        </div>
+        <div>
+          <dt>Internet during setup</dt>
+          <dd>Some apps download on the first boot.</dd>
+        </div>
+      </dl>
+      <p class="actions">
+        <a class="button" href="/install/">Next: install it</a>
+        <a class="quiet" href="/dual-boot/">Keeping Windows next to it</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="pair" aria-labelledby="check-the-download" data-draw>
+    <div class="section-head">
+      <h2 id="check-the-download">Check the download</h2>
+      <p>
+        Every ISO comes with a <code>-CHECKSUM</code> file. To make sure your download isn't damaged, run one
+        of these and compare the result with the number in that file.
+      </p>
+    </div>
+    <div class="section-body">
+      <Command label="Windows PowerShell" code="Get-FileHash .\lupios.iso -Algorithm SHA256" />
+      <Command label="Linux" code="sha256sum lupios.iso" />
+      <Command label="Mac" code="shasum -a 256 lupios.iso" />
+    </div>
+  </section>
+
+  <section class="pair" aria-labelledby="already-on-fedora-atomic" data-draw>
+    <div class="section-head">
+      <h2 id="already-on-fedora-atomic">Already on Fedora Atomic?</h2>
+      <p>
+        If you run Fedora Silverblue, Kinoite or another Fedora Atomic desktop, you can switch it to LupiOS
+        without reinstalling. Use <code>lupios-nvidia</code> instead of <code>lupios</code> if you have an NVIDIA
+        card.
+      </p>
+      <p>Your Fedora version stays the one LupiOS is built on, so you're never upgraded to the next one by surprise.</p>
+    </div>
+    <div class="section-body">
+      <ol class="steps">
+        <li>
+          <p>Switch to the unsigned image first. That installs LupiOS's signing key and policy:</p>
+          <Command code={"rpm-ostree rebase ostree-unverified-registry:ghcr.io/vukkz/lupios:latest\nsystemctl reboot"} />
+        </li>
+        <li>
+          <p>Then switch to the signed image. From now on, your PC only accepts updates signed with the LupiOS key:</p>
+          <Command code={"rpm-ostree rebase ostree-image-signed:docker://ghcr.io/vukkz/lupios:latest\nsystemctl reboot"} />
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="pair" aria-labelledby="check-the-signature-yourself" data-draw>
+    <div class="section-head">
+      <h2 id="check-the-signature-yourself">Check the signature yourself</h2>
+      <p>
+        Every LupiOS image is signed with <a href="https://github.com/sigstore/cosign">cosign</a>.
+        With <a href={`${repo}/blob/main/cosign.pub`}><code>cosign.pub</code></a> from the repository:
+      </p>
+    </div>
+    <div class="section-body">
+      <Command code="cosign verify --key cosign.pub ghcr.io/vukkz/lupios" />
+    </div>
+  </section>
+</GuideLayout>

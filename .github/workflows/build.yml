@@ -8,6 +8,7 @@ on:
     paths-ignore: # don't rebuild if only documentation or the website has changed
       - "**.md"
       - "website/**"
+      - ".impeccable/**" # the website's design notes (DESIGN.md's sidecar, page briefs)
       - ".github/workflows/website.yml"
       - ".github/ISSUE_TEMPLATE/**"
       - "iso/**" # the installer's look and the online installer: build-iso.yml, not the image

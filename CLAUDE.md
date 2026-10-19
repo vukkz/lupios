@@ -52,12 +52,16 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   git-ignored), so those files stay the only originals. Download buttons: `src/downloads.ts` (`ready`).
   Preview: `npm run dev` in `website/` → http://localhost:4321/. The link preview picture (`og:image`) is
   `src/assets/og.svg` from art/generate.mjs, rendered to `public/og.png` at build (`scripts/og-image.mjs`).
-  The home page is its own Astro page, `src/pages/index.astro` + `src/styles/guide.css` (not Starlight): a
-  "night field guide" (2026-10-16, designed with the Impeccable skill). PRODUCT.md (audience, promise, early
-  release) and DESIGN.md (palette, type, named rules) at the repo root are its references; the page brief is
-  `.impeccable/surfaces/`. Fonts are self-hosted with @fontsource. `src/components/IdentificationKey.astro` (the
-  ISO key) is shared with the Starlight download page. Screenshots in `src/assets/screenshots/` carry their
-  origin in the PNG (`embed-prompt.mjs --read`).
+  The home page and the download page are their own Astro pages, `src/pages/index.astro` and `download.astro`
+  (framed by `src/layouts/GuideLayout.astro`, styled by `src/styles/guide.css`; not Starlight): a "night field
+  guide" (2026-10-16, refined 2026-10-19, designed with the Impeccable skill). PRODUCT.md (audience, promise, early
+  release) and DESIGN.md (palette, type, named rules, motion) at the repo root are its references; the page brief is
+  `.impeccable/surfaces/`. The type is Arimo everywhere, docs included (self-hosted with @fontsource): the logo's
+  wordmark is Helvetica, bold "Lupi" + regular "OS", and Arimo has the same letter shapes. The Starlight sidebar
+  links to /download/ (`link:`), since it isn't a docs page. `src/components/IdentificationKey.astro` is the ISO
+  key, `Command.astro` a command with a Copy button. Sections with `data-draw` rule their lines in when they
+  scroll into view (GuideLayout's script); only lines and marks start hidden, never text. Screenshots in
+  `src/assets/screenshots/` carry their origin in the PNG (`embed-prompt.mjs --read`).
 
 ## Conventions
 - LF line endings everywhere (`.gitattributes`); the repo is edited on Windows. New executables:
