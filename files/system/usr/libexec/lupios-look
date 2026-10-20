@@ -4,14 +4,25 @@
 set -u
 
 config=${XDG_CONFIG_HOME:-$HOME/.config}
-done_flag="$config/lupios/look-v1"
+# v2 (2026-10): the night look became paper and ink. Accounts made before still carry the night look's
+# defaults (a copy of the old colours, dark icons, the dark Plasma style), so v2 moves those once too.
+done_flag="$config/lupios/look-v2"
 [[ -e $done_flag ]] && exit 0
 
 # Read the user's own files only (not the system defaults), to see what they changed
 user_value() { kreadconfig6 --file "$config/$1" --group "$2" --key "$3" 2>/dev/null; }
 
+# "LupiOS" is the default: Plasma keeps a copy of a scheme's colours in kdeglobals, so it's applied
+# again to pick up the new ones. Anything else (LupiOS Dark included) was the user's choice.
 case $(user_value kdeglobals General ColorScheme) in
-    "" | BreezeLight | BreezeClassic | BreezeDark) plasma-apply-colorscheme LupiOS ;;
+    "" | BreezeLight | BreezeClassic | BreezeDark | LupiOS) plasma-apply-colorscheme LupiOS ;;
+esac
+# the night look's dark icons and Plasma style, where they're still at that old default
+if [[ $(user_value kdeglobals Icons Theme) == breeze-dark ]]; then
+    kwriteconfig6 --file kdeglobals --group Icons --key Theme --delete
+fi
+case $(user_value plasmarc Theme name) in
+    breeze-dark) plasma-apply-desktoptheme default >/dev/null ;;
 esac
 
 case $(user_value ksplashrc KSplash Theme) in

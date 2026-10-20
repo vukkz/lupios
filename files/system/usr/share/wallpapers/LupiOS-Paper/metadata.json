@@ -1,8 +1,8 @@
 {
     "KPlugin": {
         "Authors": [{ "Name": "LupiOS" }],
-        "Id": "LupiOS-Night",
+        "Id": "LupiOS-Paper",
         "License": "Apache-2.0",
-        "Name": "LupiOS Night"
+        "Name": "LupiOS Paper"
     }
 }

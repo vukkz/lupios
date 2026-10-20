@@ -44,7 +44,8 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - `art/generate.mjs`: all artwork (SVGs, fastfetch logo, installer art, website art, `art/preview.html`). The
   `check` workflow fails if its output isn't committed, so run `node art/generate.mjs` after editing it.
   The logo is the owner's design (2026-10-06), traced to outlines in `art/logo/lupios-{mark,wordmark}.svg`:
-  one black path of straight segments each, drawn in ice blue (dark backgrounds) or deep blue (light).
+  one black path of straight segments each. The OS draws it in ink (paper) or bone (dark); the website still
+  uses the night palette (`NIGHT` in generate.mjs) until it moves to the new look too.
   `lupios-logo-small.svg` thickens the lines for 16–32 px icons. The terminal logo is the mark in Braille
   dots (needs `dejavu-sans-mono-fonts`). The owner's file is a Figma export with JPEGs inside, not vectors.
 - `website/`: the site (Astro Starlight), published by `website.yml` from `main` to https://lupios.org (GitHub Pages custom domain: DNS at Cloudflare, records DNS-only, HTTPS enforced; vukkz.github.io/lupios redirects there).
@@ -88,7 +89,9 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
   pushes the previous OS version out of the rollback slot.
 - Fedora KDE: `XDG_CONFIG_DIRS=/etc/xdg:/usr/share/kde-settings/kde-profile/default/xdg`, so our defaults
   go in `/etc/xdg`. The app-menu icon is `start-here` (look.sh swaps it and deletes the sized PNGs).
-  The default wallpaper is `/usr/share/wallpapers/Fedora` (symlinked to ours).
+  The default wallpaper is `/usr/share/wallpapers/Fedora` (symlinked to ours, LupiOS-Paper). A wallpaper package's
+  `contents/images_dark/` is shown instead of `images/` while the colour scheme is dark (Plasma 5.26+), so Paper
+  turns into Forest with "LupiOS Dark".
 - Plasma 6.6 Welcome Center: `Welcome.Page { heading; description }` and
   `Welcome.Controller.runCommand(cmd, (code, output) => …)`. Pages live in
   `/usr/share/plasma/plasma-welcome/extra-pages/NN-Name.qml`. `debrand.sh` removes `plasma-welcome-fedora`
@@ -292,6 +295,16 @@ and make sure they understand the *why* (see README.md, SECURITY.md, docs/instal
 - BlueBuild (recipe V1) copies its own CLI, cosign and nushell (~190 MB unpacked) into the image unless the
   recipe says `blue-build-tag: none`, `cosign-version: none`; nushell is still needed during the build (dnf
   and script@v2 modules run on it), so the last module deletes it with `script@v1` (plain shell).
+- The look moved from night (navy, ice blue) to **paper and ink** (2026-10-19, the owner's choice from two
+  concept boards; no brand colour at all): a naturalist's sketchbook, pencil branches and spruces drawn in code
+  (`branch`, `spruce`, `forest` in art/generate.mjs, seeded), the light "LupiOS" scheme as the default and
+  "LupiOS Dark" (the forest at dusk) beside it. The boot screen and the terminal stay dark: Fedora's
+  Plymouth password box and spinner are white assets made for dark, and hacking tools' colours assume a dark
+  terminal. Red, amber and green stay in the colour schemes for errors, warnings and success. `lupios-look`
+  v2 moves accounts still on the night defaults (it re-applies "LupiOS", whose colours Plasma copies into
+  kdeglobals). Still to confirm in the VM: that Plasma inks the start-here icon (`current-color-scheme`
+  stylesheet, `ColorScheme-Text`) bone on a dark panel, and that `org.fedoraproject.fedora.desktop` (the light
+  global theme) exists in Fedora 44. Phase 2: the website (guide.css, lupios.css, DESIGN.md, og image).
 - Ideas: a LupiOS control center in Rust (owner is learning Rust in C:\dev\kernel).
 - The terminal stays plain Konsole (the owner dropped the "Howl" rename on 2026-09-30: users pick and
   customise their own terminal). LupiOS only adds defaults to it: fastfetch and the prompt.

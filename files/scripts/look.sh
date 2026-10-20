@@ -23,19 +23,29 @@ mkdir -p /usr/share/pixmaps
 rsvg-convert -w 256 -h 256 "$art/lupios-logo.svg" -o /usr/share/pixmaps/lupios-logo.png # About page
 
 # --- Wallpapers (metadata.json for each comes from files/system) ----------------------
-for name in night lines emblem; do
-    dir="/usr/share/wallpapers/LupiOS-${name^}"
-    mkdir -p "$dir/contents/images"
+# Plasma shows a package's images_dark/ instead of images/ while the colour scheme is dark: Paper
+# (the default) turns into Forest with "LupiOS Dark". The pencil-wobble filter is slow to draw
+# (about a minute at 3840x2160), so Forest is drawn once and copied into Paper's dark side.
+render() { # <svg> <images dir>
+    mkdir -p "$2"
     for size in 3840x2160 2560x1440 1920x1080; do
-        rsvg-convert -w "${size%x*}" -h "${size#*x}" "$art/wallpaper-$name.svg" -o "$dir/contents/images/$size.png"
+        rsvg-convert -w "${size%x*}" -h "${size#*x}" "$1" -o "$2/$size.png"
     done
-    rsvg-convert -w 400 -h 225 "$art/wallpaper-$name.svg" -o "$dir/contents/screenshot.png"
+}
+wp=/usr/share/wallpapers
+render "$art/wallpaper-paper.svg" "$wp/LupiOS-Paper/contents/images"
+render "$art/wallpaper-forest.svg" "$wp/LupiOS-Forest/contents/images"
+cp -r "$wp/LupiOS-Forest/contents/images" "$wp/LupiOS-Paper/contents/images_dark"
+render "$art/wallpaper-emblem.svg" "$wp/LupiOS-Emblem/contents/images"
+render "$art/wallpaper-emblem-dark.svg" "$wp/LupiOS-Emblem/contents/images_dark"
+for name in paper forest emblem; do
+    rsvg-convert -w 400 -h 225 "$art/wallpaper-$name.svg" -o "$wp/LupiOS-${name^}/contents/screenshot.png"
 done
 # The desktop, login screen and lock screen all default to /usr/share/wallpapers/Fedora. "Default"
 # points at Fedora 44's own wallpaper (desktop-backgrounds-kde, which the desktop needs installed):
 # anything still asking for it gets ours too.
-ln -sfn LupiOS-Night /usr/share/wallpapers/Fedora
-ln -sfn LupiOS-Night /usr/share/wallpapers/Default
+ln -sfn LupiOS-Paper /usr/share/wallpapers/Fedora
+ln -sfn LupiOS-Paper /usr/share/wallpapers/Default
 
 # --- Boot screen (Plymouth). The initramfs module later bakes it into the boot image ----
 theme=/usr/share/plymouth/themes/lupios

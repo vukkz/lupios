@@ -4,12 +4,12 @@
   "logo": {
     "type": "file",
     "source": "/usr/share/lupios/fastfetch-logo.txt",
-    "color": { "1": "#8BE0FF" },
+    "color": { "1": "#E9E7E0" },
     "padding": { "top": 1, "right": 3 }
   },
   "display": {
     "separator": "  ",
-    "color": { "keys": "#33B5F0", "title": "#8BE0FF" }
+    "color": { "keys": "#959B97", "title": "#F4F2EC" }
   },
   "modules": [
     "title",

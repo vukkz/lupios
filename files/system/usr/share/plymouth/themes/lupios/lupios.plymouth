@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=LupiOS
-Description=LupiOS boot screen: the wolf emblem above the disk password box and a small spinner.
+Description=LupiOS boot screen: the wolf emblem in bone white on charcoal (the forest at dusk), above the disk password box and a small spinner.
 ModuleName=two-step
 
 [two-step]
@@ -17,10 +17,10 @@ WatermarkHorizontalAlignment=.5
 WatermarkVerticalAlignment=.38
 Transition=none
 TransitionDuration=0.0
-BackgroundStartColor=0x0e1726
-BackgroundEndColor=0x05080f
-ProgressBarBackgroundColor=0x1f2835
-ProgressBarForegroundColor=0x33b5f0
+BackgroundStartColor=0x171a18
+BackgroundEndColor=0x0e100f
+ProgressBarBackgroundColor=0x262b28
+ProgressBarForegroundColor=0xe9e7e0
 MessageBelowAnimation=true
 
 [boot-up]

@@ -912,7 +912,7 @@ ${B}Hacking lab${N}
 
 ${B}Terminal${N}
   ${C}lupi fastfetch${N} [on|off]          the wolf at the top of new terminals
-  ${C}lupi prompt${N} [on|off]             the icy terminal prompt
+  ${C}lupi prompt${N} [on|off]             the LupiOS terminal prompt
 
 Leave out the part in [brackets] to see the current state.
 Universal Blue's own extra commands: ${C}ujust${N}

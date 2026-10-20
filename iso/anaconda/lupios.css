@@ -2,15 +2,18 @@
  * lupios-look.tmpl copies this over every stylesheet in /usr/share/anaconda/pixmaps
  * and our PNGs over Fedora's, at the paths below. Same layout as Fedora's fedora.css. */
 
-@define-color lupios_night #0B1220;
+@define-color lupios_paper #F3F1EB;
+@define-color lupios_ink #191B1A;
+@define-color lupios_rule #D9D6CC;
 
 /* The sidebar: a background, then a logo on top */
 .logo-sidebar {
     background-image: url('/usr/share/anaconda/pixmaps/sidebar-bg.png');
-    background-color: @lupios_night;
+    background-color: @lupios_paper;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: 50% 100%;
+    border-right: 1px solid @lupios_rule;
 }
 
 .logo {
@@ -25,9 +28,9 @@
     background-color: transparent;
 }
 
-/* The bar at the top of each page */
+/* The bar at the top of each page: an ink band, so its white text stays readable */
 AnacondaSpokeWindow #nav-box {
-    background-color: @lupios_night;
+    background-color: @lupios_ink;
     background-image: url('/usr/share/anaconda/pixmaps/topbar-bg.png');
     background-repeat: no-repeat;
     background-size: cover;

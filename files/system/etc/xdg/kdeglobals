@@ -1,9 +1,11 @@
 # LupiOS defaults. These only apply until you change them in System Settings.
+# The paper look: the light LupiOS colour scheme, Breeze's light icons and Fedora's light global
+# theme. "LupiOS Dark" (the forest at dusk) is one click away under Colors.
 [General]
 ColorScheme=LupiOS
 
 [Icons]
-Theme=breeze-dark
+Theme=breeze
 
 [KDE]
-LookAndFeelPackage=org.fedoraproject.fedoradark.desktop
+LookAndFeelPackage=org.fedoraproject.fedora.desktop
